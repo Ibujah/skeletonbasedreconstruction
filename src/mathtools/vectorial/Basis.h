@@ -29,6 +29,9 @@ SOFTWARE.
  *  \author Bastien Durix
  */
 
+#include <boost/shared_ptr.hpp>
+#include <Eigen/Dense>
+
 /**
  *  \brief Mathematical tools
  */
@@ -42,11 +45,27 @@ namespace mathtools
 		/**
 		 *  \class Basis
 		 *  \brief Basis of a vectorial space
+		 *  \tparam Dim: dimension of the vectorial space
 		 */
 		template<unsigned int Dim>
 		class Basis
 		{
-			
+			public:
+				/**
+				 *  \brief Basis shared pointer
+				 */
+				typedef boost::shared_ptr<Frame<Dim> > Ptr;
+
+			private:
+				/**
+				 *  \brief Basis coordinates in canonic basis
+				 */
+				Eigen::Matrix<double,Dim,Dim> m_basis;
+
+				/**
+				 *  \brief Canonic basis coordinates in basis
+				 */
+				Eigen::Matrix<double,Dim,Dim> m_basis_inv;
 		}
 	}
 }
