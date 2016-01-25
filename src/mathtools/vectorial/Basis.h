@@ -66,6 +66,23 @@ namespace mathtools
 				 *  \brief Canonic basis coordinates in basis
 				 */
 				Eigen::Matrix<double,Dim,Dim> m_basis_inv;
+			public:
+				/**
+				 *  \brief Constructor
+				 *
+				 *  \param basis : full rank matrix
+				 *
+				 *  \throws logic_error if basis parameter not invertible
+				 */
+				Basis(const Eigen::Matrix<double,Dim,Dim> &basis = Eigen::Matrix<double,Dim,Dim>::Identity()) : m_basis(basis)
+				{
+					double det = m_basis.determinant();
+					if(det*det <= Eigen::NumTraits<double>::dummy_precision())
+					{
+						throw new std::logic_error("mathtools::vectorial::Basis() : basis parameter not invertible");
+					}
+					m_basis_inv = m_basis.inverse();
+				}
 		}
 	}
 }
