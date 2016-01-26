@@ -20,10 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _CLASSICMODEL_H_
-#define _CLASSICMODEL_H_
-
-#include "MetaModel.h"
+#ifndef _METAMODEL_H_
+#define _METAMODEL_H_
 
 /**
  *  \brief Skeleton representations
@@ -36,31 +34,13 @@ namespace skeleton
 	namespace model
 	{
 		/**
-		 *  \brief Describe classical skeleton model
-		 *
-		 *  \tparam Dim : Dimension of the hyperspheres composing the skeleton
+		 * \brief Describes meta data in a skeletal model
+		 * 
+		 * \tparam Model : Skeletal model
 		 */
-		template<unsigned int Dim>
-		class Classic
-		{
-			
-		}
-		
-		/**
-		 *  \brief Describe Classic model meta data
-		 *
-		 *  \tparam Dim : Dimension of the hyperspheres composing the skeleton
-		 */
-		template<unsigned int Dim>
-		meta<Classic<Dim> >
-		{
-			/**
-			 *  \brief Describe storage dimension of the model
-			 */
-			static constexpr unsigned int stordim = Dim+1;
-		}
+		template<typename Model> struct meta;
 	}
 }
 
 
-#endif //_CLASSICMODEL_H_
+#endif //_METAMODEL_H_
