@@ -31,10 +31,9 @@ namespace skeleton
 	/**
 	 *  \brief Describes all kind of skeletons
 	 *
-	 *  \tparam Dim : Dimension of the stored data
-	 *  \tparam Interpretation : Class giving a meaning to the skeleton
+	 *  \tparam Model : Class giving a meaning to the skeleton (dimensions, geometric interpretation...)
 	 */
-	template<unsigned int Dim, typename Interpretation>
+	template<typename Model>
 	class Skeleton
 	{
 		
