@@ -20,6 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+/**
+ *  \file Projective.h
+ *  \brief Defines skeleton projective model
+ *  \author Bastien Durix
+ */
+
 #ifndef _PROJECTIVEMODEL_H_
 #define _PROJECTIVEMODEL_H_
 

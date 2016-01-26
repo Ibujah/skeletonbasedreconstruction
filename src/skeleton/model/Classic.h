@@ -20,6 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+/**
+ *  \file Classic.h
+ *  \brief Defines skeleton classical model
+ *  \author Bastien Durix
+ */
+
 #ifndef _CLASSICMODEL_H_
 #define _CLASSICMODEL_H_
 

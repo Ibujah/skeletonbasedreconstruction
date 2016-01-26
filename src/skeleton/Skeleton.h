@@ -20,6 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+/**
+ *  \file Skeleton.h
+ *  \brief Defines generic skeleton
+ *  \author Bastien Durix
+ */
+
 #ifndef _SKELETON_H_
 #define _SKELETON_H_
 
