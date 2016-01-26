@@ -42,4 +42,4 @@ namespace skeleton
 }
 
 
-#endif _SKELETON_H_
+#endif //_SKELETON_H_
