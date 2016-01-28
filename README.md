@@ -1,4 +1,4 @@
-# skeletonbasedreconstruction
+# Skeleton based reconstruction
 
 This software is an implementation of the skeleton-based reconstruction.
 
