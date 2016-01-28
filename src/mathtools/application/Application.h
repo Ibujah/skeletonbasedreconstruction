@@ -30,6 +30,8 @@ SOFTWARE.
 #ifndef _APPLICATION_H_
 #define _APPLICATION_H_
 
+#include <Eigen/Dense>
+
 /**
  *  \brief Mathematical tools
  */
@@ -49,7 +51,33 @@ namespace mathtools
 		template<typename OutType, typename InType>
 		class Application
 		{
+			public:
+				/**
+				 *  \brief Out type of result funtion
+				 */
+				typedef typename OutType outType;
+				/**
+				 *  \brief In type of result funtion
+				 */
+				typedef typename InType inType;
 			
+		};
+
+		/**
+		 *  \brief Type dimension getter
+		 *
+		 *  \tparam Type : out or in type of an application
+		 */
+		template<typename Type> struct dimension;
+
+		/**
+		 *  \brief Eigen vector dimension getter
+		 *
+		 *  \tparam Dim : Eigen vector dimension
+		 */
+		template<unsigned int Dim> struct dimension<Eigen::Matrix<double,Dim,1> >
+		{
+			static constexpr unsigned int value = Dim;
 		};
 	}
 }
