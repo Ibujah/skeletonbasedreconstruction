@@ -87,9 +87,11 @@ namespace mathtools
 				 *  \param t : input variable
 				 *  \return Jacobian evaluation at t
 				 */
-				Eigen::Matrix<double,> jac(const inType &t) const
+				// Eigen::Matrix<double,> jac(const inType &t) const
+				template<typename Out = outType, typename In = inType>
+				Eigen::Matrix<double,dimension<Out>::value,dimension<In>::value> jac(const inType &t) const
 				{
-					return m_fct.jac(t); 
+					return m_fct.jac(t);
 				}
 		};
 
@@ -97,8 +99,7 @@ namespace mathtools
 		 * \brief Recursive template composition of n function
 		 */
 		template<typename Fct, typename Fct_, typename... Args>
-		class Compositor<Fct,Fct_,Args...> : Compositor<Fct_,Args...>
-		{
+		class Compositor<Fct,Fct_,Args...>		 {
 			public:
 				/**
 				 *  \brief Out type of result funtion
@@ -110,9 +111,14 @@ namespace mathtools
 				typedef typename Compositor<Fct_,Args...>::inType inType;
 			protected:
 				/**
+				 * \brief Compositor contain all the previous functions
+				 */
+				Compositor<Fct_,Args...> m_others;
+				/**
 				 *  \brief Current function
 				 */
 				Fct m_fct;
+
 			public:
 				/**
 				 *  \brief Constructor
@@ -121,8 +127,8 @@ namespace mathtools
 				 *  \param fct_ : reference to second function to compose
 				 *  \param fcts : next function arguments
 				 */
-				Compositor(const Fct &fct = Fct(), const Fct_ &fct_ = Fct_(), const Args&... fcts) : Compositor<Fct_,Args...>(fct_,fcts...), m_fct(fct) {};
-				
+				Compositor(const Fct &fct = Fct(), const Fct_ &fct_ = Fct_(), const Args&... fcts) : m_others{Compositor<Fct_,Args...>(fcts...)}, m_fct(fct) {};
+
 				/**
 				 *  \brief Function call
 				 *
@@ -131,7 +137,7 @@ namespace mathtools
 				 */
 				outType operator()(const inType &t) const
 				{
-					return m_fct(  Compositor<Fct_,Args...>::operator()(t) );
+					return m_fct(  m_others(t) );
 				};
 
 				/**
@@ -140,9 +146,10 @@ namespace mathtools
 				 *  \param t : input variable
 				 *  \return Jacobian evaluation at t
 				 */
-				Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value> jac(const inType &t) const
+				template<typename Out = outType, typename In = inType>
+				Eigen::Matrix<double,dimension<Out>::value,dimension<In>::value> jac(const inType &t) const
 				{
-					return m_fct.jac(Compositor<Fct_,Args...>::operator()(t))*Compositor<Fct_,Args...>::jac(t);
+					return m_fct.jac(m_others(t))*m_others.jac(t);
 				}
 
 				/**

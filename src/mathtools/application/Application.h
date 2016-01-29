@@ -55,12 +55,12 @@ namespace mathtools
 				/**
 				 *  \brief Out type of result funtion
 				 */
-				typedef typename OutType outType;
+                using outType = OutType;
 				/**
 				 *  \brief In type of result funtion
 				 */
-				typedef typename InType inType;
-			
+                using inType = InType;
+
 		};
 
 		/**
