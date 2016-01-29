@@ -45,8 +45,8 @@ namespace mathtools
 		/**
 		 *  \brief Main application class
 		 *
-		 *  \tparam OutType: out type of the application
-		 *  \tparam InType: in type of the application
+		 *  \tparam OutType out type of the application
+		 *  \tparam InType  in type of the application
 		 */
 		template<typename OutType, typename InType>
 		class Application
@@ -55,25 +55,25 @@ namespace mathtools
 				/**
 				 *  \brief Out type of result funtion
 				 */
-                using outType = OutType;
+				using outType = OutType;
 				/**
 				 *  \brief In type of result funtion
 				 */
-                using inType = InType;
+				using inType = InType;
 
 		};
 
 		/**
 		 *  \brief Type dimension getter
 		 *
-		 *  \tparam Type : out or in type of an application
+		 *  \tparam Type: out or in type of an application
 		 */
 		template<typename Type> struct dimension;
 
 		/**
 		 *  \brief Eigen vector dimension getter
 		 *
-		 *  \tparam Dim : Eigen vector dimension
+		 *  \tparam Dim Eigen vector dimension
 		 */
 		template<unsigned int Dim> struct dimension<Eigen::Matrix<double,Dim,1> >
 		{

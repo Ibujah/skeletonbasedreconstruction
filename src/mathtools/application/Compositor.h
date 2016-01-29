@@ -46,17 +46,17 @@ namespace mathtools
 		 * \brief Recursive template composition of n function
 		 */
 		template<typename Fct, typename... Args>
-		class Compositor
+		class Compositor : Application<typename Fct::outType, typename Fct::inType>
 		{
 			public:
 				/**
 				 *  \brief Out type of result funtion
 				 */
-				typedef typename Fct::outType outType;
+				using outType = typename Fct::outType;
 				/**
 				 *  \brief In type of result funtion
 				 */
-				typedef typename Fct::inType inType;
+				using inType = typename Fct::inType;
 			protected:
 				/**
 				 *  \brief Current function
@@ -65,15 +65,19 @@ namespace mathtools
 			public:
 				/**
 				 *  \brief Constructor
-				 *
-				 *  \param fct : reference to function to compose
 				 */
-				Compositor(const Fct &fct = Fct()) : m_fct(fct) {};
+				Compositor() : m_fct() {};
+				/**
+				 *  \brief Constructor
+				 *
+				 *  \param fct reference to function to compose
+				 */
+				Compositor(const Fct &fct) : m_fct(fct) {};
 
 				/**
 				 *  \brief Function call
 				 *
-				 *  \param t : input variable
+				 *  \param t input variable
 				 *  \return Function evaluation at t
 				 */
 				outType operator()(const inType &t) const
@@ -84,10 +88,9 @@ namespace mathtools
 				/**
 				 *  \brief Jacobian call
 				 *
-				 *  \param t : input variable
+				 *  \param t: input variable
 				 *  \return Jacobian evaluation at t
 				 */
-				// Eigen::Matrix<double,> jac(const inType &t) const
 				template<typename Out = outType, typename In = inType>
 				Eigen::Matrix<double,dimension<Out>::value,dimension<In>::value> jac(const inType &t) const
 				{
@@ -99,57 +102,64 @@ namespace mathtools
 		 * \brief Recursive template composition of n function
 		 */
 		template<typename Fct, typename Fct_, typename... Args>
-		class Compositor<Fct,Fct_,Args...>		 {
+		class Compositor<Fct,Fct_,Args...> : Application<typename Fct::outType,typename Compositor<Fct_,Args...>::inType>
+		{
 			public:
 				/**
 				 *  \brief Out type of result funtion
 				 */
-				typedef typename Fct::outType outType;
+				using outType = typename Fct::outType;
 				/**
 				 *  \brief In type of result funtion
 				 */
-				typedef typename Compositor<Fct_,Args...>::inType inType;
+				using inType = typename Compositor<Fct_,Args...>::inType;
 			protected:
-				/**
-				 * \brief Compositor contain all the previous functions
-				 */
-				Compositor<Fct_,Args...> m_others;
 				/**
 				 *  \brief Current function
 				 */
 				Fct m_fct;
+				/**
+				 * \brief Compositor contain all the next functions
+				 */
+				Compositor<Fct_,Args...> m_next;
 
 			public:
 				/**
 				 *  \brief Constructor
-				 *
-				 *  \param fct  : reference to first function to compose
-				 *  \param fct_ : reference to second function to compose
-				 *  \param fcts : next function arguments
 				 */
-				Compositor(const Fct &fct = Fct(), const Fct_ &fct_ = Fct_(), const Args&... fcts) : m_others{Compositor<Fct_,Args...>(fcts...)}, m_fct(fct) {};
+				Compositor() :  m_fct(), m_next() {};
+
+
+				/**
+				 *  \brief Constructor
+				 *
+				 *  \param fct   reference to first function to compose
+				 *  \param fct_  reference to second function to compose
+				 *  \param fcts  next function arguments
+				 */
+				Compositor(const Fct &fct, const Fct_ &fct_, const Args&... fcts) :  m_fct(fct), m_next(fct_, fcts...) {};
 
 				/**
 				 *  \brief Function call
 				 *
-				 *  \param t : input variable
+				 *  \param t input variable
 				 *  \return Function evaluation at t
 				 */
 				outType operator()(const inType &t) const
 				{
-					return m_fct(  m_others(t) );
+					return m_fct(  m_next(t) );
 				};
 
 				/**
 				 *  \brief Jacobian call
 				 *
-				 *  \param t : input variable
+				 *  \param t input variable
 				 *  \return Jacobian evaluation at t
 				 */
 				template<typename Out = outType, typename In = inType>
 				Eigen::Matrix<double,dimension<Out>::value,dimension<In>::value> jac(const inType &t) const
 				{
-					return m_fct.jac(m_others(t))*m_others.jac(t);
+					return m_fct.jac( m_next(t) ) * m_next.jac(t);
 				}
 
 				/**
@@ -157,9 +167,9 @@ namespace mathtools
 				 *
 				 *  \return next function
 				 */
-				inline const Compositor<Fct_,Args...>* next() const
+				inline const Compositor<Fct_,Args...>& next() const
 				{
-					return (Compositor<Fct_,Args...>*) (this);
+					return m_next;
 				}
 		};
 	}
