@@ -60,7 +60,17 @@ namespace mathtools
 				 *  \brief In type of result funtion
 				 */
 				using inType = InType;
+			
 
+			public:
+				/**
+				 *  \brief Applies the function to the parameter
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns Out put associated by the application
+				 */
+				virtual outType operator()(const inType &t) = 0;
 		};
 
 		/**
@@ -78,6 +88,14 @@ namespace mathtools
 		template<unsigned int Dim> struct dimension<Eigen::Matrix<double,Dim,1> >
 		{
 			static constexpr unsigned int value = Dim;
+		};
+
+		/**
+		 *  \brief Double dimension getter
+		 */
+		struct dimension<double>
+		{
+			static constexpr unsigned int value = 1;
 		};
 	}
 }
