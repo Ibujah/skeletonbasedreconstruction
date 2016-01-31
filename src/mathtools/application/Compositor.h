@@ -88,7 +88,7 @@ namespace mathtools
 				/**
 				 *  \brief Jacobian call
 				 *
-				 *  \param t: input variable
+				 *  \param t input variable
 				 *  \return Jacobian evaluation at t
 				 */
 				template<typename Out = outType, typename In = inType>
