@@ -60,7 +60,6 @@ namespace mathtools
 				 *  \brief In type of result funtion
 				 */
 				using inType = InType;
-			
 
 			public:
 				/**
@@ -70,7 +69,7 @@ namespace mathtools
 				 *
 				 *  \returns Out put associated by the application
 				 */
-				virtual outType operator()(const inType &t) = 0;
+				virtual outType operator()(const inType &t) const = 0;
 		};
 
 		/**

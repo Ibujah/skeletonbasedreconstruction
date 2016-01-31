@@ -30,6 +30,7 @@ SOFTWARE.
 #ifndef _COMPOSITOR_H_
 #define _COMPOSITOR_H_
 
+#include "Application.h"
 #include <Eigen/Dense>
 
 /**
@@ -44,9 +45,12 @@ namespace mathtools
 	{
 		/**
 		 * \brief Recursive template composition of n function
+		 *
+		 * \tparam Fct  First function type
+		 * \tparam Args Next functions type
 		 */
 		template<typename Fct, typename... Args>
-		class Compositor : Application<typename Fct::outType, typename Fct::inType>
+		class Compositor : public Application<typename Fct::outType, typename Fct::inType>
 		{
 			public:
 				/**
@@ -100,9 +104,13 @@ namespace mathtools
 
 		/**
 		 * \brief Recursive template composition of n function
+		 *
+		 * \tparam Fct  First function type
+		 * \tparam Fct_ Second function type
+		 * \tparam Args Next functions type
 		 */
 		template<typename Fct, typename Fct_, typename... Args>
-		class Compositor<Fct,Fct_,Args...> : Application<typename Fct::outType,typename Compositor<Fct_,Args...>::inType>
+		class Compositor<Fct,Fct_,Args...> : public Application<typename Fct::outType,typename Compositor<Fct_,Args...>::inType>
 		{
 			public:
 				/**
