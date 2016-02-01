@@ -43,6 +43,59 @@ namespace mathtools
 	 */
 	namespace application
 	{
+		/**
+		 *  \brief Defines Bspline basis function
+		 *
+		 *  \tparam degree  Basis degree
+		 *  \tparam indice  Basis indice
+		 */
+		template<unsigned int degree, unsigned int indice>
+		class BsplineBasis : public Application<double,double>
+		{
+			public:
+				/**
+				 *  \brief Evaluate the basis
+				 *
+				 *	\param t    Parameter for which evaluate the basis
+				 *	\param node Node vector of the basis
+				 *
+				 *  \return evaluation of the basis for parameter t
+				 */
+				static double eval(double t, const Eigen::Matrix<double,1,Eigen::Dynamic> &node)
+				{
+					
+				}
+		};
+
+		/**
+		 *  \brief Defines Degree 0 bspline basis function
+		 *
+		 *  \tparam indice  Basis indice
+		 */
+		template<unsigned int indice>
+		class BsplineBasis<0,indice> : public Application<double,double>
+		{
+			public:
+				/**
+				 *  \brief Evaluate the basis
+				 *
+				 *	\param t    Parameter for which evaluate the basis
+				 *	\param node Node vector of the basis
+				 *
+				 *  \return evaluation of the basis for parameter t
+				 *
+				 *  \throws std::logic_error if basis indice is out of node vector
+				 */
+				static double eval(double t, const Eigen::Matrix<double,1,Eigen::Dynamic> &node)
+				{
+					if(indice >= node.cols()-1)
+						throw std::logic_error("Basis indice is out of node vector");
+					double val = 0.0;
+					if(node(0,indice) <= t && t < node(0,indice+1))
+						val = 1.0;
+					return val;
+				}
+		};
 
 		/**
 		 *  \brief Defines Bspline curve
