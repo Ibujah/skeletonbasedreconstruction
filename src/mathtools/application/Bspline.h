@@ -30,7 +30,7 @@ SOFTWARE.
 #ifndef _BSPLINE_H_
 #define _BSPLINE_H_
 
-#include "Curve.h"
+#include "Application.h"
 #include <Eigen/Dense>
 
 /**
@@ -50,7 +50,7 @@ namespace mathtools
 		 *  \tparam Dim Curve dimension
 		 */
 		template<unsigned int Dim>
-		class Bspline : public Curve<Dim>
+		class Bspline : public Application<Eigen::Matrix<double,Dim,1>,double>
 		{
 			public:
 				/**
@@ -62,7 +62,7 @@ namespace mathtools
 				 */
 				using inType = double;
 			
-		}
+		};
 	}
 }
 
