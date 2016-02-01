@@ -63,7 +63,32 @@ namespace mathtools
 				 */
 				static double eval(double t, const Eigen::Matrix<double,1,Eigen::Dynamic> &node)
 				{
-					
+					double res = 0.0;
+					if(indice > 0)
+					{
+						if(node_vec(0,indice-1) <= t && ( t < node_vec(indice+degree-1) || indice+degree == node_vec.cols() ))
+						{
+							double num1 = t                           - node_vec(0,indice-1);
+							double den1 = node_vec(0,indice+degree-1) - node_vec(0,indice-1);
+
+							if(den1 != 0)
+								res += (num1/den1) * BsplineBasis<degree-1,indice-1>::eval(t,node_vec.block(0,1,1,node_vec.cols()-2));
+						}
+					}
+
+					if(indice + degree < node_vec.cols())
+					{
+						if(node_vec(0,indice) <= t && (t < node_vec(0,indice+degree) || indice+degree+1 == node_vec.cols()))
+						{
+							double num2 = node_vec(0,indice+degree) - t;
+							double den2 = node_vec(0,indice+degree) - node_vec(0,indice);
+
+							if(den2 != 0)
+								res += (num2/den2) * BsplineBasis<degree-1,indice>::eval(t,node_vec.block(0,1,1,node_vec.cols()-2));	
+						}
+					}
+
+					return res;
 				}
 		};
 
