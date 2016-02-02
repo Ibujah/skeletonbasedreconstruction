@@ -108,7 +108,7 @@ namespace mathtools
 					m_nodevec(nodevec), m_degree(degree)
 				{
 					if( ctrlpt.cols() + degree != nodevec.cols()+1  )
-						throw std::logic_error("Bspline : not verified #CtrlPt = #NodeVec - degree + 1");
+						throw std::logic_error("Bspline : not verified #CtrlPt + degree = #NodeVec + 1");
 				}
 
 				/**
