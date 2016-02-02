@@ -71,7 +71,7 @@ namespace mathtools
 				/**
 				 *  \brief Construtor
 				 *
-				 *  \param matrix : Application matrix
+				 *  \param matrix Application matrix
 				 */
 				LinearApp(const Eigen::Matrix<double,DimOut,DimIn> &matrix = Eigen::Matrix<double,DimOut,DimIn>::Zero()) :
 					Application<Eigen::Matrix<double,DimOut,1>,Eigen::Matrix<double,DimIn,1> >(), m_matrix(matrix)
@@ -80,7 +80,7 @@ namespace mathtools
 				/**
 				 *  \brief Copy construtor
 				 *
-				 *  \param linapp : LinearApplication to copy in
+				 *  \param linapp LinearApplication to copy in
 				 */
 				LinearApp(const LinearApp<DimOut,DimIn> &linapp) :
 					Application<Eigen::Matrix<double,DimOut,1>,Eigen::Matrix<double,DimIn,1> >(), m_matrix(linapp.m_matrix)
@@ -89,7 +89,7 @@ namespace mathtools
 				/**
 				 *  \brief Application call
 				 *
-				 *  \param vec : application input
+				 *  \param vec application input
 				 * 
 				 *  \return application output 
 				 */
@@ -101,7 +101,7 @@ namespace mathtools
 				/**
 				 *  \brief Jacobian call
 				 *
-				 *  \param vec : input parameter
+				 *  \param : input parameter
 				 *
 				 *  \return Jacobian evaluation at vec
 				 */

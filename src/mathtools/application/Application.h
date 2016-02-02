@@ -86,6 +86,9 @@ namespace mathtools
 		 */
 		template<unsigned int Dim> struct dimension<Eigen::Matrix<double,Dim,1> >
 		{
+			/**
+			 *  \brief Dimension value
+			 */
 			static constexpr unsigned int value = Dim;
 		};
 
@@ -95,6 +98,9 @@ namespace mathtools
 		template<>
 		struct dimension<double>
 		{
+			/**
+			 *  \brief Dimension value
+			 */
 			static constexpr unsigned int value = 1;
 		};
 	}
