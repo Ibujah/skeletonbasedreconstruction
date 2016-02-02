@@ -28,31 +28,55 @@ SOFTWARE.
 
 #include <iostream>
 #include <mathtools/application/Bspline.h>
-
+#include <math.h>
 
 int main()
 {
-	Eigen::Matrix<double,1,Eigen::Dynamic> node(1,6);
-	node << 0.0, 0.0, 0.0, 1.0, 1.0, 1.0;
-	for(unsigned int i=0;i<11;i++)
-		std::cout << "B_{3,0}(" << (double)i*0.1 <<  ") = " << mathtools::application::BsplineBasis<3,0>::eval((double)i*0.1,node)
-				  << "; (1-x)^3=" << (1-(double)i*0.1)*(1-(double)i*0.1)*(1-(double)i*0.1) << std::endl;
-	for(unsigned int i=0;i<11;i++)
-		std::cout << "B_{3,1}(" << (double)i*0.1 <<  ") = " << mathtools::application::BsplineBasis<3,1>::eval((double)i*0.1,node)
-				  << "; 3*(1-x)^2*x=" << 3*(1-(double)i*0.1)*(1-(double)i*0.1)*(double)i*0.1 << std::endl;
-	for(unsigned int i=0;i<11;i++)
-		std::cout << "B_{3,2}(" << (double)i*0.1 <<  ") = " << mathtools::application::BsplineBasis<3,2>::eval((double)i*0.1,node)
-				  << "; 3*(1-x)*x^2=" << 3*(1-(double)i*0.1)*(double)i*0.1*(double)i*0.1 << std::endl;
-	for(unsigned int i=0;i<11;i++)
-		std::cout << "B_{3,3}(" << (double)i*0.1 <<  ") = " << mathtools::application::BsplineBasis<3,3>::eval((double)i*0.1,node)
-				  << "; x^3=" << (double)i*0.1*(double)i*0.1*(double)i*0.1 << std::endl;
-	for(unsigned int i=0;i<11;i++)
+	unsigned int return_value = 0;
+
+	bool bspline_test = true;
+	unsigned int fraction = 100;
+	
+	std::cout << "Bspline test... ";
+	std::vector<unsigned int> bin_coeff(6,0);
+	bin_coeff[0] = 1;
+	for(unsigned int degree = 1; degree < 5 && bspline_test; degree++)
 	{
-		std::cout << "B_{3,0}(" << (double)i*0.1 <<  ") + B_{3,1}(" << (double)i*0.1 <<  ") + B_{3,2}(" << (double)i*0.1 <<  ") + B_{3,3}(" << (double)i*0.1 <<  ") = "
-								<< mathtools::application::BsplineBasis<3,0>::eval((double)i*0.1,node) +
-								   mathtools::application::BsplineBasis<3,1>::eval((double)i*0.1,node) +
-								   mathtools::application::BsplineBasis<3,2>::eval((double)i*0.1,node) +
-								   mathtools::application::BsplineBasis<3,3>::eval((double)i*0.1,node) << std::endl;
+		// Filling node vector
+		Eigen::Matrix<double,1,Eigen::Dynamic> node(1,degree*2);
+		for(unsigned int i = 0; i < degree; i++)
+		{
+			node(0,i)        = 0.0;
+			node(0,i+degree) = 1.0;
+		}
+		
+		for(unsigned int i = degree; i > 0; i--)
+		{
+			bin_coeff[i] += bin_coeff[i-1];
+		}
+		
+		for(unsigned int indice = 0; indice <= degree && bspline_test; indice++)
+		{
+			for(unsigned int i = 0; i < fraction && bspline_test; i++)
+			{
+				double t = (double)i*(1.0/(double)fraction);
+				
+				double res = mathtools::application::BsplineBasis(t,degree,indice,node);
+				
+				double ref = pow((1-t),degree-indice)*pow(t,indice)*(double)bin_coeff[indice];
+				
+				if(fabs(res - ref) > std::numeric_limits<double>::epsilon())
+					bspline_test = false;
+			}
+		}
 	}
-	return 0;
+	if(!bspline_test)
+	{
+		return_value = -1;
+		std::cout << "Fail!" << std::endl;
+	}
+	else
+		std::cout << "Success!" << std::endl;
+	
+	return return_value;
 }
