@@ -74,7 +74,71 @@ namespace mathtools
 				 *  \brief In type of result funtion
 				 */
 				using inType = double;
-			
+
+			protected:
+				/**
+				 *  \brief Control points
+				 */
+				Eigen::Matrix<double,Dim,Eigen::Dynamic> m_ctrlpt;
+
+				/**
+				 *  \brief Node vector
+				 */
+				Eigen::Matrix<double,1,Eigen::Dynamic> m_nodevec;
+
+				/**
+				 *  \brief Bspline degree
+				 */
+				unsigned int m_degree;
+
+			public:
+				/**
+				 *  \brief Constructor
+				 *
+				 *  \param ctrlpt   Control points
+				 *  \param nodevec  Node vector
+				 *  \param degree   Bspline degree
+				 *
+				 *  \throws std::logic_error if number of control points, nodes and degree does not match
+				 */
+				Bspline(const Eigen::Matrix<double,Dim,Eigen::Dynamic> &ctrlpt,
+						const Eigen::Matrix<double,1,Eigen::Dynamic>   &nodevec,
+						const unsigned int &degree) : 
+					Application<Eigen::Matrix<double,Dim,1>,double>(), m_ctrlpt(ctrlpt), 
+					m_nodevec(nodevec), m_degree(degree)
+				{
+					if( ctrlpt.cols() + degree != nodevec.cols()+1  )
+						throw std::logic_error("Bspline : not verified #CtrlPt = #NodeVec - degree + 1");
+				}
+
+				/**
+				 *  \brief Copy constructor
+				 *
+				 *  \param bspline Bspline to copy
+				 */
+				Bspline(const Bspline<Dim> &bspline) : 
+					Application<Eigen::Matrix<double,Dim,1>,double>(), m_ctrlpt(bspline.m_ctrlpt), 
+					m_nodevec(bspline.m_nodevec), m_degree(bspline.m_degree) {};
+				
+				/**
+				 *  \brief Bspline call
+				 *
+				 *  \param t Bspline parameter
+				 * 
+				 *  \return Bspline evaluation at t
+				 */
+				Eigen::Matrix<double,Dim,1> operator()(const double &t) const
+				{
+					Eigen::Matrix<double,Dim,1> res = Eigen::Matrix<double,Dim,1>::Zero();
+
+					for(unsigned int ind = 0; ind<m_ctrlpt.cols(); ind++)
+					{
+						double basis_ind = BsplineBasis(t,m_degree,ind,m_nodevec);
+						res+=m_ctrlpt.block(0,ind,Dim,1)*basis_ind;
+					}
+
+					return res;
+				}
 		};
 	}
 }
