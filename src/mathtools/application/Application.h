@@ -92,6 +92,7 @@ namespace mathtools
 		/**
 		 *  \brief Double dimension getter
 		 */
+		template<>
 		struct dimension<double>
 		{
 			static constexpr unsigned int value = 1;
