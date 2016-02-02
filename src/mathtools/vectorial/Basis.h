@@ -20,14 +20,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _BASIS_H_
-#define _BASIS_H_
 
 /**
  *  \file  Basis.h
  *  \brief Defines a basis of a vectorial space
  *  \author Bastien Durix
  */
+
+#ifndef _BASIS_H_
+#define _BASIS_H_
 
 #include <boost/shared_ptr.hpp>
 #include <Eigen/Dense>
