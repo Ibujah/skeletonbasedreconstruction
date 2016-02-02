@@ -7,5 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 find_package(Boost REQUIRED)
 find_package(EIGEN REQUIRED)
 
+include_directories(${Boost_INCLUDE_DIR}
+					${EIGEN_INCLUDE_DIRS})
 
 add_subdirectory(src/)
