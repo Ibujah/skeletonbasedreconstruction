@@ -31,6 +31,7 @@ SOFTWARE.
 #define _BSPLINE_H_
 
 #include "Application.h"
+#include "BsplineUtils.h"
 #include <Eigen/Dense>
 
 /**
@@ -43,20 +44,6 @@ namespace mathtools
 	 */
 	namespace application
 	{
-		/**
-		 *  \brief Evaluate the bspline basis function
-		 *
-		 *	\param t      Parameter for which evaluate the basis
-		 *	\param degree Bspline degree
-		 *	\param indice Indice of bspline basis
-		 *	\param node   Node vector of the basis
-		 *
-		 *  \return evaluation of the basis for parameter t
-		 *
-		 *  \throws std::logic_error if basis indice is out of node vector
-		 */
-		double BsplineBasis(double t, unsigned int degree, unsigned int indice, const Eigen::Matrix<double,1,Eigen::Dynamic> &node);
-
 		/**
 		 *  \brief Defines Bspline curve
 		 *

@@ -22,8 +22,8 @@ SOFTWARE.
 
 
 /**
- *  \file Bspline.cpp
- *  \brief Defines bspline function
+ *  \file BsplineUtils.cpp
+ *  \brief Defines bspline utilitary functions
  *  \author Bastien Durix
  */
 

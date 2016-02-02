@@ -1,6 +1,6 @@
 set(LIBRARY_NAME ${MATHTOOLS_LIB})
 
-set(SOURCE_FILES    application/Bspline.cpp)
+set(SOURCE_FILES    application/BsplineUtils.cpp)
 
 # make the library
 add_library(
