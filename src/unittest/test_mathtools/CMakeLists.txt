@@ -1,4 +1,4 @@
-include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/src/lib)
 
 set(source_files main.cpp)
 
