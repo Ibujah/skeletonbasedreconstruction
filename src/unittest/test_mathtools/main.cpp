@@ -32,5 +32,27 @@ SOFTWARE.
 
 int main()
 {
+	Eigen::Matrix<double,1,Eigen::Dynamic> node(1,6);
+	node << 0.0, 0.0, 0.0, 1.0, 1.0, 1.0;
+	for(unsigned int i=0;i<11;i++)
+		std::cout << "B_{3,0}(" << (double)i*0.1 <<  ") = " << mathtools::application::BsplineBasis<3,0>::eval((double)i*0.1,node)
+				  << "; (1-x)^3=" << (1-(double)i*0.1)*(1-(double)i*0.1)*(1-(double)i*0.1) << std::endl;
+	for(unsigned int i=0;i<11;i++)
+		std::cout << "B_{3,1}(" << (double)i*0.1 <<  ") = " << mathtools::application::BsplineBasis<3,1>::eval((double)i*0.1,node)
+				  << "; 3*(1-x)^2*x=" << 3*(1-(double)i*0.1)*(1-(double)i*0.1)*(double)i*0.1 << std::endl;
+	for(unsigned int i=0;i<11;i++)
+		std::cout << "B_{3,2}(" << (double)i*0.1 <<  ") = " << mathtools::application::BsplineBasis<3,2>::eval((double)i*0.1,node)
+				  << "; 3*(1-x)*x^2=" << 3*(1-(double)i*0.1)*(double)i*0.1*(double)i*0.1 << std::endl;
+	for(unsigned int i=0;i<11;i++)
+		std::cout << "B_{3,3}(" << (double)i*0.1 <<  ") = " << mathtools::application::BsplineBasis<3,3>::eval((double)i*0.1,node)
+				  << "; x^3=" << (double)i*0.1*(double)i*0.1*(double)i*0.1 << std::endl;
+	for(unsigned int i=0;i<11;i++)
+	{
+		std::cout << "B_{3,0}(" << (double)i*0.1 <<  ") + B_{3,1}(" << (double)i*0.1 <<  ") + B_{3,2}(" << (double)i*0.1 <<  ") + B_{3,3}(" << (double)i*0.1 <<  ") = "
+								<< mathtools::application::BsplineBasis<3,0>::eval((double)i*0.1,node) +
+								   mathtools::application::BsplineBasis<3,1>::eval((double)i*0.1,node) +
+								   mathtools::application::BsplineBasis<3,2>::eval((double)i*0.1,node) +
+								   mathtools::application::BsplineBasis<3,3>::eval((double)i*0.1,node) << std::endl;
+	}
 	return 0;
 }
