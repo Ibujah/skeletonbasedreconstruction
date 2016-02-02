@@ -30,7 +30,7 @@ SOFTWARE.
 #ifndef _BASIS_H_
 #define _BASIS_H_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <Eigen/Dense>
 
 /**
@@ -55,7 +55,7 @@ namespace mathtools
 				/**
 				 *  \brief Basis shared pointer
 				 */
-				typedef boost::shared_ptr<Frame<Dim> > Ptr;
+				typedef std::shared_ptr<Frame<Dim> > Ptr;
 
 			private:
 				/**
