@@ -28,11 +28,20 @@ SOFTWARE.
 
 #include <iostream>
 #include <math.h>
+
 #include <mathtools/application/Bspline.h>
 #include <mathtools/application/Compositor.h>
 #include <mathtools/application/LinearApp.h>
 
+#include <mathtools/vectorial/Basis.h>
+
+#include <mathtools/affine/Frame.h>
+#include <mathtools/affine/Point.h>
+
+using namespace mathtools;
 using namespace mathtools::application;
+using namespace mathtools::vectorial;
+using namespace mathtools::affine;
 
 unsigned int bsplinetest()
 {
@@ -131,6 +140,105 @@ unsigned int compositortest()
 	return return_value;
 }
 
+unsigned int vecbasistest()
+{
+	std::cout << "Vectorial basis test... ";
+	
+	bool vecbasis_test = true;
+	
+	// matrix inversion test
+	try
+	{
+		Eigen::Matrix3d mat;
+		mat <<  1,  2, -7,
+			   -2, 45,  6,
+				0, -5,  3;
+		Basis<3> basis(mat);
+		
+		Eigen::Matrix3d matinv = mat.inverse();
+		
+		vecbasis_test = matinv.isApprox(basis.getMatrixInverse(),std::numeric_limits<double>::epsilon());
+
+	}
+	catch(...)
+	{
+		vecbasis_test = false;
+	}
+
+	// non invertible matrix test
+	try
+	{
+		Eigen::Matrix3d mat;
+		mat <<  1, 0, 0,
+			    0, 1, 1,
+				1, 0, 0;
+		Basis<3> basis(mat);
+	}
+	catch(...)
+	{
+		vecbasis_test = true;
+	}
+
+	unsigned int return_value = 0;
+	if(!vecbasis_test)
+	{
+		return_value = -1;
+		std::cout << "Fail!" << std::endl;
+	}
+	else
+		std::cout << "Success!" << std::endl;
+	
+	return return_value;
+}
+
+unsigned int affinetest()
+{
+	std::cout << "Affine test... ";
+	
+	bool affine_test = true;
+	
+	Point<2> A(0,0), B(10,0), C(4,5);
+	Eigen::Vector2d AB = B-A;
+	
+	if(!AB.isApprox(Eigen::Vector2d(10,0),std::numeric_limits<double>::epsilon()))
+		affine_test = false;
+	
+	Frame<2> frame1(Basis<2>(),B.getCoords());
+	
+	if(B.getCoords(frame1).norm() > std::numeric_limits<double>::epsilon())
+		affine_test = false;
+
+	Eigen::Vector2d AB_1 = B.getCoords(frame1) - A.getCoords(frame1);
+
+	if(!AB.isApprox(AB_1,std::numeric_limits<double>::epsilon()))
+		affine_test = false;
+	
+	Eigen::Matrix2d mat;
+	mat << 1,  2,
+		   0, -1;
+
+	Frame<2> frame2(Basis<2>(mat),C.getCoords());
+	
+	Eigen::Vector2d coordsB_2 = B.getCoords(frame2);
+
+	Point<2> D(coordsB_2,frame2);
+
+	if(!D.getCoords().isApprox(B.getCoords(),std::numeric_limits<double>::epsilon()))
+		affine_test = false;
+	
+	unsigned int return_value = 0;
+	if(!affine_test)
+	{
+		return_value = -1;
+		std::cout << "Fail!" << std::endl;
+	}
+	else
+		std::cout << "Success!" << std::endl;
+	
+	return return_value;
+	
+}
+
 int main()
 {
 	unsigned int return_value = 0;
@@ -140,6 +248,12 @@ int main()
 	
 	unsigned int compositor_test_value = compositortest();
 	if(compositor_test_value != 0) return_value = -1;
+
+	unsigned int vecbasis_test_value = vecbasistest();
+	if(vecbasis_test_value != 0) return_value = -1;
+
+	unsigned int affine_test_value = affinetest();
+	if(affine_test_value != 0) return_value = -1;
 
 	return return_value;
 }
