@@ -80,6 +80,13 @@ namespace mathtools
 					m_basis(basis), m_origin(origin) {}
 
 				/**
+				 *  \brief Copy constructor
+				 *
+				 *  \param frame frame to copy
+				 */
+				Frame(const Frame<Dim> &frame) : m_basis(frame.m_basis), m_origin(frame.m_origin) {}
+
+				/**
 				 *  \brief Vectorial basis getter
 				 *
 				 *  \return Current basis

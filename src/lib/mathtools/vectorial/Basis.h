@@ -31,6 +31,7 @@ SOFTWARE.
 #define _BASIS_H_
 
 #include <Eigen/Dense>
+#include <stdexcept>
 
 /**
  *  \brief Mathematical tools
@@ -54,29 +55,39 @@ namespace mathtools
 				/**
 				 *  \brief Basis coordinates in canonic basis
 				 */
-				Eigen::Matrix<double,Dim,Dim> m_basis;
+				Eigen::Matrix<double,Dim,Dim> m_matrix;
 
 				/**
 				 *  \brief Canonic basis coordinates in basis
 				 */
-				Eigen::Matrix<double,Dim,Dim> m_basis_inv;
+				Eigen::Matrix<double,Dim,Dim> m_matrix_inv;
 			public:
 				/**
 				 *  \brief Constructor
 				 *
-				 *  \param basis  full rank matrix
+				 *  \param matrix  full rank matrix
 				 *
-				 *  \throws logic_error if basis parameter not invertible
+				 *  \throws logic_error if matrix parameter not invertible
 				 */
-				Basis(const Eigen::Matrix<double,Dim,Dim> &basis = Eigen::Matrix<double,Dim,Dim>::Identity()) : m_basis(basis)
+				Basis(const Eigen::Matrix<double,Dim,Dim> &matrix = Eigen::Matrix<double,Dim,Dim>::Identity()) : m_matrix(matrix)
 				{
-					double det = m_basis.determinant();
+					double det = m_matrix.determinant();
 					if(det*det <= Eigen::NumTraits<double>::dummy_precision())
 					{
 						throw new std::logic_error("mathtools::vectorial::Basis() : basis parameter not invertible");
 					}
-					m_basis_inv = m_basis.inverse();
+					m_matrix_inv = m_matrix.inverse();
 				}
+
+				/**
+				 *  \brief Copy constructor
+				 *
+				 *  \param basis basis to copy
+				 *
+				 *  \throws logic_error if basis parameter not invertible
+				 */
+				Basis(const Basis<Dim> &basis) : m_matrix(basis.m_matrix), m_matrix_inv(basis.m_matrix_inv)
+				{}
 
 				/**
 				 *  \brief Basis matrix accessor
@@ -85,7 +96,7 @@ namespace mathtools
 				 */
 				inline const Eigen::Matrix<double,Dim,Dim>& getMatrix() const
 				{
-					return m_basis;
+					return m_matrix;
 				}
 
 				/**
@@ -95,7 +106,7 @@ namespace mathtools
 				 */
 				inline const Eigen::Matrix<double,Dim,Dim>& getMatrixInverse() const
 				{
-					return m_basis_inv;
+					return m_matrix_inv;
 				}
 		};
 	}
