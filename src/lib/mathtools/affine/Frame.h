@@ -56,7 +56,7 @@ namespace mathtools
 				/**
 				 *  \brief Frame shared pointer
 				 */
-				typedef std::shared_ptr<Frame<Dim> > Ptr;
+				using Ptr = std::shared_ptr<Frame<Dim> >;
 			
 			protected:
 				/**
