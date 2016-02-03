@@ -76,7 +76,8 @@ namespace mathtools
 				 *  \param basis  vectorial basis of the frame
 				 *  \param origin frame origin
 				 */
-				Frame(const vectorial::Basis<Dim> &basis, const Eigen::Matrix<double,Dim,1> &origin) : m_basis(new vectorial::Basis<Dim>(basis)), m_origin(origin) {}
+				Frame(const vectorial::Basis<Dim> &basis = vectorial::Basis<Dim>(), const Eigen::Matrix<double,Dim,1> &origin = Eigen::Matrix<double,Dim,1>::Zeros()) :
+					m_basis(new vectorial::Basis<Dim>(basis)), m_origin(origin) {}
 				
 				/**
 				 *  \brief Constructor
