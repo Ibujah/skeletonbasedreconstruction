@@ -22,16 +22,17 @@ SOFTWARE.
 
 
 /**
- *  \file  Basis.h
- *  \brief Defines a basis of a vectorial space
+ *  \file  Frame.h
+ *  \brief Defines a frame of an affine space
  *  \author Bastien Durix
  */
 
-#ifndef _BASIS_H_
-#define _BASIS_H_
+#ifndef _FRAME_H_
+#define _FRAME_H_
 
 #include <memory>
 #include <Eigen/Dense>
+#include <mathtools/vectorial/Basis.h>
 
 /**
  *  \brief Mathematical tools
@@ -39,53 +40,53 @@ SOFTWARE.
 namespace mathtools
 {
 	/**
-	 *  \brief Vectorial tools
+	 *  \brief Affine tools
 	 */
-	namespace vectorial
+	namespace affine
 	{
 		/**
-		 *  \class Basis
-		 *  \brief Basis of a vectorial space
-		 *  \tparam Dim: dimension of the vectorial space
+		 *  \class Frame
+		 *  \brief Frame of an affine space
+		 *  \tparam Dim dimension of the affine space
 		 */
 		template<unsigned int Dim>
-		class Basis
+		class Frame
 		{
 			public:
 				/**
-				 *  \brief Basis shared pointer
+				 *  \brief Frame shared pointer
 				 */
-				typedef std::shared_ptr<Basis<Dim> > Ptr;
-
-			private:
+				typedef std::shared_ptr<Frame<Dim> > Ptr;
+			
+			protected:
 				/**
-				 *  \brief Basis coordinates in canonic basis
+				 *  \brief Vectorial basis
 				 */
-				Eigen::Matrix<double,Dim,Dim> m_basis;
+				typename vectorial::Basis<Dim>::Ptr m_basis;
 
 				/**
-				 *  \brief Canonic basis coordinates in basis
+				 *  \brief Frame origin
 				 */
-				Eigen::Matrix<double,Dim,Dim> m_basis_inv;
+				Eigen::Matrix<double,Dim,1> m_origin;
+
 			public:
 				/**
 				 *  \brief Constructor
 				 *
-				 *  \param basis : full rank matrix
-				 *
-				 *  \throws logic_error if basis parameter not invertible
+				 *  \param basis  vectorial basis of the frame
+				 *  \param origin frame origin
 				 */
-				Basis(const Eigen::Matrix<double,Dim,Dim> &basis = Eigen::Matrix<double,Dim,Dim>::Identity()) : m_basis(basis)
-				{
-					double det = m_basis.determinant();
-					if(det*det <= Eigen::NumTraits<double>::dummy_precision())
-					{
-						throw new std::logic_error("mathtools::vectorial::Basis() : basis parameter not invertible");
-					}
-					m_basis_inv = m_basis.inverse();
-				}
+				Frame(const vectorial::Basis<Dim> &basis, const Eigen::Matrix<double,Dim,1> &origin) : m_basis(new vectorial::Basis<Dim>(basis)), m_origin(origin) {}
+				
+				/**
+				 *  \brief Constructor
+				 *
+				 *  \param basis  vectorial basis of the frame
+				 *  \param origin frame origin
+				 */
+				Frame(const typename vectorial::Basis<Dim>::Ptr &basis, const Eigen::Matrix<double,Dim,1> &origin) : m_basis(basis), m_origin(origin) {}
 		};
 	}
 }
 
-#endif //_BASIS_H_
+#endif //_FRAME_H_
