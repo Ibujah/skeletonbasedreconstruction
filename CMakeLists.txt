@@ -10,6 +10,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 find_package(EIGEN REQUIRED)
 
 set(MATHTOOLS_LIB "Mathtools_Lib")
+set(SHAPE_LIB "Shape_Lib")
 
 include_directories(${Boost_INCLUDE_DIR}
 					${EIGEN_INCLUDE_DIRS})
