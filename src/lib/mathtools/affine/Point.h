@@ -154,6 +154,30 @@ namespace mathtools
 				{
 					return m_coords;
 				}
+
+				/**
+				 *  \brief Translation operator
+				 *
+				 *  \param vec translation vector in canonic frame
+				 *
+				 *  \return result point of the translation
+				 */
+				inline const Point<Dim> operator+(const Eigen::Matrix<double,Dim,1> &vec) const
+				{
+					return Point<Dim>(m_coords + vec);
+				}
+
+				/**
+				 *  \brief Translation getter
+				 *
+				 *  \param point origin of the translation vector
+				 *
+				 *  \return translation vector in canonic frame
+				 */
+				inline const Eigen::Matrix<double,Dim,1> operator-(const Point<Dim> &point) const
+				{
+					return m_coords - point.m_coords;
+				}
 		};
 	}
 }
