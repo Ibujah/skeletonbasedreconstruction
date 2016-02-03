@@ -30,7 +30,6 @@ SOFTWARE.
 #ifndef _BASIS_H_
 #define _BASIS_H_
 
-#include <memory>
 #include <Eigen/Dense>
 
 /**
@@ -51,12 +50,6 @@ namespace mathtools
 		template<unsigned int Dim>
 		class Basis
 		{
-			public:
-				/**
-				 *  \brief Basis shared pointer
-				 */
-				typedef std::shared_ptr<Basis<Dim> > Ptr;
-
 			private:
 				/**
 				 *  \brief Basis coordinates in canonic basis
@@ -71,7 +64,7 @@ namespace mathtools
 				/**
 				 *  \brief Constructor
 				 *
-				 *  \param basis : full rank matrix
+				 *  \param basis  full rank matrix
 				 *
 				 *  \throws logic_error if basis parameter not invertible
 				 */
@@ -83,6 +76,26 @@ namespace mathtools
 						throw new std::logic_error("mathtools::vectorial::Basis() : basis parameter not invertible");
 					}
 					m_basis_inv = m_basis.inverse();
+				}
+
+				/**
+				 *  \brief Basis matrix accessor
+				 *
+				 *  \return Basis matrix in canonic basis
+				 */
+				inline const Eigen::Matrix<double,Dim,Dim>& getMatrix() const
+				{
+					return m_basis;
+				}
+
+				/**
+				 *  \brief Inverse basis matrix accessor
+				 *
+				 *  \return Canonic basis matrix in actual basis
+				 */
+				inline const Eigen::Matrix<double,Dim,Dim>& getMatrixInverse() const
+				{
+					return m_basis_inv;
 				}
 		};
 	}
