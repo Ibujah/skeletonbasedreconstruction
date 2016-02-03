@@ -12,4 +12,5 @@ Towards Skeleton Based Reconstruction: From Projective Skeletonization to Canal 
 
 ## Needed libraries:
 
+ * Boost: http://www.boost.org/ (header only)
  * Eigen: http://eigen.tuxfamily.org/index.php?title=Main_Page (header only)
