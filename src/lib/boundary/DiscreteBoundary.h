@@ -29,7 +29,6 @@ SOFTWARE.
 
 #include <memory>
 #include <list>
-#include "Boundary.h"
 #include <mathtools/affine/Frame.h>
 #include <mathtools/affine/Point.h>
 
@@ -44,16 +43,26 @@ namespace boundary
 	 *  \tparam Dim dimension of the space
 	 */
 	template<unsigned int Dim>
-	class DiscreteBoundary : public Boundary<Dim>
+	class DiscreteBoundary
 	{};
 
 	/**
 	 *  \brief Describe discrete boundary in 2d space
 	 */
 	template<>
-	class DiscreteBoundary<2> : public Boundary<2>
+	class DiscreteBoundary<2>
 	{
 		protected:
+			/**
+			 *  \brief Boundary shared pointer
+			 */
+			using Ptr = std::shared_ptr<DiscreteBoundary<2> >;
+
+			/**
+			 *  \brief Boundary frame
+			 */
+			typename mathtools::affine::Frame<2>::Ptr m_frame;
+
 			/**
 			 *  \brief vector of vertices composing the boundary
 			 */

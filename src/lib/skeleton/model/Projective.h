@@ -47,19 +47,19 @@ namespace skeleton
 		class Projective
 		{
 			
-		}
+		};
 		
 		/**
 		 *  \brief Describe Projective model meta data
 		 */
 		template<>
-		meta<Projective>
+		struct meta<Projective>
 		{
 			/**
 			 *  \brief Describe storage dimension of the model
 			 */
 			static constexpr unsigned int stordim = 3;
-		}
+		};
 	}
 }
 

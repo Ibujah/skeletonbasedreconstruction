@@ -31,7 +31,8 @@ SOFTWARE.
 #define _DISCRETESHAPE_H_
 
 #include <vector>
-#include "ImplicitShape.h"
+#include <mathtools/affine/Frame.h>
+#include <mathtools/affine/Point.h>
 
 /**
  *  \brief Defines shape tools
@@ -44,16 +45,21 @@ namespace shape
 	 *  \tparam Dim espace dimension
 	 */
 	template<unsigned int Dim>
-	class DiscreteShape : public ImplicitShape<Dim>
+	class DiscreteShape
 	{};
 
 	/**
 	 *  \brief Discrete shape in dimension 2
 	 */
 	template<>
-	class DiscreteShape<2> : public ImplicitShape<2>
+	class DiscreteShape<2>
 	{
 		protected:
+			/**
+			 *  \brief Shape frame
+			 */
+			typename mathtools::affine::Frame<2>::Ptr m_frame;
+
 			/**
 			 *  \brief Vector containing discrete shape data, row wise
 			 */

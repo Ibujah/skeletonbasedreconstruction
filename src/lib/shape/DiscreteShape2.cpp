@@ -32,11 +32,11 @@ SOFTWARE.
 using namespace shape;
 
 DiscreteShape<2>::DiscreteShape(const mathtools::affine::Frame<2> &frame, unsigned int width, unsigned int height) :
-	ImplicitShape<2>(frame), m_disc(width*height,0), m_width(width), m_height(height)
+	m_frame(new mathtools::affine::Frame<2>(frame)), m_disc(width*height,0), m_width(width), m_height(height)
 {}
 
 DiscreteShape<2>::DiscreteShape(unsigned int width, unsigned int height) :
-	ImplicitShape<2>(), m_disc(width*height,0), m_width(width), m_height(height)
+	DiscreteShape(mathtools::affine::Frame<2>(), width, height)
 {}
 
 DiscreteShape<2>::DiscreteShape(const mathtools::affine::Frame<2>::Ptr frame, unsigned int width, unsigned int height) :

@@ -50,7 +50,7 @@ namespace skeleton
 		class Classic
 		{
 			
-		}
+		};
 		
 		/**
 		 *  \brief Describe Classic model meta data
@@ -58,13 +58,13 @@ namespace skeleton
 		 *  \tparam Dim : Dimension of the hyperspheres composing the skeleton
 		 */
 		template<unsigned int Dim>
-		meta<Classic<Dim> >
+		struct meta<Classic<Dim> >
 		{
 			/**
 			 *  \brief Describe storage dimension of the model
 			 */
 			static constexpr unsigned int stordim = Dim+1;
-		}
+		};
 	}
 }
 
