@@ -20,48 +20,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+
 /**
- *  \file Projective.h
- *  \brief Defines skeleton projective model
+ *  \file  DiscreteBoundary2.cpp
+ *  \brief Defines 2d discrete boundary of a shape
  *  \author Bastien Durix
  */
 
-#ifndef _PROJECTIVEMODEL_H_
-#define _PROJECTIVEMODEL_H_
+#include "DiscreteBoundary.h"
 
-#include "MetaModel.h"
+using namespace boundary;
 
-/**
- *  \brief Skeleton representations
- */
-namespace skeleton
-{
-	/**
-	 *  \brief Skeletal models
-	 */
-	namespace model
-	{
-		/**
-		 *  \brief Describe projective skeleton model
-		 */
-		class Projective
-		{
-			
-		};
-		
-		/**
-		 *  \brief Describe Projective model meta data
-		 */
-		template<>
-		struct meta<Projective>
-		{
-			/**
-			 *  \brief Describe storage dimension of the model
-			 */
-			static constexpr unsigned int stordim = 3;
-		};
-	}
-}
+DiscreteBoundary<2>::DiscreteBoundary(const mathtools::affine::Frame<2>::Ptr frame) : m_frame(frame) {}
 
-
-#endif //_PROJECTIVEMODEL_H_
+DiscreteBoundary<2>::DiscreteBoundary(const mathtools::affine::Frame<2> &frame) :
+	DiscreteBoundary(typename mathtools::affine::Frame<2>::Ptr(new mathtools::affine::Frame<2>(frame))) {}

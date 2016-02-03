@@ -21,13 +21,19 @@ SOFTWARE.
 */
 
 /**
- *  \file Skeleton.h
- *  \brief Defines generic skeleton
+ *  \file GraphCurveSkeleton.h
+ *  \brief Defines graph curve skeleton
  *  \author Bastien Durix
  */
 
-#ifndef _SKELETON_H_
-#define _SKELETON_H_
+#ifndef _GRAPHCURVESKELETON_H_
+#define _GRAPHCURVESKELETON_H_
+
+#include <map>
+#include <Eigen/Dense>
+#include <boost/graph/adjacency_list.hpp>
+#include "model/MetaModel.h"
+
 
 /**
  *  \brief Skeleton representations
@@ -35,16 +41,27 @@ SOFTWARE.
 namespace skeleton
 {
 	/**
-	 *  \brief Describes all kind of skeletons
+	 *  \brief Describes graph curve skeleton
 	 *
 	 *  \tparam Model : Class giving a meaning to the skeleton (dimensions, geometric interpretation...)
 	 */
 	template<typename Model>
-	class Skeleton
+	class GraphCurveSkeleton
 	{
-		
-	}
+		protected:
+			/**
+			 *  \brief All nodes in the graph curve skeleton
+			 */
+			std::map<unsigned int,Eigen::Matrix<double,model::meta<Model>::stordim,1> > m_node;
+			
+			/**
+			 *  \brief Graph of the curve skeleton
+			 */
+			boost::adjacency_list<> m_graph;
+
+	};
 }
 
 
-#endif //_SKELETON_H_
+#endif //_GRAPHCURVESKELETON_H_
+

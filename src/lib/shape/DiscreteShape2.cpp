@@ -20,48 +20,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+
 /**
- *  \file Projective.h
- *  \brief Defines skeleton projective model
+ *  \file DiscreteShape2.cpp
+ *  \brief Defines discrete shape in dimension 2
  *  \author Bastien Durix
  */
 
-#ifndef _PROJECTIVEMODEL_H_
-#define _PROJECTIVEMODEL_H_
+#include "DiscreteShape.h"
 
-#include "MetaModel.h"
+using namespace shape;
 
-/**
- *  \brief Skeleton representations
- */
-namespace skeleton
+DiscreteShape<2>::DiscreteShape(const mathtools::affine::Frame<2> &frame, unsigned int width, unsigned int height) :
+	m_frame(new mathtools::affine::Frame<2>(frame)), m_disc(width*height,0), m_width(width), m_height(height)
+{}
+
+DiscreteShape<2>::DiscreteShape(unsigned int width, unsigned int height) :
+	DiscreteShape(mathtools::affine::Frame<2>(), width, height)
+{}
+
+DiscreteShape<2>::DiscreteShape(const mathtools::affine::Frame<2>::Ptr frame, unsigned int width, unsigned int height) :
+	DiscreteShape<2>(*frame,width,height)
+{}
+
+bool DiscreteShape<2>::isIn(const mathtools::affine::Point<2> &point) const
 {
-	/**
-	 *  \brief Skeletal models
-	 */
-	namespace model
+	Eigen::Vector2d coords = point.getCoords(m_frame);
+	
+	bool isin=false;
+	
+	if(coords.x() >= 0 && coords.y() >= 0 && coords.x() < m_width && coords.y() < m_height)
 	{
-		/**
-		 *  \brief Describe projective skeleton model
-		 */
-		class Projective
-		{
-			
-		};
-		
-		/**
-		 *  \brief Describe Projective model meta data
-		 */
-		template<>
-		struct meta<Projective>
-		{
-			/**
-			 *  \brief Describe storage dimension of the model
-			 */
-			static constexpr unsigned int stordim = 3;
-		};
+		unsigned int ind = (unsigned int)coords.x() + m_width * (unsigned int)coords.y();
+
+		if(m_disc[ind]) isin = true;
 	}
+
+	return isin;
 }
 
-
-#endif //_PROJECTIVEMODEL_H_

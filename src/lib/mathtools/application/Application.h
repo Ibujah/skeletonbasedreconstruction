@@ -70,6 +70,11 @@ namespace mathtools
 				 *  \returns Out put associated by the application
 				 */
 				virtual outType operator()(const inType &t) const = 0;
+
+				/**
+				 *  \brief Pure virtual destructor
+				 */
+				virtual ~Application<OutType,InType>() {};
 		};
 
 		/**
