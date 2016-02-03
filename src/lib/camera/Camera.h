@@ -54,6 +54,7 @@ namespace camera
 			 *  \brief Camera extrinsic parameters
 			 */
 			std::shared_ptr<Extrinsics> m_extrinsics;
+			
 	};
 }
 

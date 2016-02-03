@@ -40,7 +40,25 @@ namespace camera
 	 */
 	class Intrinsics
 	{
-		
+		protected:
+			/**
+			 *  \brief Image width
+			 */
+			unsigned int m_width;
+			
+			/**
+			 *  \brief Image height
+			 */
+			unsigned int m_height;
+			
+		public:
+			/**
+			 *  \brief Constructor
+			 *
+			 *  \param width   image width
+			 *  \param height  image height
+			 */
+			Intrinsics(unsigned int width, unsigned int height) : m_width(width), m_height(height) {}
 	};
 }
 

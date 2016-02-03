@@ -30,6 +30,8 @@ SOFTWARE.
 #ifndef _ORTHOCAM_H_
 #define _ORTHOCAM_H_
 
+#include "Intrinsics.h"
+
 /**
  *  \brief Camera tools
  */
@@ -38,7 +40,7 @@ namespace camera
 	/**
 	 *  \brief Defines orthographic camera parameters
 	 */
-	class OrthoCam
+	class OrthoCam : public Intrinsics
 	{
 		
 	};
