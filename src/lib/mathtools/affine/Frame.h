@@ -62,7 +62,7 @@ namespace mathtools
 				/**
 				 *  \brief Vectorial basis
 				 */
-				typename vectorial::Basis<Dim>::Ptr m_basis;
+				vectorial::Basis<Dim> m_basis;
 
 				/**
 				 *  \brief Frame origin
@@ -76,16 +76,28 @@ namespace mathtools
 				 *  \param basis  vectorial basis of the frame
 				 *  \param origin frame origin
 				 */
-				Frame(const vectorial::Basis<Dim> &basis = vectorial::Basis<Dim>(), const Eigen::Matrix<double,Dim,1> &origin = Eigen::Matrix<double,Dim,1>::Zeros()) :
-					m_basis(new vectorial::Basis<Dim>(basis)), m_origin(origin) {}
-				
+				Frame(const vectorial::Basis<Dim> &basis = vectorial::Basis<Dim>(), const Eigen::Matrix<double,Dim,1> &origin = Eigen::Matrix<double,Dim,1>::Zero()) :
+					m_basis(basis), m_origin(origin) {}
+
 				/**
-				 *  \brief Constructor
+				 *  \brief Vectorial basis getter
 				 *
-				 *  \param basis  vectorial basis of the frame
-				 *  \param origin frame origin
+				 *  \return Current basis
 				 */
-				Frame(const typename vectorial::Basis<Dim>::Ptr &basis, const Eigen::Matrix<double,Dim,1> &origin) : m_basis(basis), m_origin(origin) {}
+				inline const vectorial::Basis<Dim>& getBasis() const
+				{
+					return m_basis;
+				}
+
+				/**
+				 *  \brief Frame origin coordinates getter
+				 *
+				 *  \return Current origin coordinates in canonic frame
+				 */
+				inline const Eigen::Matrix<double,Dim,1>& getOrigin() const
+				{
+					return m_origin;
+				}
 		};
 	}
 }
