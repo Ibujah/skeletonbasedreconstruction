@@ -130,7 +130,7 @@ namespace mathtools
 				 */
 				inline const Eigen::Matrix<double,Dim,1> getCoords(const Frame<Dim> &frame) const
 				{
-					return frame.getBasisInverse() * (m_coords - frame.getOrigin());
+					return frame.getBasis().getMatrixInverse() * (m_coords - frame.getOrigin());
 				}
 
 				/**
