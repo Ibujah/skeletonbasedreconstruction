@@ -66,7 +66,7 @@ namespace shape
 			 *  \tparam frame Shape frame
 			 */
 			ImplicitShape(mathtools::affine::Frame<Dim> frame = mathtools::affine::Frame<Dim>()) :
-				ImplicitShape(typename mathtools::affine::Frame<Dim>(new mathtools::affine::Frame<Dim>(frame))) {}
+				ImplicitShape(typename mathtools::affine::Frame<Dim>::Ptr(new mathtools::affine::Frame<Dim>(frame))) {}
 
 			/**
 			 *  \brief Test if a point is in the shape
