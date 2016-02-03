@@ -9,9 +9,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 find_package(EIGEN REQUIRED)
 
-set(MATHTOOLS_LIB "Mathtools_Lib")
-set(SHAPE_LIB     "Shape_Lib")
-set(BOUNDARY_LIB  "Boundary_Lib")
+set(MATHTOOLS_LIB "Mathtools")
+set(SHAPE_LIB     "Shape")
+set(BOUNDARY_LIB  "Boundary")
 
 include_directories(${EIGEN_INCLUDE_DIRS})
 
