@@ -105,16 +105,6 @@ namespace skeleton
 			 *  \brief Last added node, to compute the key of the next added node
 			 */
 			unsigned int m_last;
-			
-			/**
-			 *  \brief Map of vertex indices
-			 */
-			typename boost::property_map<GraphType,boost::vertex_index_t>::const_type m_map_index;
-			
-			/**
-			 *  \brief Map of vertex vectors
-			 */
-			typename boost::property_map<GraphType,vertex_vec_t>::const_type m_map_vec;
 
 		public:
 			/**
@@ -137,21 +127,9 @@ namespace skeleton
 			 *  \param grsk skeleton to copy
 			 */
 			GraphCurveSkeleton(const GraphCurveSkeleton<Model> &grsk) :
-				m_model(grsk.m_model), m_graph(grsk.m_graph), m_last(grsk.m_last)
-			{
-				updateVert();
-			}
+				m_model(grsk.m_model), m_graph(grsk.m_graph), m_last(grsk.m_last) {}
 		
 		protected:
-			/**
-			 *  \brief Updates the vertices informations
-			 */
-			void updateVert()
-			{
-				m_map_index = boost::get(boost::vertex_index_t(),m_graph);
-				m_map_vec   = boost::get(vertex_vec_t(),         m_graph);
-			}
-
 			/**
 			 *  \brief Get the vertex descriptor associated to a vertex index
 			 *
@@ -164,9 +142,10 @@ namespace skeleton
 			{
 				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
 				bool v_found = false;
+				boost::property_map<GraphType,boost::vertex_index_t> map_index = boost::get(boost::vertex_vec_t(),m_graph);
 				for(boost::tie(vi,vi_end) = boost::vertex(m_graph); vi != vi_end && v_found; vi++)
 				{
-					if(m_map_index[*vi] == index)
+					if(map_index[*vi] == index)
 					{
 						v_desc = *vi;
 						v_found = true;
@@ -192,14 +171,15 @@ namespace skeleton
 			{
 				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
 				bool v1_found = false, v2_found = false;
+				boost::property_map<GraphType,boost::vertex_index_t> map_index = boost::get(boost::vertex_vec_t(),m_graph);
 				for(boost::tie(vi,vi_end) = boost::vertex(m_graph); vi != vi_end && (!v1_found || !v2_found); vi++)
 				{
-					if(m_map_index[*vi] == ind1)
+					if(map_index[*vi] == ind1)
 					{
 						v_desc1 = *vi;
 						v1_found = true;
 					}
-					if(m_map_index[*vi] == ind2)
+					if(map_index[*vi] == ind2)
 					{
 						v_desc2 = *vi;
 						v2_found = true;
@@ -224,8 +204,6 @@ namespace skeleton
 				unsigned int index = m_last++;
 				//Adds the vertex in the graph, with index and storage information
 				boost::add_vertex(index,vec,m_graph);
-				//updates maps containing informations on vertices
-				updateVert();
 				return index;
 			}
 
@@ -260,14 +238,9 @@ namespace skeleton
 				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
 				bool v_found = getDesc(index,v_desc);
 
+				// second step, remove the node
 				if(v_found)
-				{
-					// second step, remove the node
 					boost::remove_vertex(v_desc,m_graph);
-
-					//third step, update node database
-					updateVert();
-				}
 
 				return v_found;
 			}
