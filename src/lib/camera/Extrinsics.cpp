@@ -22,48 +22,16 @@ SOFTWARE.
 
 
 /**
- *  \file  Extrinsics.h
+ *  \file  Extrinsics.cpp
  *  \brief Defines extrinsic camera parameters
  *  \author Bastien Durix
  */
 
-#ifndef _EXTRINSICS_H_
-#define _EXTRINSICS_H_
+#include "Extrinsics.h"
 
-#include <memory>
-#include <mathtools/affine/Frame.h>
+camera::Extrinsics::Extrinsics(const mathtools::affine::Frame<3>::Ptr frame) : m_frame(frame)
+{}
 
-/**
- *  \brief Camera tools
- */
-namespace camera
-{
-	/**
-	 *  \brief Defines extrinsic camera parameters
-	 */
-	class Extrinsics
-	{
-		protected:
-			/**
-			 *  \brief Camera frame
-			 */
-			std::shared_ptr<mathtools::affine::Frame<3> > m_frame;
+camera::Extrinsics::Extrinsics(const mathtools::affine::Frame<3> &frame) : Extrinsics(mathtools::affine::Frame<3>::Ptr(new mathtools::affine::Frame<3>(frame)))
+{}
 
-		public:
-			/**
-			 *  \brief Constructor
-			 *
-			 *  \param frame camera frame
-			 */
-			Extrinsics(const mathtools::affine::Frame<3>::Ptr frame);
-
-			/**
-			 *  \brief Constructor
-			 *
-			 *  \param frame camera frame
-			 */
-			Extrinsics(const mathtools::affine::Frame<3> &frame);
-	};
-}
-
-#endif //_EXTRINSICS_H_
