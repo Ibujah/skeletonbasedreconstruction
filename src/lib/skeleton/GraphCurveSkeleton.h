@@ -49,17 +49,45 @@ namespace skeleton
 	template<typename Model>
 	class GraphCurveSkeleton
 	{
-		protected:
+		public:
 			/**
 			 *  \brief Graph curve skeleton shared pointer
 			 */
 			using Ptr = std::shared_ptr<GraphCurveSkeleton<Model> >;
-			
+
 			/**
 			 *  \brief Storage type of the objects in the skeleton
 			 */
 			using Stor = Eigen::Matrix<double,model::meta<Model>::stordim,1>;
-
+			
+		protected:
+			/**
+			 *  \brief Name of storage property in boost graph
+			 */
+			struct vertex_vec_t
+			{
+				/**
+				 *  \brief Define a vertex tag for the property
+				 */
+				typedef boost::vertex_property_tag kind;
+			};
+			
+			/**
+			 *  \brief Vertex property
+			 *
+			 *  \details Creates a property called vertex_index_t of type unsigned int
+			 *           and a property called vertex_stor of type Stor
+			 */
+			using VertexProperty = boost::property< boost::vertex_index_t, unsigned int,
+								   boost::property< vertex_vec_t,          Stor> >;
+			
+			/**
+			 *  \brief Graph type
+			 *
+			 *  \details Creates a undirected graph with vertices using VertexProperty
+			 */
+			using GraphType = boost::adjacency_list<boost::listS,boost::listS,boost::undirectedS,VertexProperty>;
+			
 			/**
 			 *  \brief Model used to give a meaning to the skeleton
 			 *
@@ -67,26 +95,44 @@ namespace skeleton
 			 *			 once it is created, it should not be changed
 			 */
 			typename Model::Ptr m_model;
-			
-			/**
-			 *  \brief All nodes in the graph curve skeleton
-			 *
-			 *  \details This storage will be intrepreted by the model
-			 */
-			std::map<unsigned int,Stor> m_node;
-			
+
 			/**
 			 *  \brief Graph of the curve skeleton
 			 */
-			boost::adjacency_list<boost::listS,boost::listS,boost::undirectedS> m_graph;
+			GraphType m_graph;
 			
+			/**
+			 *  \brief Last added node, to compute the key of the next added node
+			 */
+			unsigned int m_last;
+			
+			/**
+			 *  \brief Map of vertex indices
+			 */
+			typename boost::property_map<GraphType,boost::vertex_index_t>::const_type m_map_index;
+			
+			/**
+			 *  \brief Map of vertex vectors
+			 */
+			typename boost::property_map<GraphType,vertex_vec_t>::const_type m_map_vec;
+		
+		protected:
+			/**
+			 *  \brief Updates the vertices informations
+			 */
+			void updateVert()
+			{
+				m_map_index = boost::get(boost::vertex_index_t(),m_graph);
+				m_map_vec   = boost::get(vertex_vec_t(),         m_graph);
+			}
+
 		public:
 			/**
 			 *  \brief Constructor
 			 *
 			 *  \param model initialisation of the model to use
 			 */
-			GraphCurveSkeleton(const typename Model::Ptr model) : m_model(model) {}
+			GraphCurveSkeleton(const typename Model::Ptr model) : m_model(model), m_graph(), m_last(0) {}
 
 			/**
 			 *  \brief Constructor
@@ -101,22 +147,38 @@ namespace skeleton
 			 *  \param grsk skeleton to copy
 			 */
 			GraphCurveSkeleton(const GraphCurveSkeleton<Model> &grsk) :
-				GraphCurveSkeleton(grsk.m_model), m_node(grsk.m_node), m_graph(grsk.m_graph) {}
+				m_model(grsk.m_model), m_graph(grsk.m_graph), m_last(grsk.m_last)
+			{
+				updateVert();
+			}
+			
+			/**
+			 *  \brief Model getter
+			 *
+			 *  \return Const shared pointer to skeleton model
+			 */
+			inline const typename Model::Ptr getModel() const
+			{
+				return m_model;
+			}
 
 			/**
 			 *  \brief Adding node function
 			 *
-			 *  \param node node to add
+			 *  \param vec vector to add
 			 *
-			 *  \return node indice
+			 *  \return node index
 			 *
 			 *  \details The function does not check if the node is already in the skeleton or not
 			 */
-			unsigned int addNode(const Stor &node)
+			unsigned int addNode(const Stor &vec)
 			{
-				unsigned int key = *(m_node.rbegin())+1;
-				m_node.insert(std::pair<unsigned int,Stor>(key,node));
-				return key;
+				unsigned int index = m_last++;
+				//Adds the vertex in the graph, with index and storage information
+				boost::add_vertex(index,vec,m_graph);
+				//updates maps containing informations on vertices
+				updateVert();
+				return index;
 			}
 
 			/**
@@ -126,7 +188,7 @@ namespace skeleton
 			 *
 			 *  \param node node to add
 			 *
-			 *  \return node indice
+			 *  \return node index
 			 *
 			 *  \details The function does not check if the node is already in the skeleton or not
 			 */
@@ -135,6 +197,39 @@ namespace skeleton
 			{
 				Stor vec = m_model->template toVec<TypeNode>(node);
 				return addNode<Eigen::Matrix<double,model::meta<Model>::stordim,1> >(vec);
+			}
+
+			/**
+			 *  \brief Adding edge function
+			 *
+			 *  \param ind1 first node index
+			 *  \param ind2 second node index
+			 *
+			 *  \return false if one of the two nodes is not in the skeleton
+			 */
+			bool addEdge(unsigned int ind1, unsigned int ind2)
+			{
+				// first step, get the descriptors corresponding to indices
+				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
+				typename boost::graph_traits<GraphType>::vertex_descriptor v1, v2;
+				bool v1_found = false, v2_found = false;
+				for(boost::tie(vi,vi_end) = boost::vertex(m_graph); vi != vi_end && (!v1_found || !v2_found); vi++)
+				{
+					if(m_map_index[*vi] == ind1)
+					{
+						v1 = *vi;
+						v1_found = true;
+					}
+					if(m_map_index[*vi] == ind2)
+					{
+						v2 = *vi;
+						v2_found = true;
+					}
+				}
+				if(v1_found && v2_found)
+					boost::add_edge(v1,v2,m_graph);
+
+				return v1_found && v2_found;
 			}
 	};
 }
