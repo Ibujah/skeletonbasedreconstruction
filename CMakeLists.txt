@@ -13,7 +13,9 @@ find_package(EIGEN REQUIRED)
 set(MATHTOOLS_LIB "Mathtools")
 set(SHAPE_LIB     "Shape")
 set(BOUNDARY_LIB  "Boundary")
+set(CAMERA_LIB    "Camera")
 
-include_directories(${EIGEN_INCLUDE_DIRS})
+include_directories(${EIGEN_INCLUDE_DIRS}
+					${Boost_INCLUDE_DIR})
 
 add_subdirectory(src/)
