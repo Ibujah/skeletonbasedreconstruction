@@ -115,16 +115,6 @@ namespace skeleton
 			 *  \brief Map of vertex vectors
 			 */
 			typename boost::property_map<GraphType,vertex_vec_t>::const_type m_map_vec;
-		
-		protected:
-			/**
-			 *  \brief Updates the vertices informations
-			 */
-			void updateVert()
-			{
-				m_map_index = boost::get(boost::vertex_index_t(),m_graph);
-				m_map_vec   = boost::get(vertex_vec_t(),         m_graph);
-			}
 
 		public:
 			/**
@@ -151,7 +141,75 @@ namespace skeleton
 			{
 				updateVert();
 			}
-			
+		
+		protected:
+			/**
+			 *  \brief Updates the vertices informations
+			 */
+			void updateVert()
+			{
+				m_map_index = boost::get(boost::vertex_index_t(),m_graph);
+				m_map_vec   = boost::get(vertex_vec_t(),         m_graph);
+			}
+
+			/**
+			 *  \brief Get the vertex descriptor associated to a vertex index
+			 *
+			 *  \param index  vertex index
+			 *  \param v_desc out vertex descriptor
+			 *
+			 *  \return false if the index is not in the skeleton
+			 */
+			bool getDesc(unsigned int index, typename boost::graph_traits<GraphType>::vertex_descriptor &v_desc) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
+				bool v_found = false;
+				for(boost::tie(vi,vi_end) = boost::vertex(m_graph); vi != vi_end && v_found; vi++)
+				{
+					if(m_map_index[*vi] == index)
+					{
+						v_desc = *vi;
+						v_found = true;
+					}
+				}
+				
+				return v_found;
+			}
+
+			/**
+			 *  \brief Get the vertex descriptors associated to two vertex indices
+			 *
+			 *  \param ind1    first vertex index
+			 *  \param ind2    second vertex index
+			 *  \param v_desc1 out first vertex descriptor
+			 *  \param v_desc2 out second vertex descriptor
+			 *
+			 *  \return false if one of the indices is not in the skeleton
+			 */
+			bool getDesc(unsigned int ind1, unsigned int ind2,
+						 typename boost::graph_traits<GraphType>::vertex_descriptor &v_desc1,
+						 typename boost::graph_traits<GraphType>::vertex_descriptor &v_desc2) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
+				bool v1_found = false, v2_found = false;
+				for(boost::tie(vi,vi_end) = boost::vertex(m_graph); vi != vi_end && (!v1_found || !v2_found); vi++)
+				{
+					if(m_map_index[*vi] == ind1)
+					{
+						v_desc1 = *vi;
+						v1_found = true;
+					}
+					if(m_map_index[*vi] == ind2)
+					{
+						v_desc2 = *vi;
+						v2_found = true;
+					}
+				}
+				
+				return v_found;
+			}
+
+		public:
 			/**
 			 *  \brief Model getter
 			 *
@@ -198,6 +256,31 @@ namespace skeleton
 				Stor vec = m_model->template toVec<TypeNode>(node);
 				return addNode<Eigen::Matrix<double,model::meta<Model>::stordim,1> >(vec);
 			}
+			
+			/**
+			 *  \brief Removing node function
+			 *
+			 *  \param index node index
+			 *
+			 *  \return false if node is not in the skeleton
+			 */
+			bool remNode(unsigned int index)
+			{
+				// first step, get the descriptor corresponding to index
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
+				bool v_found = getDesc(index,v_desc);
+
+				if(v_found)
+				{
+					// second step, remove the node
+					boost::remove_vertex(v_desc,m_graph);
+
+					//third step, update node database
+					updateVert();
+				}
+
+				return v_found;
+			}
 
 			/**
 			 *  \brief Adding edge function
@@ -210,27 +293,37 @@ namespace skeleton
 			bool addEdge(unsigned int ind1, unsigned int ind2)
 			{
 				// first step, get the descriptors corresponding to indices
-				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
-				typename boost::graph_traits<GraphType>::vertex_descriptor v1, v2;
-				bool v1_found = false, v2_found = false;
-				for(boost::tie(vi,vi_end) = boost::vertex(m_graph); vi != vi_end && (!v1_found || !v2_found); vi++)
-				{
-					if(m_map_index[*vi] == ind1)
-					{
-						v1 = *vi;
-						v1_found = true;
-					}
-					if(m_map_index[*vi] == ind2)
-					{
-						v2 = *vi;
-						v2_found = true;
-					}
-				}
-				if(v1_found && v2_found)
-					boost::add_edge(v1,v2,m_graph);
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
+				bool v_found = getDesc(ind1,ind2,v_desc1,v_desc2);
 
-				return v1_found && v2_found;
+				// second step, add the edge
+				if(v_found)
+					boost::add_edge(v_desc1,v_desc2,m_graph);
+
+				return v_found;
 			}
+			
+			/**
+			 *  \brief Removing edge function
+			 *
+			 *  \param ind1 first node index
+			 *  \param ind2 second node index
+			 *
+			 *  \return false if one of the two nodes is not in the skeleton
+			 */
+			bool remEdge(unsigned int ind1, unsigned int ind2)
+			{
+				// first step, get the descriptors corresponding to indices
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
+				bool v_found = getDesc(ind1,ind2,v_desc1,v_desc2);
+
+				// second step, remove the edge
+				if(v_found)
+					boost::remove_edge(v_desc1,v_desc2,m_graph);
+
+				return v_found;
+			}
+
 	};
 }
 
