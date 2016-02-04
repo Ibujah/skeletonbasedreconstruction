@@ -59,6 +59,11 @@ namespace camera
 			 *  \param height  image height
 			 */
 			Intrinsics(unsigned int width, unsigned int height) : m_width(width), m_height(height) {}
+
+			/**
+			 *  \brief Virtual destructor
+			 */
+			virtual ~Intrinsics() {}
 	};
 }
 
