@@ -206,20 +206,10 @@ namespace skeleton
 					}
 				}
 				
-				return v_found;
+				return v1_found && v2_found;
 			}
 
-		public:
-			/**
-			 *  \brief Model getter
-			 *
-			 *  \return Const shared pointer to skeleton model
-			 */
-			inline const typename Model::Ptr getModel() const
-			{
-				return m_model;
-			}
-
+		public: // modifying functions
 			/**
 			 *  \brief Adding node function
 			 *
@@ -324,6 +314,16 @@ namespace skeleton
 				return v_found;
 			}
 
+		public: // non modifying functions
+			/**
+			 *  \brief Model getter
+			 *
+			 *  \return Const shared pointer to skeleton model
+			 */
+			inline const typename Model::Ptr getModel() const
+			{
+				return m_model;
+			}
 	};
 }
 
