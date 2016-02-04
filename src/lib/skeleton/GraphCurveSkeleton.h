@@ -142,7 +142,7 @@ namespace skeleton
 			{
 				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
 				bool v_found = false;
-				boost::property_map<GraphType,boost::vertex_index_t> map_index = boost::get(boost::vertex_vec_t(),m_graph);
+				boost::property_map<GraphType,boost::vertex_index_t> map_index = boost::get(boost::vertex_index_t(),m_graph);
 				for(boost::tie(vi,vi_end) = boost::vertex(m_graph); vi != vi_end && v_found; vi++)
 				{
 					if(map_index[*vi] == index)
@@ -171,7 +171,7 @@ namespace skeleton
 			{
 				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
 				bool v1_found = false, v2_found = false;
-				boost::property_map<GraphType,boost::vertex_index_t> map_index = boost::get(boost::vertex_vec_t(),m_graph);
+				boost::property_map<GraphType,boost::vertex_index_t> map_index = boost::get(boost::vertex_index_t(),m_graph);
 				for(boost::tie(vi,vi_end) = boost::vertex(m_graph); vi != vi_end && (!v1_found || !v2_found); vi++)
 				{
 					if(map_index[*vi] == ind1)
