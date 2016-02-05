@@ -29,6 +29,8 @@ SOFTWARE.
 #include <iostream>
 #include <math.h>
 
+#include <cstdlib>
+
 #include <skeleton/GraphCurveSkeleton.h>
 #include <skeleton/model/Classic.h>
 
@@ -36,20 +38,54 @@ using namespace mathtools::affine;
 
 int main()
 {
+	unsigned int return_value = 0;
+	
+	// frame creation
+	Frame<2>::Ptr frame(new Frame<2>{Eigen::Vector2d(0.0,1.0),Eigen::Vector2d(1.0,0.0),Eigen::Vector2d(0.0,0.0)});
+
 	// model creation
-	skeleton::model::Classic<2>::Ptr modclass(new skeleton::model::Classic<2>());
+	skeleton::model::Classic<2>::Ptr modclass(new skeleton::model::Classic<2>{frame});
+	
+	// creating a random node
+	Eigen::Vector3d vec3((double)(rand()%201)/10.0-1.0,
+						 (double)(rand()%201)/10.0-1.0,
+						 (double)(rand()%201)/10.0);
 
 	// skeleton creation
 	skeleton::GraphCurveSkeleton<skeleton::model::Classic<2> > skel(modclass);
 	
+	std::cout << "Adding Node test... ";
+
 	// adding a node
-	unsigned int ind = skel.addNode(Eigen::Vector3d(1.0,2.0,3.0));
+	unsigned int ind = skel.addNode(vec3);
 	
 	// getting the node (vector form)
-	std::cout << skel.getNode(ind).transpose() << std::endl;
+	Eigen::Vector3d vec3_2 = skel.getNode(ind);
+	
+	if(vec3_2.isApprox(vec3,std::numeric_limits<double>::epsilon()))
+	{
+		std::cout << "Success!" << std::endl;
+	}
+	else
+	{
+		return_value = -1;
+		std::cout << "Fail!" << std::endl;
+	}
+	
+	std::cout << "Getter test... ";
 
 	// getting the node (center form)
-	std::cout << skel.getNode<Point<2> >(ind).getCoords().transpose() << std::endl;
+	Point<2> pt = skel.getNode<Point<2> >(ind);
+	
+	if(pt.getCoords().isApprox(frame->getBasis().getMatrix()*vec3.block<2,1>(0,0)+frame->getOrigin()))
+	{
+		std::cout << "Success!" << std::endl;
+	}
+	else
+	{
+		return_value = -1;
+		std::cout << "Fail!" << std::endl;
+	}
 
-	return 0;
+	return return_value;
 }
