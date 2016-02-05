@@ -30,8 +30,11 @@ SOFTWARE.
 #include <math.h>
 
 #include <skeleton/GraphCurveSkeleton.h>
+#include <skeleton/model/Classic.h>
+
 
 int main()
 {
+	skeleton::GraphCurveSkeleton<skeleton::model::Classic<2> > skel(skeleton::model::Classic<2>);
 	return 0;
 }
