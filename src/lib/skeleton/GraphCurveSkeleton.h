@@ -31,6 +31,7 @@ SOFTWARE.
 
 #include <memory>
 #include <map>
+#include <stdexcept>
 #include <Eigen/Dense>
 #include <boost/graph/adjacency_list.hpp>
 #include "model/MetaModel.h"
@@ -296,6 +297,58 @@ namespace skeleton
 			inline const typename Model::Ptr getModel() const
 			{
 				return m_model;
+			}
+			
+			/**
+			 *  \brief Test if the node inex is in the skeleton
+			 *
+			 *  \return true if the node is in the skeleton
+			 */
+			bool isNodeIn(unsigned int index) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
+				return getDesc(index,v_desc);
+			}
+
+			/**
+			 *  \brief Node getter by index
+			 *
+			 *  \param index index of the node to get
+			 *
+			 *  \return storage associated to the node
+			 */
+			const Stor getNode(unsigned int index) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
+				if(!getDesc(index,v_desc))
+				{
+					throw new std::logic_error("skeleton::GraphCurveSkeleton::getNode(): Node index is not in the skeleton");
+				}
+				
+				boost::property_map<GraphType,vertex_vec_t> map_stor = boost::get(vertex_vec_t(),m_graph);
+				return map_stor[v_desc];
+			}
+
+			/**
+			 *  \brief Node getter by index
+			 *
+			 *  \tparam TypeNode type of the node to get
+			 *
+			 *  \param index index of the node to get
+			 *
+			 *  \return node associated to index
+			 */
+			template<typename TypeNode>
+			const TypeNode getNode(unsigned int index) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
+				if(!getDesc(index,v_desc))
+				{
+					throw new std::logic_error("skeleton::GraphCurveSkeleton::getNode(): Node index is not in the skeleton");
+				}
+				
+				boost::property_map<GraphType,vertex_vec_t> map_stor = boost::get(vertex_vec_t(),m_graph);
+				return m_model->template toObj<TypeNode>(map_stor[v_desc]);
 			}
 	};
 }
