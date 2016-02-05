@@ -75,7 +75,7 @@ namespace skeleton
 				 *
 				 *  \param frame frame of the skeleton
 				 */
-				Classic(const mathtools::affine::Frame<Dim> &frame) : Classic(typename mathtools::affine::Frame<Dim>::Ptr(new mathtools::affine::Frame<Dim>(frame))) {}
+				Classic(const mathtools::affine::Frame<Dim> &frame = mathtools::affine::Frame<Dim>()) : Classic(typename mathtools::affine::Frame<Dim>::Ptr(new mathtools::affine::Frame<Dim>(frame))) {}
 
 				/**
 				 *  \brief Converts an object into a vector
@@ -101,9 +101,7 @@ namespace skeleton
 				template<typename TypeObj>
 				TypeObj toObj(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec)
 				{
-					TypeObj obj;
-					toObj(vec,obj);
-					return obj;
+					return toObj(vec,TypeObj{});
 				}
 
 			protected:
@@ -114,10 +112,10 @@ namespace skeleton
 				 *
 				 *  \return center associated to vec
 				 */
-				inline void toObj(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec,
-						   mathtools::affine::Point<Dim> &pt)
+				inline mathtools::affine::Point<Dim> toObj(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec,
+														   const mathtools::affine::Point<Dim> &)
 				{
-					pt = mathtools::affine::Point<Dim>(vec.template block<Dim,1>(0,0),m_frame);
+					return mathtools::affine::Point<Dim>(vec.template block<Dim,1>(0,0),m_frame);
 				}
 		};
 		
