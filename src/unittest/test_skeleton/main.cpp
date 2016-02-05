@@ -41,7 +41,7 @@ int main()
 	unsigned int return_value = 0;
 	
 	// frame creation
-	Frame<2>::Ptr frame(new Frame<2>{Eigen::Vector2d(0.0,1.0),Eigen::Vector2d(1.0,0.0),Eigen::Vector2d(0.0,0.0)});
+	Frame<2>::Ptr frame(new Frame<2>{Eigen::Vector2d(2.0,1.0),Eigen::Vector2d(1.0,0.0),Eigen::Vector2d(1.0,0.0)});
 
 	// model creation
 	skeleton::model::Classic<2>::Ptr modclass(new skeleton::model::Classic<2>{frame});

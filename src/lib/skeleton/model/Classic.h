@@ -57,11 +57,13 @@ namespace skeleton
 				 *  \brief Shared pointer to the model
 				 */
 				using Ptr = std::shared_ptr<Classic<Dim> >;
+
 			protected:
 				/**
 				 *  \brief Frame of the skeleton
 				 */
 				typename mathtools::affine::Frame<Dim>::Ptr m_frame;
+
 			public:
 				/**
 				 *  \brief Constructor
