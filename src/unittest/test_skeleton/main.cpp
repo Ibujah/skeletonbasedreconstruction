@@ -32,9 +32,24 @@ SOFTWARE.
 #include <skeleton/GraphCurveSkeleton.h>
 #include <skeleton/model/Classic.h>
 
+using namespace mathtools::affine;
 
 int main()
 {
-	skeleton::GraphCurveSkeleton<skeleton::model::Classic<2> > skel(skeleton::model::Classic<2>);
+	// model creation
+	skeleton::model::Classic<2>::Ptr modclass(new skeleton::model::Classic<2>());
+
+	// skeleton creation
+	skeleton::GraphCurveSkeleton<skeleton::model::Classic<2> > skel(modclass);
+	
+	// adding a node
+	unsigned int ind = skel.addNode(Eigen::Vector3d(1.0,2.0,3.0));
+	
+	// getting the node (vector form)
+	std::cout << skel.getNode(ind).transpose() << std::endl;
+
+	// getting the node (center form)
+	std::cout << skel.getNode<Point<2> >(ind).getCoords().transpose() << std::endl;
+
 	return 0;
 }
