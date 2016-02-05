@@ -29,6 +29,9 @@ SOFTWARE.
 #ifndef _CLASSICMODEL_H_
 #define _CLASSICMODEL_H_
 
+#include <memory>
+#include <mathtools/affine/Frame.h>
+#include <mathtools/affine/Point.h>
 #include "MetaModel.h"
 
 /**
@@ -49,7 +52,73 @@ namespace skeleton
 		template<unsigned int Dim>
 		class Classic
 		{
-			
+			public:
+				/**
+				 *  \brief Shared pointer to the model
+				 */
+				using Ptr = std::shared_ptr<Classic<Dim> >;
+			protected:
+				/**
+				 *  \brief Frame of the skeleton
+				 */
+				typename mathtools::affine::Frame<Dim>::Ptr m_frame;
+			public:
+				/**
+				 *  \brief Constructor
+				 *
+				 *  \param frame frame of the skeleton
+				 */
+				Classic(const typename mathtools::affine::Frame<Dim>::Ptr frame) : m_frame(frame) {}
+
+				/**
+				 *  \brief Constructor
+				 *
+				 *  \param frame frame of the skeleton
+				 */
+				Classic(const mathtools::affine::Frame<Dim> &frame) : Classic(typename mathtools::affine::Frame<Dim>::Ptr(new mathtools::affine::Frame<Dim>(frame))) {}
+
+				/**
+				 *  \brief Converts an object into a vector
+				 *
+				 *  \tparam TypeObj type of the object to convert
+				 *
+				 *  \param obj object to convert
+				 *
+				 *  \return vector associated to obj
+				 */
+				template<typename TypeObj>
+				Eigen::Matrix<double,meta<Classic>::stordim,1> toVec(const TypeObj &obj);
+
+				/**
+				 *  \brief Converts a vector into an object
+				 *
+				 *  \tparam TypeObj type of the object to convert in
+				 *
+				 *  \param vec vector to convert
+				 *
+				 *  \return object associated to vec
+				 */
+				template<typename TypeObj>
+				TypeObj toObj(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec)
+				{
+					TypeObj obj;
+					toObj(vec,obj);
+					return obj;
+				}
+
+			protected:
+				/**
+				 *  \brief Associate the center of the sphere to a vector
+				 *
+				 *  \param vec vector to convert
+				 *
+				 *  \return center associated to vec
+				 */
+				inline void toObj(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec,
+						   mathtools::affine::Point<Dim> &pt)
+				{
+					pt = mathtools::affine::Point<Dim>(vec.template block<Dim,1>(0,0),m_frame);
+				}
 		};
 		
 		/**
