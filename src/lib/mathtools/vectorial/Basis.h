@@ -80,6 +80,45 @@ namespace mathtools
 				}
 
 				/**
+				 *  \brief 2d basis constructor 
+				 *
+				 *  \param vec1 first basis vector
+				 *  \param vec2 second basis vector
+				 *
+				 *  \throws logic_error if matrix parameter not invertible
+				 */
+				Basis(const Eigen::Vector2d &vec1, const Eigen::Vector2d &vec2)
+				{
+					m_matrix << vec1, vec2;
+					double det = m_matrix.determinant();
+					if(det*det <= Eigen::NumTraits<double>::dummy_precision())
+					{
+						throw new std::logic_error("mathtools::vectorial::Basis() : basis parameter not invertible");
+					}
+					m_matrix_inv = m_matrix.inverse();
+				}
+
+				/**
+				 *  \brief 3d basis constructor 
+				 *
+				 *  \param vec1 first basis vector
+				 *  \param vec2 second basis vector
+				 *  \param vec3 third basis vector
+				 *
+				 *  \throws logic_error if matrix parameter not invertible
+				 */
+				Basis(const Eigen::Vector3d &vec1, const Eigen::Vector3d &vec2, const Eigen::Vector3d &vec3)
+				{
+					m_matrix << vec1, vec2, vec3;
+					double det = m_matrix.determinant();
+					if(det*det <= Eigen::NumTraits<double>::dummy_precision())
+					{
+						throw new std::logic_error("mathtools::vectorial::Basis() : basis parameter not invertible");
+					}
+					m_matrix_inv = m_matrix.inverse();
+				}
+
+				/**
 				 *  \brief Copy constructor
 				 *
 				 *  \param basis basis to copy
