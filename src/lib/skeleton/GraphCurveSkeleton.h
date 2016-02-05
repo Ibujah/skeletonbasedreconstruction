@@ -79,8 +79,18 @@ namespace skeleton
 			 *  \details Creates a property called vertex_index_t of type unsigned int
 			 *           and a property called vertex_stor of type Stor
 			 */
-			using VertexProperty = boost::property< boost::vertex_index_t, unsigned int,
-								   boost::property< vertex_vec_t,          Stor> >;
+			struct VertexProperty 
+			{
+				/**
+				 *  \brief Vertex index
+				 */
+				unsigned int index;
+
+				/**
+				 *  \brief Vector storage
+				 */
+				Stor vec;
+			};
 			
 			/**
 			 *  \brief Graph type
@@ -143,10 +153,9 @@ namespace skeleton
 			{
 				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
 				bool v_found = false;
-				boost::property_map<GraphType,boost::vertex_index_t> map_index = boost::get(boost::vertex_index_t(),m_graph);
-				for(boost::tie(vi,vi_end) = boost::vertex(m_graph); vi != vi_end && v_found; vi++)
+				for(boost::tie(vi,vi_end) = boost::vertices(m_graph); vi != vi_end && !v_found; vi++)
 				{
-					if(map_index[*vi] == index)
+					if(m_graph[*vi].index == index)
 					{
 						v_desc = *vi;
 						v_found = true;
@@ -172,15 +181,14 @@ namespace skeleton
 			{
 				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
 				bool v1_found = false, v2_found = false;
-				boost::property_map<GraphType,boost::vertex_index_t> map_index = boost::get(boost::vertex_index_t(),m_graph);
-				for(boost::tie(vi,vi_end) = boost::vertex(m_graph); vi != vi_end && (!v1_found || !v2_found); vi++)
+				for(boost::tie(vi,vi_end) = boost::vertices(m_graph); vi != vi_end && (!v1_found || !v2_found); vi++)
 				{
-					if(map_index[*vi] == ind1)
+					if(m_graph[*vi].index == ind1)
 					{
 						v_desc1 = *vi;
 						v1_found = true;
 					}
-					if(map_index[*vi] == ind2)
+					if(m_graph[*vi].index == ind2)
 					{
 						v_desc2 = *vi;
 						v2_found = true;
@@ -204,7 +212,9 @@ namespace skeleton
 			{
 				unsigned int index = m_last++;
 				//Adds the vertex in the graph, with index and storage information
-				boost::add_vertex(index,vec,m_graph);
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc = boost::add_vertex(m_graph);
+				m_graph[v_desc].index = index;
+				m_graph[v_desc].vec = vec;
 				return index;
 			}
 
@@ -325,8 +335,7 @@ namespace skeleton
 					throw new std::logic_error("skeleton::GraphCurveSkeleton::getNode(): Node index is not in the skeleton");
 				}
 				
-				boost::property_map<GraphType,vertex_vec_t> map_stor = boost::get(vertex_vec_t(),m_graph);
-				return map_stor[v_desc];
+				return m_graph[v_desc].vec;
 			}
 
 			/**
@@ -347,8 +356,7 @@ namespace skeleton
 					throw new std::logic_error("skeleton::GraphCurveSkeleton::getNode(): Node index is not in the skeleton");
 				}
 				
-				boost::property_map<GraphType,vertex_vec_t> map_stor = boost::get(vertex_vec_t(),m_graph);
-				return m_model->template toObj<TypeNode>(map_stor[v_desc]);
+				return m_model->template toObj<TypeNode>(m_graph[v_desc].vec);
 			}
 	};
 }
