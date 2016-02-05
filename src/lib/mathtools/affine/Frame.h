@@ -80,6 +80,27 @@ namespace mathtools
 					m_basis(basis), m_origin(origin) {}
 
 				/**
+				 *  \brief 2d frame constructor
+				 *
+				 *  \param vec1   first basis vector
+				 *  \param vec2   second basis vector
+				 *  \param origin frame origin
+				 */
+				Frame(const Eigen::Vector2d &vec1, const Eigen::Vector2d &vec2, const Eigen::Vector2d &origin) :
+					m_basis(vec1,vec2), m_origin(origin) {}
+
+				/**
+				 *  \brief 3d frame constructor
+				 *
+				 *  \param vec1   first basis vector
+				 *  \param vec2   second basis vector
+				 *  \param vec3   third basis vector
+				 *  \param origin frame origin
+				 */
+				Frame(const Eigen::Vector3d &vec1, const Eigen::Vector3d &vec2, const Eigen::Vector3d &vec3, const Eigen::Vector3d &origin) :
+					m_basis(vec1,vec2,vec3), m_origin(origin) {}
+
+				/**
 				 *  \brief Copy constructor
 				 *
 				 *  \param frame frame to copy
