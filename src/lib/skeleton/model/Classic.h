@@ -73,13 +73,6 @@ namespace skeleton
 				Classic(const typename mathtools::affine::Frame<Dim>::Ptr frame) : m_frame(frame) {}
 
 				/**
-				 *  \brief Constructor
-				 *
-				 *  \param frame frame of the skeleton
-				 */
-				Classic(const mathtools::affine::Frame<Dim> &frame = mathtools::affine::Frame<Dim>()) : Classic(typename mathtools::affine::Frame<Dim>::Ptr(new mathtools::affine::Frame<Dim>(frame))) {}
-
-				/**
 				 *  \brief Converts an object into a vector
 				 *
 				 *  \tparam TypeObj type of the object to convert

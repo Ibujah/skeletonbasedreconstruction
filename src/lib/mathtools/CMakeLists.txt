@@ -1,7 +1,10 @@
 set(LIBRARY_NAME ${MATHTOOLS_LIB})
 
+include_directories(../)
+
 set(SOURCE_FILES    
 	vectorial/Basis.cpp
+	affine/Frame.cpp
 	application/BsplineUtils.cpp)
 
 # make the library

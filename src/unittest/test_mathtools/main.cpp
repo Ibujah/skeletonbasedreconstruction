@@ -203,7 +203,7 @@ unsigned int affinetest()
 	if(!AB.isApprox(Eigen::Vector2d(10,0),std::numeric_limits<double>::epsilon()))
 		affine_test = false;
 	
-	Frame<2> frame1(B.getCoords());
+	Frame<2>::Ptr frame1 = Frame<2>::CreateFrame(B.getCoords());
 	
 	if(B.getCoords(frame1).norm() > std::numeric_limits<double>::epsilon())
 		affine_test = false;
@@ -217,7 +217,7 @@ unsigned int affinetest()
 	mat << 1,  2,
 		   0, -1;
 
-	Frame<2> frame2(C.getCoords(),Basis<2>::CreateBasis(mat));
+	Frame<2>::Ptr frame2 = Frame<2>::CreateFrame(C.getCoords(),Basis<2>::CreateBasis(mat));
 	
 	Eigen::Vector2d coordsB_2 = B.getCoords(frame2);
 

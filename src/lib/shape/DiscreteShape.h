@@ -79,15 +79,6 @@ namespace shape
 			/**
 			 *  \brief Constructor
 			 *
-			 *  \param frame  frame of the discrete shape
-			 *  \param width  width of the discrete shape
-			 *  \param height height of the discrete shape
-			 */
-			DiscreteShape<2>(const mathtools::affine::Frame<2> &frame, unsigned int width, unsigned int height);
-
-			/**
-			 *  \brief Constructor
-			 *
 			 *  \param width  width of the discrete shape
 			 *  \param height height of the discrete shape
 			 */

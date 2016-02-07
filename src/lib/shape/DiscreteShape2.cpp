@@ -31,16 +31,12 @@ SOFTWARE.
 
 using namespace shape;
 
-shape::DiscreteShape<2>::DiscreteShape(const mathtools::affine::Frame<2> &frame, unsigned int width, unsigned int height) :
-	m_frame(new mathtools::affine::Frame<2>(frame)), m_disc(width*height,0), m_width(width), m_height(height)
+shape::DiscreteShape<2>::DiscreteShape(const mathtools::affine::Frame<2>::Ptr frame, unsigned int width, unsigned int height) :
+	m_frame(frame), m_width(width), m_height(height)
 {}
 
 shape::DiscreteShape<2>::DiscreteShape(unsigned int width, unsigned int height) :
-	DiscreteShape(mathtools::affine::Frame<2>(), width, height)
-{}
-
-shape::DiscreteShape<2>::DiscreteShape(const mathtools::affine::Frame<2>::Ptr frame, unsigned int width, unsigned int height) :
-	DiscreteShape<2>(*frame,width,height)
+	DiscreteShape(mathtools::affine::Frame<2>::CanonicFrame(), width, height)
 {}
 
 bool shape::DiscreteShape<2>::isIn(const mathtools::affine::Point<2> &point) const

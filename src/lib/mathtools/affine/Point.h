@@ -64,9 +64,9 @@ namespace mathtools
 				 *  \param coords coordinates of the point
 				 *  \param frame  frame in which the coordinates are expressed
 				 */
-				Point(const Eigen::Matrix<double,Dim,1> &coords = Eigen::Matrix<double,Dim,1>::Zero(), const Frame<Dim> &frame = Frame<Dim>())
+				Point(const Eigen::Matrix<double,Dim,1> &coords = Eigen::Matrix<double,Dim,1>::Zero(), const typename Frame<Dim>::Ptr &frame = Frame<Dim>::CanonicFrame())
 				{
-					m_coords = frame.getBasis()->getMatrix() * coords + frame.getOrigin();
+					m_coords = frame->getBasis()->getMatrix() * coords + frame->getOrigin();
 				}
 
 				/**
@@ -76,40 +76,8 @@ namespace mathtools
 				 *  \param y      y-coordinate of the point
 				 *  \param frame  frame in which the coordinates are expressed
 				 */
-				Point(double x, double y, const Frame<Dim> &frame = Frame<Dim>())
-				{
-					m_coords = frame.getBasis()->getMatrix() * Eigen::Vector2d(x,y) + frame.getOrigin();
-				}
-
-				/**
-				 *  \brief Constructor
-				 *
-				 *  \param x      x-coordinate of the point
-				 *  \param y      y-coordinate of the point
-				 *  \param z      z-coordinate of the point
-				 *  \param frame  frame in which the coordinates are expressed
-				 */
-				Point(double x, double y, double z, const Frame<Dim> &frame = Frame<Dim>())
-				{
-					m_coords = frame.getBasis()->getMatrix() * Eigen::Vector3d(x,y,z) + frame.getOrigin();
-				}
-
-				/**
-				 *  \brief Constructor
-				 *
-				 *  \param coords coordinates of the point
-				 *  \param frame  frame in which the coordinates are expressed
-				 */
-				Point(const Eigen::Matrix<double,Dim,1> &coords, const typename Frame<Dim>::Ptr frame) : Point(coords,*frame) {}
-
-				/**
-				 *  \brief Constructor
-				 *
-				 *  \param x      x-coordinate of the point
-				 *  \param y      y-coordinate of the point
-				 *  \param frame  frame in which the coordinates are expressed
-				 */
-				Point(double x, double y, const typename Frame<Dim>::Ptr frame) : Point(x,y,*frame) {}
+				Point(double x, double y, const typename Frame<Dim>::Ptr &frame = Frame<Dim>::CanonicFrame()) : Point(Eigen::Vector2d(x,y),frame)
+				{}
 
 				/**
 				 *  \brief Constructor
@@ -119,7 +87,8 @@ namespace mathtools
 				 *  \param z      z-coordinate of the point
 				 *  \param frame  frame in which the coordinates are expressed
 				 */
-				Point(double x, double y, double z, const typename Frame<Dim>::Ptr frame) : Point(x,y,z,*frame) {}
+				Point(double x, double y, double z, const typename Frame<Dim>::Ptr &frame = Frame<Dim>::CanonicFrame()) : Point(Eigen::Vector3d(x,y,z),frame)
+				{}
 
 				/**
 				 *  \brief Coordinates getter
@@ -128,21 +97,9 @@ namespace mathtools
 				 *
 				 *  \return coordinates vector
 				 */
-				inline const Eigen::Matrix<double,Dim,1> getCoords(const Frame<Dim> &frame) const
+				inline const Eigen::Matrix<double,Dim,1> getCoords(const typename Frame<Dim>::Ptr &frame) const
 				{
-					return frame.getBasis()->getMatrixInverse() * (m_coords - frame.getOrigin());
-				}
-
-				/**
-				 *  \brief Coordinates getter
-				 *
-				 *  \param frame frame in which get the coordinates
-				 *
-				 *  \return coordinates vector
-				 */
-				inline const Eigen::Matrix<double,Dim,1> getCoords(const typename Frame<Dim>::Ptr frame) const
-				{
-					return getCoords(*frame);
+					return frame->getBasis()->getMatrixInverse() * (m_coords - frame->getOrigin());
 				}
 
 				/**

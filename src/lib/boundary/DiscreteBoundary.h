@@ -79,14 +79,7 @@ namespace boundary
 			 *
 			 *  \param frame boundary frame
 			 */
-			DiscreteBoundary<2>(const mathtools::affine::Frame<2>::Ptr frame);
-
-			/**
-			 *  \brief Constructor
-			 *
-			 *  \param frame boundary frame
-			 */
-			DiscreteBoundary<2>(const mathtools::affine::Frame<2> &frame = mathtools::affine::Frame<2>());
+			DiscreteBoundary<2>(const mathtools::affine::Frame<2>::Ptr frame = mathtools::affine::Frame<2>::CanonicFrame());
 			
 			/**
 			 *  \brief Adds new string of vertices
