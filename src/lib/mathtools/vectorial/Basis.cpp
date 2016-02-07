@@ -2,12 +2,12 @@
 
 template<>
 mathtools::vectorial::Basis<2>::Ptr mathtools::vectorial::Basis<2>::canonicbasis =
-										mathtools::vectorial::Basis<2>::Ptr(new mathtools::vectorial::Basis<2>(Eigen::Matrix2d::Identity()));
+										mathtools::vectorial::Basis<2>::CreateBasis(Eigen::Matrix2d::Identity());
 
 template<>
 mathtools::vectorial::Basis<3>::Ptr mathtools::vectorial::Basis<3>::canonicbasis =
-										mathtools::vectorial::Basis<3>::Ptr(new mathtools::vectorial::Basis<3>(Eigen::Matrix3d::Identity()));
+										mathtools::vectorial::Basis<3>::CreateBasis(Eigen::Matrix3d::Identity());
 
 template<>
 mathtools::vectorial::Basis<4>::Ptr mathtools::vectorial::Basis<4>::canonicbasis =
-										mathtools::vectorial::Basis<4>::Ptr(new mathtools::vectorial::Basis<4>(Eigen::Matrix4d::Identity()));
+										mathtools::vectorial::Basis<4>::CreateBasis(Eigen::Matrix4d::Identity());
