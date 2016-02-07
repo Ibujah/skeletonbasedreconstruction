@@ -30,8 +30,9 @@ SOFTWARE.
 #ifndef _BASIS_H_
 #define _BASIS_H_
 
-#include <Eigen/Dense>
+#include <memory>
 #include <stdexcept>
+#include <Eigen/Dense>
 
 /**
  *  \brief Mathematical tools
@@ -51,6 +52,11 @@ namespace mathtools
 		template<unsigned int Dim>
 		class Basis
 		{
+			public:
+				/**
+ 				 *  \brief Shared pointer to basis
+ 				 */
+				using Ptr = std::shared_ptr<Basis<Dim> >;
 			private:
 				/**
 				 *  \brief Basis coordinates in canonic basis
