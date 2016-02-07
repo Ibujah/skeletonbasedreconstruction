@@ -153,11 +153,11 @@ unsigned int vecbasistest()
 		mat <<  1,  2, -7,
 			   -2, 45,  6,
 				0, -5,  3;
-		Basis<3> basis(mat);
+		Basis<3>::Ptr basis = Basis<3>::CreateBasis(mat);
 		
 		Eigen::Matrix3d matinv = mat.inverse();
 		
-		vecbasis_test = matinv.isApprox(basis.getMatrixInverse(),std::numeric_limits<double>::epsilon());
+		vecbasis_test = matinv.isApprox(basis->getMatrixInverse(),std::numeric_limits<double>::epsilon());
 
 	}
 	catch(...)
@@ -172,7 +172,7 @@ unsigned int vecbasistest()
 		mat <<  1, 0, 0,
 			    0, 1, 1,
 				1, 0, 0;
-		Basis<3> basis(mat);
+		Basis<3>::Ptr basis = Basis<3>::CreateBasis(mat);
 	}
 	catch(...)
 	{
@@ -203,7 +203,7 @@ unsigned int affinetest()
 	if(!AB.isApprox(Eigen::Vector2d(10,0),std::numeric_limits<double>::epsilon()))
 		affine_test = false;
 	
-	Frame<2> frame1(Basis<2>(),B.getCoords());
+	Frame<2> frame1(B.getCoords());
 	
 	if(B.getCoords(frame1).norm() > std::numeric_limits<double>::epsilon())
 		affine_test = false;
@@ -217,7 +217,7 @@ unsigned int affinetest()
 	mat << 1,  2,
 		   0, -1;
 
-	Frame<2> frame2(Basis<2>(mat),C.getCoords());
+	Frame<2> frame2(C.getCoords(),Basis<2>::CreateBasis(mat));
 	
 	Eigen::Vector2d coordsB_2 = B.getCoords(frame2);
 

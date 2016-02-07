@@ -66,7 +66,7 @@ namespace mathtools
 				 */
 				Point(const Eigen::Matrix<double,Dim,1> &coords = Eigen::Matrix<double,Dim,1>::Zero(), const Frame<Dim> &frame = Frame<Dim>())
 				{
-					m_coords = frame.getBasis().getMatrix() * coords + frame.getOrigin();
+					m_coords = frame.getBasis()->getMatrix() * coords + frame.getOrigin();
 				}
 
 				/**
@@ -78,7 +78,7 @@ namespace mathtools
 				 */
 				Point(double x, double y, const Frame<Dim> &frame = Frame<Dim>())
 				{
-					m_coords = frame.getBasis().getMatrix() * Eigen::Vector2d(x,y) + frame.getOrigin();
+					m_coords = frame.getBasis()->getMatrix() * Eigen::Vector2d(x,y) + frame.getOrigin();
 				}
 
 				/**
@@ -91,7 +91,7 @@ namespace mathtools
 				 */
 				Point(double x, double y, double z, const Frame<Dim> &frame = Frame<Dim>())
 				{
-					m_coords = frame.getBasis().getMatrix() * Eigen::Vector3d(x,y,z) + frame.getOrigin();
+					m_coords = frame.getBasis()->getMatrix() * Eigen::Vector3d(x,y,z) + frame.getOrigin();
 				}
 
 				/**
@@ -130,7 +130,7 @@ namespace mathtools
 				 */
 				inline const Eigen::Matrix<double,Dim,1> getCoords(const Frame<Dim> &frame) const
 				{
-					return frame.getBasis().getMatrixInverse() * (m_coords - frame.getOrigin());
+					return frame.getBasis()->getMatrixInverse() * (m_coords - frame.getOrigin());
 				}
 
 				/**

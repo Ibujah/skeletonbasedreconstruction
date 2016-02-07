@@ -60,9 +60,9 @@ namespace mathtools
 			
 			protected:
 				/**
-				 *  \brief Vectorial basis
+				 *  \brief Pointer to vectorial basis
 				 */
-				vectorial::Basis<Dim> m_basis;
+				typename vectorial::Basis<Dim>::Ptr m_basis;
 
 				/**
 				 *  \brief Frame origin
@@ -73,10 +73,11 @@ namespace mathtools
 				/**
 				 *  \brief Constructor
 				 *
-				 *  \param basis  vectorial basis of the frame
 				 *  \param origin frame origin
+				 *  \param basis  pointer to vectorial basis of the frame
 				 */
-				Frame(const vectorial::Basis<Dim> &basis = vectorial::Basis<Dim>(), const Eigen::Matrix<double,Dim,1> &origin = Eigen::Matrix<double,Dim,1>::Zero()) :
+				Frame(const Eigen::Matrix<double,Dim,1> &origin = Eigen::Matrix<double,Dim,1>::Zero(),
+					  const typename vectorial::Basis<Dim>::Ptr &basis = vectorial::Basis<Dim>::CanonicBasis()) :
 					m_basis(basis), m_origin(origin) {}
 
 				/**
@@ -87,7 +88,7 @@ namespace mathtools
 				 *  \param origin frame origin
 				 */
 				Frame(const Eigen::Vector2d &vec1, const Eigen::Vector2d &vec2, const Eigen::Vector2d &origin) :
-					m_basis(vec1,vec2), m_origin(origin) {}
+					m_basis(vectorial::Basis<Dim>::CreateBasis(vec1,vec2)), m_origin(origin) {}
 
 				/**
 				 *  \brief 3d frame constructor
@@ -98,7 +99,7 @@ namespace mathtools
 				 *  \param origin frame origin
 				 */
 				Frame(const Eigen::Vector3d &vec1, const Eigen::Vector3d &vec2, const Eigen::Vector3d &vec3, const Eigen::Vector3d &origin) :
-					m_basis(vec1,vec2,vec3), m_origin(origin) {}
+					m_basis(vectorial::Basis<Dim>::CreateBasis(vec1,vec2,vec3)), m_origin(origin) {}
 
 				/**
 				 *  \brief Copy constructor
@@ -112,7 +113,7 @@ namespace mathtools
 				 *
 				 *  \return Current basis
 				 */
-				inline const vectorial::Basis<Dim>& getBasis() const
+				inline const typename vectorial::Basis<Dim>::Ptr getBasis() const
 				{
 					return m_basis;
 				}

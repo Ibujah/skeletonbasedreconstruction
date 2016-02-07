@@ -57,6 +57,7 @@ namespace mathtools
  				 *  \brief Shared pointer to basis
  				 */
 				using Ptr = std::shared_ptr<Basis<Dim> >;
+
 			private:
 				/**
 				 *  \brief Basis coordinates in canonic basis
@@ -67,7 +68,7 @@ namespace mathtools
 				 *  \brief Canonic basis coordinates in basis
 				 */
 				Eigen::Matrix<double,Dim,Dim> m_matrix_inv;
-			public:
+
 				/**
 				 *  \brief Constructor
 				 *
@@ -75,7 +76,7 @@ namespace mathtools
 				 *
 				 *  \throws logic_error if matrix parameter not invertible
 				 */
-				Basis(const Eigen::Matrix<double,Dim,Dim> &matrix = Eigen::Matrix<double,Dim,Dim>::Identity()) : m_matrix(matrix)
+				Basis(const Eigen::Matrix<double,Dim,Dim> &matrix) : m_matrix(matrix)
 				{
 					double det = m_matrix.determinant();
 					if(det*det <= Eigen::NumTraits<double>::dummy_precision())
@@ -123,17 +124,8 @@ namespace mathtools
 					}
 					m_matrix_inv = m_matrix.inverse();
 				}
-
-				/**
-				 *  \brief Copy constructor
-				 *
-				 *  \param basis basis to copy
-				 *
-				 *  \throws logic_error if basis parameter not invertible
-				 */
-				Basis(const Basis<Dim> &basis) : m_matrix(basis.m_matrix), m_matrix_inv(basis.m_matrix_inv)
-				{}
-
+			
+			public:
 				/**
 				 *  \brief Basis matrix accessor
 				 *
@@ -152,6 +144,56 @@ namespace mathtools
 				inline const Eigen::Matrix<double,Dim,Dim>& getMatrixInverse() const
 				{
 					return m_matrix_inv;
+				}
+			
+			protected:
+				/**
+ 				 *  \brief Pointer to canonic basis
+ 				 */
+				static Ptr canonicbasis;
+
+			public:
+				/**
+ 				 *  \brief Canonic basis getter
+ 				 *
+ 				 *  \return pointer to current canonic basis
+ 				 */
+				static const Ptr CanonicBasis()
+				{
+					return canonicbasis;
+				}
+
+				/**
+				 *  \brief Basis creator
+				 *
+				 *  \param matrix full rank matrix
+				 */
+				static const Ptr CreateBasis(const Eigen::Matrix<double,Dim,Dim> &matrix)
+				{
+					return Ptr(new Basis(matrix));
+				}
+
+				/**
+				 *  \brief 2d basis creator
+				 *
+				 *  \param vec1 first basis vector
+				 *  \param vec2 second basis vector
+				 */
+				static const Ptr CreateBasis(const Eigen::Vector2d &vec1, const Eigen::Vector2d &vec2)
+				{
+					return Ptr(new Basis(vec1,vec2));
+				}
+
+				/**
+				 *  \brief 3d basis creator
+				 *
+				 *  \param vec1 first basis vector
+				 *  \param vec2 second basis vector
+				 *  \param vec3 third basis vector
+				 */
+				static const Ptr CreateBasis(const Eigen::Vector3d &vec1, const Eigen::Vector3d &vec2, const Eigen::Vector3d &vec3)
+				{
+					return Ptr(new Basis(vec1,vec2,vec3));
 				}
 		};
 	}

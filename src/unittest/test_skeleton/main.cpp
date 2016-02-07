@@ -77,7 +77,7 @@ int main()
 	// getting the node (center form)
 	Point<2> pt = skel.getNode<Point<2> >(ind);
 	
-	if(pt.getCoords().isApprox(frame->getBasis().getMatrix()*vec3.block<2,1>(0,0)+frame->getOrigin()))
+	if(pt.getCoords().isApprox(frame->getBasis()->getMatrix()*vec3.block<2,1>(0,0)+frame->getOrigin()))
 	{
 		std::cout << "Success!" << std::endl;
 	}
