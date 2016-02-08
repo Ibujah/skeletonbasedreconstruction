@@ -32,6 +32,7 @@ SOFTWARE.
 #include <memory>
 #include <mathtools/affine/Frame.h>
 #include <mathtools/affine/Point.h>
+#include <mathtools/geometry/euclidian/HyperSphere.h>
 #include "MetaModel.h"
 
 /**
@@ -82,7 +83,10 @@ namespace skeleton
 				 *  \return vector associated to obj
 				 */
 				template<typename TypeObj>
-				Eigen::Matrix<double,meta<Classic>::stordim,1> toVec(const TypeObj &obj);
+				Eigen::Matrix<double,meta<Classic>::stordim,1> toVec(const TypeObj &obj)
+				{
+					return toVec(obj);
+				}
 
 				/**
 				 *  \brief Converts a vector into an object
@@ -101,6 +105,23 @@ namespace skeleton
 
 			protected:
 				/**
+				 *  \brief Conversion function from hypersphere to vector
+				 *
+				 *  \param sph hypersphere to convert
+				 *
+				 *  \return vector associated to hyperpshere
+				 */
+				Eigen::Matrix<double,meta<Classic>::stordim,1> toVec(const mathtools::geometry::euclidian::HyperSphere<Dim> &sph)
+				{
+					if(!sph.getFrame()->getBasis()->getMatrix().isApprox(m_frame->getBasis()->getMatrix(),std::numeric_limits<double>::epsilon()))
+						throw std::logic_error("skeleton::model::Classic::toVec: hypersphere coordinates cannot be expressed in this model");
+					Eigen::Matrix<double,meta<Classic>::stordim,1> vec;
+					vec.template block<Dim,1>(0,0) = sph.getCenter().getCoords(m_frame);
+					vec(Dim,0) = sph.getRadius();
+					return vec;
+				}
+
+				/**
 				 *  \brief Associate the center of the sphere to a vector
 				 *
 				 *  \param vec vector to convert
@@ -111,6 +132,22 @@ namespace skeleton
 														   const mathtools::affine::Point<Dim> &)
 				{
 					return mathtools::affine::Point<Dim>(vec.template block<Dim,1>(0,0),m_frame);
+				}
+
+				/**
+				 *  \brief Associate an hypersphere to a vector
+				 *
+				 *  \param vec vector to convert
+				 *
+				 *  \return hypersphere
+				 */
+				inline mathtools::geometry::euclidian::HyperSphere<Dim> toObj(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec,
+																			  const mathtools::geometry::euclidian::HyperSphere<Dim> &)
+				{
+					return mathtools::geometry::euclidian::HyperSphere<Dim>(
+								mathtools::affine::Point<Dim>(vec.template block<Dim,1>(0,0),m_frame),
+								vec(Dim,0),
+								m_frame);
 				}
 		};
 		
