@@ -15,6 +15,7 @@ set(MATHTOOLS_LIB "Mathtools")
 set(SHAPE_LIB     "Shape")
 set(BOUNDARY_LIB  "Boundary")
 set(CAMERA_LIB    "Camera")
+set(ALGORITHM_LIB "Algorithm")
 
 set(UTILS_LIB     "Utils")
 

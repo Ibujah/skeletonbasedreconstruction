@@ -1,3 +1,4 @@
+add_subdirectory(algorithm/)
 add_subdirectory(boundary/)
 add_subdirectory(camera/)
 add_subdirectory(mathtools/)
