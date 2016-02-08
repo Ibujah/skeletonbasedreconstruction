@@ -105,7 +105,8 @@ int main()
 	
 	if(sphcpy.getCenter().getCoords().isApprox(sph.getCenter().getCoords(),std::numeric_limits<double>::epsilon() && 
 	   sphcpy.getRadius() == sph.getRadius() &&
-	   sphcpy.getFrame()->getBasis()->getMatrix().isApprox(sph.getFrame()->getBasis()->getMatrix(),std::numeric_limits<double>::epsilon())))
+	   sphcpy.getFrame()->getBasis()->getMatrix().isApprox(sph.getFrame()->getBasis()->getMatrix(),std::numeric_limits<double>::epsilon())) && 
+	   ind != ind2)
 	{
 		std::cout << "Success!" << std::endl;
 	}
@@ -115,6 +116,25 @@ int main()
 		std::cout << "Fail!" << std::endl;
 	}
 	
+	// get all indices
+	std::list<unsigned int> listnod;
+
+	std::cout << "Get all nodes... ";
+	skel.getAllNodes(listnod);
+
+	listnod.unique();
+
+	if(listnod.size() == 2 &&
+	   std::find(listnod.begin(),listnod.end(),ind) != listnod.end() && 
+	   std::find(listnod.begin(),listnod.end(),ind2) != listnod.end())
+	{
+		std::cout << "Success!" << std::endl;
+	}
+	else
+	{
+		return_value = -1;
+		std::cout << "Fail!" << std::endl;
+	}
 
 	return return_value;
 }
