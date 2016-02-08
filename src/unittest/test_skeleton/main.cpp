@@ -135,6 +135,44 @@ int main()
 		return_value = -1;
 		std::cout << "Fail!" << std::endl;
 	}
+	
+	std::cout << "Adding edge test... ";
+
+	// adding an edge
+	skel.addEdge(ind, ind2);
+
+	std::list<unsigned int> neigh;
+	skel.getNeighbors(ind,neigh);
+	
+	if(neigh.size() == 1 && *(neigh.begin()) == ind2)
+	{
+		std::cout << "Success!" << std::endl;
+	}
+	else
+	{
+		return_value = -1;
+		std::cout << "Fail!" << std::endl;
+	}
+
+	std::cout << "Removing edge test... ";
+
+	// removing an edge
+	skel.remEdge(ind, ind2);
+	
+	neigh.erase(neigh.begin(),neigh.end());
+	skel.getNeighbors(ind,neigh);
+	
+	if(neigh.size() == 0)
+	{
+		std::cout << "Success!" << std::endl;
+	}
+	else
+	{
+		return_value = -1;
+		std::cout << "Fail!" << std::endl;
+	}
+
+
 
 	return return_value;
 }
