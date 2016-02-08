@@ -88,17 +88,9 @@ namespace shape
 			 *
 			 *  \param width  width of the discrete shape
 			 *  \param height height of the discrete shape
-			 */
-			DiscreteShape<2>(unsigned int width, unsigned int height);
-
-			/**
-			 *  \brief Constructor
-			 *
 			 *  \param frame  frame of the discrete shape
-			 *  \param width  width of the discrete shape
-			 *  \param height height of the discrete shape
 			 */
-			DiscreteShape<2>(const mathtools::affine::Frame<2>::Ptr frame, unsigned int width, unsigned int height);
+			DiscreteShape<2>(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame = mathtools::affine::Frame<2>::CanonicFrame());
 
 			/**
 			 *  \brief Test if a point is in the discrete shape
