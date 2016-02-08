@@ -55,3 +55,28 @@ bool shape::DiscreteShape<2>::isIn(const mathtools::affine::Point<2> &point) con
 	return isin;
 }
 
+
+const typename mathtools::affine::Frame<2>::Ptr shape::DiscreteShape<2>::getFrame() const
+{
+	return m_frame;
+}
+
+unsigned int shape::DiscreteShape<2>::getWidth() const
+{
+	return m_width;
+}
+
+unsigned int shape::DiscreteShape<2>::getHeight() const
+{
+	return m_height;
+}
+
+const std::vector<unsigned char>& shape::DiscreteShape<2>::getContainer() const
+{
+	return m_disc;
+}
+
+std::vector<unsigned char>& shape::DiscreteShape<2>::getContainer()
+{
+	return m_disc;
+}

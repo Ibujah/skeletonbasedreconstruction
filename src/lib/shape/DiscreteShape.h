@@ -70,7 +70,7 @@ namespace shape
 			/**
 			 *  \brief Vector containing discrete shape data, row wise
 			 */
-			std::vector<char> m_disc;
+			std::vector<unsigned char> m_disc;
 
 			/**
 			 *  \brief Shape width
@@ -108,6 +108,41 @@ namespace shape
 			 *  \return true is the point is in the discrete shape
 			 */
 			virtual bool isIn(const mathtools::affine::Point<2> &point) const;
+
+			/**
+			 *  \brief Frame getter
+			 *
+			 *  \return frame of the shape
+			 */
+			const typename mathtools::affine::Frame<2>::Ptr getFrame() const;
+
+			/**
+			 *  \brief Width getter
+			 *
+			 *  \return width of the shape
+			 */
+			unsigned int getWidth() const;
+
+			/**
+			 *  \brief Height getter
+			 *
+			 *  \return height of the shape
+			 */
+			unsigned int getHeight() const;
+
+			/**
+			 *  \brief Container getter
+			 *
+			 *  \return container of the shape
+			 */
+			const std::vector<unsigned char>& getContainer() const;
+
+			/**
+			 *  \brief Container getter
+			 *
+			 *  \return container of the shape
+			 */
+			std::vector<unsigned char>& getContainer();
 	};
 }
 
