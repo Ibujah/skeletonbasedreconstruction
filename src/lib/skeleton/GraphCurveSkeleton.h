@@ -370,13 +370,35 @@ namespace skeleton
 			void getAllNodes(Container &cont) const
 			{
 				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
-				bool v1_found = false, v2_found = false;
-				for(boost::tie(vi,vi_end) = boost::vertices(m_graph); vi != vi_end && (!v1_found || !v2_found); vi++)
+				for(boost::tie(vi,vi_end) = boost::vertices(m_graph); vi != vi_end; vi++)
 				{
 					cont.push_back(m_graph[*vi].index);
 				}
 			}
 			
+			/**
+			 *  \brief Neighbors accessor
+			 *
+			 *  \tparam Container container type
+			 *  
+			 *  \param  index index of the node
+			 *  \param  cont  container in which store the indices
+			 */
+			template<typename Container>
+			void getNeighbors(unsigned int index, Container &cont) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
+				if(getDesc(index,v_desc))
+				{
+					typename boost::graph_traits<GraphType>::adjacency_iterator ai, ai_end;
+
+					for(boost::tie(ai,ai_end) = boost::adjacent_vertices(v_desc,m_graph); ai != ai_end; ai++)
+					{
+						cont.push_back(m_graph[*ai].index);
+					}
+				}
+			}
+
 	};
 }
 
