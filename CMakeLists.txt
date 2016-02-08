@@ -9,13 +9,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 find_package(EIGEN REQUIRED)
+find_package(OpenCV REQUIRED)
 
 set(MATHTOOLS_LIB "Mathtools")
 set(SHAPE_LIB     "Shape")
 set(BOUNDARY_LIB  "Boundary")
 set(CAMERA_LIB    "Camera")
 
-include_directories(${EIGEN_INCLUDE_DIRS}
-					${Boost_INCLUDE_DIR})
+set(UTILS_LIB     "Utils")
+
+include_directories(${EIGEN_INCLUDE_DIRS})
 
 add_subdirectory(src/)
