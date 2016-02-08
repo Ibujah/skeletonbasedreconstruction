@@ -52,12 +52,13 @@ namespace boundary
 	template<>
 	class DiscreteBoundary<2>
 	{
-		protected:
+		public:
 			/**
 			 *  \brief Boundary shared pointer
 			 */
 			using Ptr = std::shared_ptr<DiscreteBoundary<2> >;
 
+		protected:
 			/**
 			 *  \brief Boundary frame
 			 */
