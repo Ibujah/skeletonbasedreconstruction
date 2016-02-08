@@ -31,6 +31,7 @@ SOFTWARE.
 #define _DISCRETESHAPE_H_
 
 #include <vector>
+#include <memory>
 #include <mathtools/affine/Frame.h>
 #include <mathtools/affine/Point.h>
 
@@ -54,6 +55,12 @@ namespace shape
 	template<>
 	class DiscreteShape<2>
 	{
+		public:
+			/**
+			 *  \brief Boundary shared pointer
+			 */
+			using Ptr = std::shared_ptr<DiscreteShape<2> >;
+
 		protected:
 			/**
 			 *  \brief Shape frame
