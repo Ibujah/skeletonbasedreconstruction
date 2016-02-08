@@ -81,7 +81,7 @@ namespace mathtools
 					 *  \param radius radius of the hypersphere, in the frame
 					 *  \param frame  frame of the hypersphere
 					 */
-					HyperSphere(const affine::Point<Dim> &center, double radius, const typename affine::Frame<Dim>::Ptr frame = affine::Frame<Dim>::CanonicFrame()) :
+					HyperSphere(const affine::Point<Dim> &center = affine::Point<Dim>(), double radius = 0.0, const typename affine::Frame<Dim>::Ptr frame = affine::Frame<Dim>::CanonicFrame()) :
 						m_frame(frame), m_center(center), m_radius(radius)
 					{}
 
@@ -90,7 +90,7 @@ namespace mathtools
 					 *
 					 *  \return center point
 					 */
-					inline const affine::Point<Dim>& getCenter()
+					inline const affine::Point<Dim>& getCenter() const
 					{
 						return m_center;
 					}
@@ -100,7 +100,7 @@ namespace mathtools
 					 *
 					 *  \return radius
 					 */
-					inline const double& getRadius()
+					inline const double& getRadius() const
 					{
 						return m_radius;
 					}
@@ -110,7 +110,7 @@ namespace mathtools
 					 *
 					 *  \return frame of the sphere
 					 */
-					inline const typename affine::Frame<Dim>::Ptr& getFrame()
+					inline const typename affine::Frame<Dim>::Ptr getFrame() const
 					{
 						return m_frame;
 					}
