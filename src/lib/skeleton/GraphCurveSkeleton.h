@@ -358,6 +358,25 @@ namespace skeleton
 				
 				return m_model->template toObj<TypeNode>(m_graph[v_desc].vec);
 			}
+
+			/**
+			 *  \brief Get the indices of all nodes
+			 *
+			 *  \tparam Container container type
+			 *
+			 *  \param  cont container in which store the indices
+			 */
+			template<typename Container>
+			void getAllNodes(Container &cont) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
+				bool v1_found = false, v2_found = false;
+				for(boost::tie(vi,vi_end) = boost::vertices(m_graph); vi != vi_end && (!v1_found || !v2_found); vi++)
+				{
+					cont.push_back(m_graph[*vi].index);
+				}
+			}
+			
 	};
 }
 
