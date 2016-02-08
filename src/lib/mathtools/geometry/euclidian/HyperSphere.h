@@ -57,11 +57,11 @@ namespace mathtools
 			template<unsigned int Dim>
 			class HyperSphere
 			{
-				protected:
+				private:
 					/**
 					 *  \brief Frame of the hypersphere (to now the scalar product)
 					 */
-					affine::Frame<Dim>::Ptr m_frame;
+					typename affine::Frame<Dim>::Ptr m_frame;
 					
 					/**
 					 *  \brief Center of the hypersphere
@@ -71,7 +71,49 @@ namespace mathtools
 					/**
 					 *  \brief Radius of the hypersphere
 					 */
-					Double m_radius;
+					double m_radius;
+
+				public:
+					/**
+					 *  \brief Constructor
+					 *
+					 *  \param center center of the hypersphere
+					 *  \param radius radius of the hypersphere, in the frame
+					 *  \param frame  frame of the hypersphere
+					 */
+					HyperSphere(const affine::Point<Dim> &center, double radius, const typename affine::Frame<Dim>::Ptr frame = affine::Frame<Dim>::CanonicFrame()) :
+						m_frame(frame), m_center(center), m_radius(radius)
+					{}
+
+					/**
+					 *  \brief Center getter
+					 *
+					 *  \return center point
+					 */
+					inline const affine::Point<Dim>& getCenter()
+					{
+						return m_center;
+					}
+
+					/**
+					 *  \brief Radius getter
+					 *
+					 *  \return radius
+					 */
+					inline const double& getRadius()
+					{
+						return m_radius;
+					}
+
+					/**
+					 *  \brief Frame getter
+					 *
+					 *  \return frame of the sphere
+					 */
+					inline const typename affine::Frame<Dim>::Ptr& getFrame()
+					{
+						return m_frame;
+					}
 			};
 		}
 	}
