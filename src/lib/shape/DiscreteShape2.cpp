@@ -32,7 +32,7 @@ SOFTWARE.
 using namespace shape;
 
 shape::DiscreteShape<2>::DiscreteShape(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame) :
-	m_frame(frame), m_width(width), m_height(height)
+	m_frame(frame), m_disc(width*height,0), m_width(width), m_height(height)
 {}
 
 bool shape::DiscreteShape<2>::isIn(const mathtools::affine::Point<2> &point) const
