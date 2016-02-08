@@ -72,11 +72,11 @@ void shapeacqonMouse( int event, int xc, int yc, int, void* data )
     }
 }
 
-shape::DiscreteShape<2>::Ptr DrawShape(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame)
+shape::DiscreteShape<2>::Ptr utils::DrawShape(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame)
 {
 	shape::DiscreteShape<2>::Ptr disshape(new shape::DiscreteShape<2>(width, height, frame));
 	
-	cv::Mat im_shape(height,width,CV_8U,&disshape->getContainer());
+	cv::Mat im_shape(height,width,CV_8U,&disshape->getContainer()[0]);
 
 	DatImg datim;
 	datim.lclick=false;
