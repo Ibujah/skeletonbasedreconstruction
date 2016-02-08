@@ -43,15 +43,17 @@ using namespace mathtools::application;
 using namespace mathtools::vectorial;
 using namespace mathtools::affine;
 
-unsigned int bsplinetest()
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE TestMathtools
+#include <boost/test/unit_test.hpp>
+
+BOOST_AUTO_TEST_CASE( BsplineTest )
 {
-	bool bspline_test = true;
 	unsigned int fraction = 100;
 	
-	std::cout << "Bspline test... ";
 	std::vector<unsigned int> bin_coeff(6,0);
 	bin_coeff[0] = 1;
-	for(unsigned int degree = 1; degree < 5 && bspline_test; degree++)
+	for(unsigned int degree = 1; degree < 5; degree++)
 	{
 		// Filling node vector
 		Eigen::Matrix<double,1,Eigen::Dynamic> node(1,degree*2);
@@ -66,9 +68,9 @@ unsigned int bsplinetest()
 			bin_coeff[i] += bin_coeff[i-1];
 		}
 		
-		for(unsigned int indice = 0; indice <= degree && bspline_test; indice++)
+		for(unsigned int indice = 0; indice <= degree ; indice++)
 		{
-			for(unsigned int i = 0; i < fraction && bspline_test; i++)
+			for(unsigned int i = 0; i < fraction; i++)
 			{
 				double t = (double)i*(1.0/(double)fraction);
 				
@@ -76,28 +78,14 @@ unsigned int bsplinetest()
 				
 				double ref = pow((1-t),degree-indice)*pow(t,indice)*(double)bin_coeff[indice];
 				
-				if(fabs(res - ref) > std::numeric_limits<double>::epsilon())
-					bspline_test = false;
+				BOOST_CHECK(fabs(res - ref) < std::numeric_limits<double>::epsilon());
 			}
 		}
 	}
-
-	unsigned int return_value = 0;
-	if(!bspline_test)
-	{
-		return_value = -1;
-		std::cout << "Fail!" << std::endl;
-	}
-	else
-		std::cout << "Success!" << std::endl;
-	
-	return return_value;
 }
 
-unsigned int compositortest()
+BOOST_AUTO_TEST_CASE( CompositorTest )
 {
-	std::cout << "Compositor test... ";
-	
 	Eigen::Matrix3d mat_lin;
 	mat_lin <<  0.0, 2.0, 0.0,
 			   -1.0, 0.0, 0.0,
@@ -113,7 +101,6 @@ unsigned int compositortest()
 	Bspline<3> bsp(ctrlpt,nodevec,degree);
 	Compositor<LinearApp<3,3>,Bspline<3> > comp(LinearApp<3,3>(mat_lin),bsp);
 	
-	bool compositor_test = true;
 	for(unsigned int i = 0; i < 101; i++)
 	{
 		double t = (double)i*0.01;
@@ -122,48 +109,22 @@ unsigned int compositortest()
 
 		Eigen::Vector3d vecref = mat_lin * bsp(t);
 		
-		if( (vecres-vecref).norm() > std::numeric_limits<double>::epsilon() )
-		{
-			compositor_test = false;
-		}
+		BOOST_CHECK( (vecres-vecref).norm() < std::numeric_limits<double>::epsilon() );
 	}
-
-	unsigned int return_value = 0;
-	if(!compositor_test)
-	{
-		return_value = -1;
-		std::cout << "Fail!" << std::endl;
-	}
-	else
-		std::cout << "Success!" << std::endl;
-	
-	return return_value;
 }
 
-unsigned int vecbasistest()
+BOOST_AUTO_TEST_CASE( BasisTest )
 {
-	std::cout << "Vectorial basis test... ";
-	
-	bool vecbasis_test = true;
-	
 	// matrix inversion test
-	try
-	{
-		Eigen::Matrix3d mat;
-		mat <<  1,  2, -7,
-			   -2, 45,  6,
-				0, -5,  3;
-		Basis<3>::Ptr basis = Basis<3>::CreateBasis(mat);
-		
-		Eigen::Matrix3d matinv = mat.inverse();
-		
-		vecbasis_test = matinv.isApprox(basis->getMatrixInverse(),std::numeric_limits<double>::epsilon());
+	Eigen::Matrix3d mat;
+	mat <<  1,  2, -7,
+		-2, 45,  6,
+		0, -5,  3;
+	Basis<3>::Ptr basis = Basis<3>::CreateBasis(mat);
 
-	}
-	catch(...)
-	{
-		vecbasis_test = false;
-	}
+	Eigen::Matrix3d matinv = mat.inverse();
+
+	BOOST_CHECK( matinv.isApprox(basis->getMatrixInverse(),std::numeric_limits<double>::epsilon()) );
 
 	// non invertible matrix test
 	try
@@ -173,45 +134,27 @@ unsigned int vecbasistest()
 			    0, 1, 1,
 				1, 0, 0;
 		Basis<3>::Ptr basis = Basis<3>::CreateBasis(mat);
+		BOOST_ERROR( "Accepted non invertible matrix" );
 	}
 	catch(...)
 	{
-		vecbasis_test = true;
 	}
-
-	unsigned int return_value = 0;
-	if(!vecbasis_test)
-	{
-		return_value = -1;
-		std::cout << "Fail!" << std::endl;
-	}
-	else
-		std::cout << "Success!" << std::endl;
-	
-	return return_value;
 }
 
-unsigned int affinetest()
+BOOST_AUTO_TEST_CASE( AffineTest )
 {
-	std::cout << "Affine test... ";
-	
-	bool affine_test = true;
-	
 	Point<2> A(0,0), B(10,0), C(4,5);
 	Eigen::Vector2d AB = B-A;
 	
-	if(!AB.isApprox(Eigen::Vector2d(10,0),std::numeric_limits<double>::epsilon()))
-		affine_test = false;
+	BOOST_CHECK( AB.isApprox(Eigen::Vector2d(10,0),std::numeric_limits<double>::epsilon()) );
 	
 	Frame<2>::Ptr frame1 = Frame<2>::CreateFrame(B.getCoords());
 	
-	if(B.getCoords(frame1).norm() > std::numeric_limits<double>::epsilon())
-		affine_test = false;
+	BOOST_CHECK( B.getCoords(frame1).norm() < std::numeric_limits<double>::epsilon() );
 
 	Eigen::Vector2d AB_1 = B.getCoords(frame1) - A.getCoords(frame1);
 
-	if(!AB.isApprox(AB_1,std::numeric_limits<double>::epsilon()))
-		affine_test = false;
+	BOOST_CHECK( AB.isApprox(AB_1,std::numeric_limits<double>::epsilon()) );
 	
 	Eigen::Matrix2d mat;
 	mat << 1,  2,
@@ -223,37 +166,5 @@ unsigned int affinetest()
 
 	Point<2> D(coordsB_2,frame2);
 
-	if(!D.getCoords().isApprox(B.getCoords(),std::numeric_limits<double>::epsilon()))
-		affine_test = false;
-	
-	unsigned int return_value = 0;
-	if(!affine_test)
-	{
-		return_value = -1;
-		std::cout << "Fail!" << std::endl;
-	}
-	else
-		std::cout << "Success!" << std::endl;
-	
-	return return_value;
-	
-}
-
-int main()
-{
-	unsigned int return_value = 0;
-	
-	unsigned int bspline_test_value = bsplinetest();
-	if(bspline_test_value != 0) return_value = -1;
-	
-	unsigned int compositor_test_value = compositortest();
-	if(compositor_test_value != 0) return_value = -1;
-
-	unsigned int vecbasis_test_value = vecbasistest();
-	if(vecbasis_test_value != 0) return_value = -1;
-
-	unsigned int affine_test_value = affinetest();
-	if(affine_test_value != 0) return_value = -1;
-
-	return return_value;
+	BOOST_CHECK( D.getCoords().isApprox(B.getCoords(),std::numeric_limits<double>::epsilon()) );
 }

@@ -38,10 +38,12 @@ SOFTWARE.
 using namespace mathtools::affine;
 using namespace mathtools::geometry::euclidian;
 
-int main()
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE TestMathtools
+#include <boost/test/unit_test.hpp>
+
+BOOST_AUTO_TEST_CASE( SkeletonTest )
 {
-	unsigned int return_value = 0;
-	
 	// frame creation
 	Frame<2>::Ptr frame = Frame<2>::CreateFrame(Eigen::Vector2d(1.0,0.0),Eigen::Vector2d(2.0,1.0),Eigen::Vector2d(1.0,0.0));
 
@@ -56,43 +58,21 @@ int main()
 	// skeleton creation
 	skeleton::GraphCurveSkeleton<skeleton::model::Classic<2> > skel(modclass);
 	
-	std::cout << "Adding Node test... ";
-
 	// adding a node
 	unsigned int ind = skel.addNode(vec3);
 	
 	// getting the node (vector form)
 	Eigen::Vector3d vec3_2 = skel.getNode(ind);
 	
-	if(vec3_2.isApprox(vec3,std::numeric_limits<double>::epsilon()))
-	{
-		std::cout << "Success!" << std::endl;
-	}
-	else
-	{
-		return_value = -1;
-		std::cout << "Fail!" << std::endl;
-	}
+	BOOST_CHECK( vec3_2.isApprox(vec3,std::numeric_limits<double>::epsilon()) );
 	
-	std::cout << "Getter test... ";
-
 	// getting the node (center form)
 	Point<2> pt = skel.getNode<Point<2> >(ind);
 	
-	if(pt.getCoords().isApprox(frame->getBasis()->getMatrix()*vec3.block<2,1>(0,0)+frame->getOrigin()))
-	{
-		std::cout << "Success!" << std::endl;
-	}
-	else
-	{
-		return_value = -1;
-		std::cout << "Fail!" << std::endl;
-	}
+	BOOST_CHECK( pt.getCoords().isApprox(frame->getBasis()->getMatrix()*vec3.block<2,1>(0,0)+frame->getOrigin()) );
 
 	// hypersphere creation
 	HyperSphere<2> sph(Point<2>(1.0,0.0),5.0,frame);
-
-	std::cout << "Adding Sphere test... ";
 
 	// adding a node
 	unsigned int ind2 = skel.addNode<HyperSphere<2> >(sph);
@@ -103,58 +83,30 @@ int main()
 	// convert the node to a sphere
 	HyperSphere<2> sphcpy = skel.getModel()->toObj<HyperSphere<2> >(vecsph);
 	
-	if(sphcpy.getCenter().getCoords().isApprox(sph.getCenter().getCoords(),std::numeric_limits<double>::epsilon() && 
-	   sphcpy.getRadius() == sph.getRadius() &&
-	   sphcpy.getFrame()->getBasis()->getMatrix().isApprox(sph.getFrame()->getBasis()->getMatrix(),std::numeric_limits<double>::epsilon())) && 
-	   ind != ind2)
-	{
-		std::cout << "Success!" << std::endl;
-	}
-	else
-	{
-		return_value = -1;
-		std::cout << "Fail!" << std::endl;
-	}
+	BOOST_CHECK( sphcpy.getCenter().getCoords().isApprox(sph.getCenter().getCoords(),std::numeric_limits<double>::epsilon()) );
+	BOOST_CHECK( sphcpy.getRadius() == sph.getRadius() );
+	BOOST_CHECK( sphcpy.getFrame()->getBasis()->getMatrix().isApprox(sph.getFrame()->getBasis()->getMatrix(),std::numeric_limits<double>::epsilon()) );
+	BOOST_CHECK( ind != ind2);
 	
 	// get all indices
 	std::list<unsigned int> listnod;
 
-	std::cout << "Get all nodes... ";
 	skel.getAllNodes(listnod);
 
 	listnod.unique();
 
-	if(listnod.size() == 2 &&
-	   std::find(listnod.begin(),listnod.end(),ind) != listnod.end() && 
-	   std::find(listnod.begin(),listnod.end(),ind2) != listnod.end())
-	{
-		std::cout << "Success!" << std::endl;
-	}
-	else
-	{
-		return_value = -1;
-		std::cout << "Fail!" << std::endl;
-	}
+	BOOST_CHECK( listnod.size() == 2 );
+	BOOST_CHECK( std::find(listnod.begin(),listnod.end(),ind) != listnod.end() );
+	BOOST_CHECK( std::find(listnod.begin(),listnod.end(),ind2) != listnod.end() );
 	
-	std::cout << "Adding edge test... ";
-
 	// adding an edge
 	skel.addEdge(ind, ind2);
 
 	std::list<unsigned int> neigh;
 	skel.getNeighbors(ind,neigh);
 	
-	if(neigh.size() == 1 && *(neigh.begin()) == ind2)
-	{
-		std::cout << "Success!" << std::endl;
-	}
-	else
-	{
-		return_value = -1;
-		std::cout << "Fail!" << std::endl;
-	}
-
-	std::cout << "Removing edge test... ";
+	BOOST_CHECK( neigh.size() == 1 );
+	BOOST_CHECK( *(neigh.begin()) == ind2 );
 
 	// removing an edge
 	skel.remEdge(ind, ind2);
@@ -162,28 +114,15 @@ int main()
 	neigh.erase(neigh.begin(),neigh.end());
 	skel.getNeighbors(ind,neigh);
 	
-	if(neigh.size() == 0)
-	{
-		std::cout << "Success!" << std::endl;
-	}
-	else
-	{
-		return_value = -1;
-		std::cout << "Fail!" << std::endl;
-	}
+	BOOST_CHECK( neigh.size() == 0 );
 
-	std::cout << "Removing node test... ";
 	skel.remNode(ind);
 
 	try
 	{
 		skel.getNode(ind);
-		std::cout << "Fail!" << std::endl;
+		BOOST_ERROR( "Deleted a node already removed" );
 	}
 	catch(...)
-	{
-		std::cout << "Success!" << std::endl;
-	}
-
-	return return_value;
+	{}
 }
