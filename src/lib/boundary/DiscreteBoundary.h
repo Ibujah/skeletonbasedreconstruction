@@ -88,17 +88,37 @@ namespace boundary
 			 *  \param vertstr    container of vertices to add
 			 *
 			 *  \tparam Container vertices container
-			 *  \tparam Vert      vertice type, either Eigen::Vector2d or mathtools::affine::Point<2>
 			 */
-			template<template<typename> class Container, typename Vert>
-			void addVerticesString(const Container<Vert> &vertstr)
+			template<template<typename> class Container>
+			void addVerticesString(const Container<mathtools::affine::Point<2> > &vertstr)
 			{
 				unsigned int ind = m_vecvert.size();
 				m_vecvert.resize(m_vecvert.size() + vertstr.size());
 				m_listind.push_back(std::list<unsigned int>());
 				for(typename Container<Eigen::Vector2d>::const_iterator it = vertstr.begin(); it != vertstr.end(); it++)
 				{
-					m_vecvert[ind] = mathtools::affine::Point<2>(*it).getCoords(m_frame);
+					m_vecvert[ind] = it->getCoords(m_frame);
+					m_listind.rbegin()->push_back(ind);
+					ind++;
+				}
+			}
+
+			/**
+			 *  \brief Adds new string of vertices
+			 *  
+			 *  \param vertstr    container of vertices to add
+			 *
+			 *  \tparam Container vertices container
+			 */
+			template<template<typename> class Container>
+			void addVerticesString(const Container<Eigen::Vector2d> &vertstr)
+			{
+				unsigned int ind = m_vecvert.size();
+				m_vecvert.resize(m_vecvert.size() + vertstr.size());
+				m_listind.push_back(std::list<unsigned int>());
+				for(typename Container<Eigen::Vector2d>::const_iterator it = vertstr.begin(); it != vertstr.end(); it++)
+				{
+					m_vecvert[ind] = *it;
 					m_listind.rbegin()->push_back(ind);
 					ind++;
 				}
