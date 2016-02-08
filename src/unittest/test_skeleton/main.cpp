@@ -172,7 +172,18 @@ int main()
 		std::cout << "Fail!" << std::endl;
 	}
 
+	std::cout << "Removing node test... ";
+	skel.remNode(ind);
 
+	try
+	{
+		skel.getNode(ind);
+		std::cout << "Fail!" << std::endl;
+	}
+	catch(...)
+	{
+		std::cout << "Success!" << std::endl;
+	}
 
 	return return_value;
 }
