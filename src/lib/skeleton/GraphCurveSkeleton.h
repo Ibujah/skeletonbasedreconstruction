@@ -233,7 +233,7 @@ namespace skeleton
 			unsigned int addNode(const TypeNode &node)
 			{
 				Stor vec = m_model->template toVec<TypeNode>(node);
-				return addNode<Eigen::Matrix<double,model::meta<Model>::stordim,1> >(vec);
+				return addNode(vec);
 			}
 			
 			/**
