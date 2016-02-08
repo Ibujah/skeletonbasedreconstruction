@@ -146,7 +146,7 @@ namespace mathtools
 					return m_matrix_inv;
 				}
 			
-			protected:
+			private:
 				/**
  				 *  \brief Pointer to canonic basis
  				 */
