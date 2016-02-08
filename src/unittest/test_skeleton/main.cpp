@@ -33,8 +33,10 @@ SOFTWARE.
 
 #include <skeleton/GraphCurveSkeleton.h>
 #include <skeleton/model/Classic.h>
+#include <mathtools/geometry/euclidian/HyperSphere.h>
 
 using namespace mathtools::affine;
+using namespace mathtools::geometry::euclidian;
 
 int main()
 {
@@ -86,6 +88,33 @@ int main()
 		return_value = -1;
 		std::cout << "Fail!" << std::endl;
 	}
+
+	// hypersphere creation
+	HyperSphere<2> sph(Point<2>(1.0,0.0),5.0,frame);
+
+	std::cout << "Adding Sphere test... ";
+
+	// adding a node
+	unsigned int ind2 = skel.addNode<HyperSphere<2> >(sph);
+	
+	// get the vector associated to the node
+	Eigen::Vector3d vecsph = skel.getNode(ind2);
+	
+	// convert the node to a sphere
+	HyperSphere<2> sphcpy = skel.getModel()->toObj<HyperSphere<2> >(vecsph);
+	
+	if(sphcpy.getCenter().getCoords().isApprox(sph.getCenter().getCoords(),std::numeric_limits<double>::epsilon() && 
+	   sphcpy.getRadius() == sph.getRadius() &&
+	   sphcpy.getFrame()->getBasis()->getMatrix().isApprox(sph.getFrame()->getBasis()->getMatrix(),std::numeric_limits<double>::epsilon())))
+	{
+		std::cout << "Success!" << std::endl;
+	}
+	else
+	{
+		return_value = -1;
+		std::cout << "Fail!" << std::endl;
+	}
+	
 
 	return return_value;
 }
