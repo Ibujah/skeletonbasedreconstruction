@@ -26,9 +26,6 @@ SOFTWARE.
  *  \author Bastien Durix
  */
 
-#include <iostream>
-#include <math.h>
-
 #include <mathtools/application/Bspline.h>
 #include <mathtools/application/Compositor.h>
 #include <mathtools/application/LinearApp.h>
