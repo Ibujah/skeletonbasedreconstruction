@@ -238,6 +238,46 @@ namespace skeleton
 			}
 			
 			/**
+			 *  \brief adding node function
+			 *
+			 *  \param index index of the node
+			 *  \param node  node to add
+			 *
+			 *  \return true if the node has been added (i.e. index does not already exists)
+			 */
+			bool addNode(unsigned int index, const Stor &vec)
+			{
+				bool added = false;
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
+				if(!getDesc(index,v_desc))
+				{
+					v_desc = boost::add_vertex(m_graph);
+					m_graph[v_desc].index = index;
+					m_graph[v_desc].vec = vec;
+					if(m_last<index)
+						m_last = index;
+				}
+				return added;
+			}
+			
+			/**
+			 *  \brief adding node function
+			 *
+			 *  \tparam TypeNode node type to add
+			 *
+			 *  \param index index of the node
+			 *  \param node  node to add
+			 *
+			 *  \return true if the node has been added (i.e. index does not already exists)
+			 */
+			template<typename TypeNode>
+			bool addNode(unsigned int index, const TypeNode &node)
+			{
+				Stor vec = m_model->template toVec<TypeNode>(node);
+				return addNode(index,vec);
+			}
+
+			/**
 			 *  \brief Removing node function
 			 *
 			 *  \param index node index
