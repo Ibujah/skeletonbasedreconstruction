@@ -87,10 +87,10 @@ namespace boundary
 			
 			/**
 			 *  \brief Adds new string of vertices
-			 *  
-			 *  \param vertstr    container of vertices to add
 			 *
 			 *  \tparam Container vertices container
+			 *  
+			 *  \param vertstr    container of vertices to add
 			 */
 			template<typename Container>
 			void addVerticesPoint(const Container &vertstr)
@@ -108,10 +108,10 @@ namespace boundary
 
 			/**
 			 *  \brief Adds new string of vertices
-			 *  
-			 *  \param vertstr    container of vertices to add
 			 *
 			 *  \tparam Container vertices container
+			 *  
+			 *  \param vertstr    container of vertices to add
 			 */
 			template<typename Container>
 			void addVerticesVector(const Container &vertstr)
@@ -133,6 +133,40 @@ namespace boundary
 			 *  \return frame of the boundary
 			 */
 			const mathtools::affine::Frame<2>::Ptr getFrame() const;
+
+			/**
+			 *  \brief Vertices getter
+			 *  
+			 *  \tparam Container vertices container
+			 *  \param  cont      container in which add the vertices
+			 */
+			template<typename Container>
+			void getVerticesPoint(Container &cont) const
+			{
+				for(unsigned int i=0; i < m_vecvert.size(); i++)
+				{
+					cont.push_back(mathtools::affine::Point<2>(m_vecvert[i],m_frame));
+				}
+			}
+
+			/**
+			 *  \brief Vertices getter
+			 *  
+			 *  \tparam Container vertices container
+			 *  \param  cont      container in which add the vertices
+			 */
+			template<typename Container>
+			void getVerticesVector(Container &cont) const
+			{
+				cont.insert(cont.end(),m_vecvert.begin(),m_vecvert.end());
+			}
+
+			/**
+			 *  \brief Index list getter
+			 *
+			 *  \return index list
+			 */
+			const std::list<std::list<unsigned int> > getIndexList() const;
 	};
 }
 

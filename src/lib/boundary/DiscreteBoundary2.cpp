@@ -31,9 +31,14 @@ SOFTWARE.
 
 using namespace boundary;
 
-boundary::DiscreteBoundary<2>::DiscreteBoundary(const mathtools::affine::Frame<2>::Ptr frame) : m_frame(frame) {}
+boundary::DiscreteBoundary<2>::DiscreteBoundary(const mathtools::affine::Frame<2>::Ptr frame) : m_frame(frame), m_vecvert(0) {}
 
 const mathtools::affine::Frame<2>::Ptr boundary::DiscreteBoundary<2>::getFrame() const
 {
 	return m_frame;
+}
+
+const std::list<std::list<unsigned int> > boundary::DiscreteBoundary<2>::getIndexList() const
+{
+	return m_listind;
 }
