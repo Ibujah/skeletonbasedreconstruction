@@ -27,6 +27,9 @@ SOFTWARE.
  *  \author Bastien Durix
  */
 
+#ifndef _DISCRETEBOUNDARY_H_
+#define _DISCRETEBOUNDARY_H_
+
 #include <memory>
 #include <list>
 #include <mathtools/affine/Frame.h>
@@ -126,3 +129,4 @@ namespace boundary
 	};
 }
 
+#endif //_DISCRETEBOUNDARY_H_
