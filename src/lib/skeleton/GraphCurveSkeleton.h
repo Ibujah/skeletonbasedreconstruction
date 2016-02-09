@@ -354,11 +354,11 @@ namespace skeleton
 				}
 
 				// add all the edges
-				typename boost::graph_traits<GraphType>::edges_iterator ei, ei_end;
+				typename boost::graph_traits<GraphType>::edge_iterator ei, ei_end;
 				for(boost::tie(ei,ei_end) = boost::edges(grskel.m_graph); ei != ei_end; ei++)
 				{
-					unsigned int ind1 = grskel.m_graph[*boost::source(ei,grskel.m_graph)].index;
-					unsigned int ind2 = grskel.m_graph[*boost::target(ei,grskel.m_graph)].index;
+					unsigned int ind1 = grskel.m_graph[boost::source(*ei,grskel.m_graph)].index;
+					unsigned int ind2 = grskel.m_graph[boost::target(*ei,grskel.m_graph)].index;
 
 					addEdge(nodeadded[ind1],nodeadded[ind2]);
 				}
@@ -402,11 +402,11 @@ namespace skeleton
 				}
 				else // add all the edges
 				{
-					typename boost::graph_traits<GraphType>::edges_iterator ei, ei_end;
+					typename boost::graph_traits<GraphType>::edge_iterator ei, ei_end;
 					for(boost::tie(ei,ei_end) = boost::edges(grskel.m_graph); ei != ei_end; ei++)
 					{
-						unsigned int ind1 = grskel.m_graph[*boost::source(ei,grskel.m_graph)].index;
-						unsigned int ind2 = grskel.m_graph[*boost::target(ei,grskel.m_graph)].index;
+						unsigned int ind1 = grskel.m_graph[boost::source(*ei,grskel.m_graph)].index;
+						unsigned int ind2 = grskel.m_graph[boost::target(*ei,grskel.m_graph)].index;
 
 						addEdge(ind1,ind2);
 					}
@@ -424,7 +424,7 @@ namespace skeleton
 			 */
 			bool insertExactSkel(const skeleton::GraphCurveSkeleton<Model>::Ptr grskel)
 			{
-				return insertSkel(*grskel);
+				return insertExactSkel(*grskel);
 			}
 
 		public: // non modifying functions
