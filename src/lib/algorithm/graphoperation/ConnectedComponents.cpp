@@ -29,6 +29,14 @@ SOFTWARE.
 
 #include "ConnectedComponents.h"
 
+/**
+ *  \brief Separate skeleton into connected components
+ *
+ *  \tparam GraphSkel skeleton type
+ *  \param  grskel    skeleton to separate
+ *
+ *  \return list of connected components
+ */
 template<typename GraphSkel>
 std::list<typename GraphSkel::Ptr> SeparateComponents_helper(const typename GraphSkel::Ptr grskel)
 {
