@@ -32,6 +32,7 @@ SOFTWARE.
 
 #include <memory>
 #include <list>
+#include <map>
 #include <mathtools/affine/Frame.h>
 #include <mathtools/affine/Point.h>
 
@@ -68,14 +69,14 @@ namespace boundary
 			typename mathtools::affine::Frame<2>::Ptr m_frame;
 
 			/**
-			 *  \brief vector of vertices composing the boundary
+			 *  \brief Vector of vertices composing the boundary
 			 */
 			std::vector<Eigen::Vector2d> m_vecvert;
 
 			/**
-			 *  \brief list of lists of all vertices indices, in direct order
+			 *  \brief Neighbors of each vertex
 			 */
-			std::list<std::list<unsigned int> > m_listind;
+			std::map<unsigned int,unsigned int> m_neigh;
 
 		public:
 			/**
@@ -97,13 +98,14 @@ namespace boundary
 			{
 				unsigned int ind = m_vecvert.size();
 				m_vecvert.resize(m_vecvert.size() + vertstr.size());
-				m_listind.push_back(std::list<unsigned int>());
+				unsigned int beg = ind;
 				for(typename Container::const_iterator it = vertstr.begin(); it != vertstr.end(); it++)
 				{
 					m_vecvert[ind] = it->getCoords(m_frame);
-					m_listind.rbegin()->push_back(ind);
+					m_neigh[ind] = ind+1;
 					ind++;
 				}
+				m_neigh[ind-1] = beg;
 			}
 
 			/**
@@ -118,13 +120,14 @@ namespace boundary
 			{
 				unsigned int ind = m_vecvert.size();
 				m_vecvert.resize(m_vecvert.size() + vertstr.size());
-				m_listind.push_back(std::list<unsigned int>());
+				unsigned int beg = ind;
 				for(typename Container::const_iterator it = vertstr.begin(); it != vertstr.end(); it++)
 				{
 					m_vecvert[ind] = *it;
-					m_listind.rbegin()->push_back(ind);
+					m_neigh[ind] = ind+1;
 					ind++;
 				}
+				m_neigh[ind-1] = beg;
 			}
 
 			/**
@@ -162,11 +165,13 @@ namespace boundary
 			}
 
 			/**
-			 *  \brief Index list getter
+			 *  \brief Get next vertex indice
 			 *
-			 *  \return index list
+			 *  \param index vertex index
+			 *
+			 *  \return next index
 			 */
-			const std::list<std::list<unsigned int> > getIndexList() const;
+			unsigned int getNext(unsigned int index) const;
 	};
 }
 

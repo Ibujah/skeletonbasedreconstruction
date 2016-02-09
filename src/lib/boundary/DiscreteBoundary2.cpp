@@ -38,7 +38,10 @@ const mathtools::affine::Frame<2>::Ptr boundary::DiscreteBoundary<2>::getFrame()
 	return m_frame;
 }
 
-const std::list<std::list<unsigned int> > boundary::DiscreteBoundary<2>::getIndexList() const
+unsigned int boundary::DiscreteBoundary<2>::getNext(unsigned int index) const
 {
-	return m_listind;
+	std::map<unsigned int,unsigned int>::const_iterator it = m_neigh.find(index);
+	if(it == m_neigh.end())
+		throw std::logic_error("boundary::DiscreteBoundary<2>::getNext: index is not in the skeleton");
+	return it->second;
 }
