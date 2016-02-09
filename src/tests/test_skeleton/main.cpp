@@ -26,11 +26,6 @@ SOFTWARE.
  *  \author Bastien Durix
  */
 
-#include <iostream>
-#include <math.h>
-
-#include <cstdlib>
-
 #include <skeleton/GraphCurveSkeleton.h>
 #include <skeleton/model/Classic.h>
 #include <mathtools/geometry/euclidian/HyperSphere.h>
