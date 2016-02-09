@@ -54,14 +54,14 @@ boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(co
 			cellvalue += dissh->getContainer()[ind3]?4:0;
 			cellvalue += dissh->getContainer()[ind4]?8:0;
 			
-			unsigned int up    = (c*2+1) + (dissh->getWidth()*2+1) * (l*2);
-			unsigned int right = (c*2+2) + (dissh->getWidth()*2+1) * (l*2+1);
-			unsigned int down  = (c*2+1) + (dissh->getWidth()*2+1) * (l*2+2);
-			unsigned int left  = (c*2)   + (dissh->getWidth()*2+1) * (l*2+1);
+			unsigned int down  = (c*2+1) + (dissh->getWidth()*2+2) * (l*2);
+			unsigned int right = (c*2+2) + (dissh->getWidth()*2+2) * (l*2+1);
+			unsigned int up  = (c*2+1) + (dissh->getWidth()*2+2) * (l*2+2);
+			unsigned int left  = (c*2)   + (dissh->getWidth()*2+2) * (l*2+1);
 			
-			map_vert[up]    = Eigen::Vector2d(0.5 + (double)c + 0.5, 0.5 + (double)l);
+			map_vert[down]  = Eigen::Vector2d(0.5 + (double)c + 0.5, 0.5 + (double)l);
 			map_vert[right] = Eigen::Vector2d(0.5 + (double)c + 1.0, 0.5 + (double)l + 0.5);
-			map_vert[down]  = Eigen::Vector2d(0.5 + (double)c + 0.5, 0.5 + (double)l + 1.0);
+			map_vert[up]    = Eigen::Vector2d(0.5 + (double)c + 0.5, 0.5 + (double)l + 1.0);
 			map_vert[left]  = Eigen::Vector2d(0.5 + (double)c,       0.5 + (double)l + 0.5);
 			
 			//cf: https://en.wikipedia.org/wiki/Marching_squares
@@ -85,23 +85,23 @@ boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(co
 					map_neigh[right] = down;
 					break;
 				case 6:
-					map_neigh[down] = up;
-					break;
-				case 7:
-					map_neigh[left] = up;
-					break;
-				case 8:
-					map_neigh[up] = left;
-					break;
-				case 9:
 					map_neigh[up] = down;
 					break;
+				case 7:
+					map_neigh[up] = left;
+					break;
+				case 8:
+					map_neigh[left] = up;
+					break;
+				case 9:
+					map_neigh[down] = up;
+					break;
 				case 10:
-					map_neigh[down] = left;
-					map_neigh[up] = right;
+					map_neigh[right] = up;
+					map_neigh[left] = down;
 					break;
 				case 11:
-					map_neigh[up] = right;
+					map_neigh[right] = up;
 					break;
 				case 12:
 					map_neigh[left] = right;
