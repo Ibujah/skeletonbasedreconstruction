@@ -122,22 +122,22 @@ boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(co
 	}
 	
 	//second step: link all the vertices on the boundary
-	do
+	while(map_neigh.size() != 0)
 	{
 		std::list<Eigen::Vector2d> list_vert;
 		
 		std::map<unsigned int,unsigned int>::iterator it = map_neigh.begin();
 
-		while(it != map_neigh.end())
+		do
 		{
 			list_vert.push_back(map_vert[it->first]);
 			unsigned int val = it->second;
 			map_neigh.erase(it);
 			it = map_neigh.find(val);
-		}
+		}while(it != map_neigh.end());
 		
 		bnd->addVerticesVector(list_vert);
+	}
 
-	}while(map_neigh.size() != 0);
 	return bnd;
 }
