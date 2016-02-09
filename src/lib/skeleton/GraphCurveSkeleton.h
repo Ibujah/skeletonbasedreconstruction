@@ -338,6 +338,94 @@ namespace skeleton
 
 				return v_found;
 			}
+			
+			/**
+			 *  \brief Insert skeleton (only vectors) into this one
+			 *
+			 *  \param grskel graph skeleton to add
+			 */
+			void insertSkel(const skeleton::GraphCurveSkeleton<Model> &grskel)
+			{
+				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
+				std::map<unsigned int,unsigned int> nodeadded;
+				for(boost::tie(vi,vi_end) = boost::vertices(grskel.m_graph); vi != vi_end; vi++)
+				{
+					nodeadded[grskel.m_graph[*vi].index] = addNode(grskel.m_graph[*vi].index,grskel.m_graph[*vi].vec);
+				}
+
+				// add all the edges
+				typename boost::graph_traits<GraphType>::edges_iterator ei, ei_end;
+				for(boost::tie(ei,ei_end) = boost::edges(grskel.m_graph); ei != ei_end; ei++)
+				{
+					unsigned int ind1 = grskel.m_graph[*boost::source(ei,grskel.m_graph)].index;
+					unsigned int ind2 = grskel.m_graph[*boost::target(ei,grskel.m_graph)].index;
+
+					addEdge(nodeadded[ind1],nodeadded[ind2]);
+				}
+			}
+			
+			/**
+			 *  \brief Insert skeleton (only vectors) into this one
+			 *
+			 *  \param grskel graph skeleton to add
+			 */
+			void insertSkel(const skeleton::GraphCurveSkeleton<Model>::Ptr grskel)
+			{
+				insertSkel(*grskel);
+			}
+			
+			/**
+			 *  \brief Insert skeleton (i.e. indices, vectors) into this one
+			 *
+			 *  \param grskel graph skeleton to add
+			 *
+			 *  \return true if the graph skeleton had been correctly added
+			 */
+			bool insertExactSkel(const skeleton::GraphCurveSkeleton<Model> &grskel)
+			{
+				bool success=true;
+				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
+				std::list<unsigned int> nodeadded;
+				for(boost::tie(vi,vi_end) = boost::vertices(grskel.m_graph); vi != vi_end && success; vi++)
+				{
+					success = addNode(grskel.m_graph[*vi].index,grskel.m_graph[*vi].vec);
+					nodeadded.push_back(grskel.m_graph[*vi].index);
+				}
+
+				if(!success) // if there is an incompatibility, remove all the added nodes
+				{
+					nodeadded.pop_back();
+					for(std::list<unsigned int>::iterator it = nodeadded.begin(); it != nodeadded.end(); it++)
+					{
+						remNode(*it);
+					}
+				}
+				else // add all the edges
+				{
+					typename boost::graph_traits<GraphType>::edges_iterator ei, ei_end;
+					for(boost::tie(ei,ei_end) = boost::edges(grskel.m_graph); ei != ei_end; ei++)
+					{
+						unsigned int ind1 = grskel.m_graph[*boost::source(ei,grskel.m_graph)].index;
+						unsigned int ind2 = grskel.m_graph[*boost::target(ei,grskel.m_graph)].index;
+
+						addEdge(ind1,ind2);
+					}
+				}
+				
+				return success;
+			}
+			
+			/**
+			 *  \brief Insert skeleton (i.e. indices, vectors) into this one
+			 *
+			 *  \param grskel graph skeleton to add
+			 *
+			 *  \return true if the graph skeleton had been correctly added
+			 */
+			bool insertExactSkel(const skeleton::GraphCurveSkeleton<Model>::Ptr grskel)
+			{
+				return insertSkel(*grskel);
+			}
 
 		public: // non modifying functions
 			/**
