@@ -72,6 +72,16 @@ namespace skeleton
 				 *  \param frame frame of the skeleton
 				 */
 				Classic(const typename mathtools::affine::Frame<Dim>::Ptr frame) : m_frame(frame) {}
+				
+				/**
+				 *  \brief Frame getter
+				 *
+				 *  \return frame of the model
+				 */
+				const typename mathtools::affine::Frame<Dim>::Ptr getFrame() const
+				{
+					return m_frame;
+				}
 
 				/**
 				 *  \brief Converts an object into a vector
