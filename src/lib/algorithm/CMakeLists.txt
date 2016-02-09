@@ -11,3 +11,8 @@ add_library(
 	)
 
 SET_TARGET_PROPERTIES(${LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
+target_link_libraries(${LIBRARY_NAME} ${MATHTOOLS_LIB}
+									  ${SHAPE_LIB}
+									  ${BOUNDARY_LIB})
+
