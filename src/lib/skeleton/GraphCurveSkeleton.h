@@ -241,7 +241,7 @@ namespace skeleton
 			 *  \brief adding node function
 			 *
 			 *  \param index index of the node
-			 *  \param node  node to add
+			 *  \param vec   vector to add
 			 *
 			 *  \return true if the node has been added (i.e. index does not already exists)
 			 */
