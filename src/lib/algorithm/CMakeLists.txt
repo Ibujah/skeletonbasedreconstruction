@@ -2,7 +2,8 @@ set(LIBRARY_NAME ${ALGORITHM_LIB})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/lib)
 set(SOURCE_FILES    extractboundary/MarchingSquares.cpp
-					graphoperation/ConnectedComponents.cpp)
+					graphoperation/ConnectedComponents.cpp
+					skeletonization/VoronoiSkeleton2D.cpp)
 # make the library
 add_library(
     ${LIBRARY_NAME}
