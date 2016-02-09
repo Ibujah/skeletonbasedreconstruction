@@ -126,6 +126,13 @@ namespace boundary
 					ind++;
 				}
 			}
+
+			/**
+			 *  \brief Frame getter
+			 *
+			 *  \return frame of the boundary
+			 */
+			const mathtools::affine::Frame<2>::Ptr getFrame() const;
 	};
 }
 

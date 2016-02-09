@@ -32,3 +32,8 @@ SOFTWARE.
 using namespace boundary;
 
 boundary::DiscreteBoundary<2>::DiscreteBoundary(const mathtools::affine::Frame<2>::Ptr frame) : m_frame(frame) {}
+
+const mathtools::affine::Frame<2>::Ptr boundary::DiscreteBoundary<2>::getFrame() const
+{
+	return m_frame;
+}
