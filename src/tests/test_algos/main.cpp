@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE( MarchingSquares )
 	for(unsigned int i=0; i < matbin.size(); i++)
 		matbin[i] = img[i];
 	
-	boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(disshp);
+	boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(disshp,1);
 	
 	verifybound(disbnd,wantedbnd,wantedneigh);
 }
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE( Skeletonization )
 	for(unsigned int i=0; i < matbin.size(); i++)
 		matbin[i] = img[i];
 	
-	boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(disshp);
+	boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(disshp,1);
 	
 	verifybound(disbnd,wantedbnd,wantedneigh);
 
