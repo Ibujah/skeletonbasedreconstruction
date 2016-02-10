@@ -105,8 +105,13 @@ skeleton::GraphSkel2d::Ptr algorithm::skeletonization::VoronoiSkeleton2d(const b
 	/*
 	 *  Nodes that are inside the skeleton
 	 */
-	std::vector<unsigned int> v_intsph;
+	std::list<unsigned int> v_intsph;
 	
+	/*
+	 *  Added nodes
+	 */
+	std::map<unsigned int,Eigen::Vector3d> v_added;
+
 	if(voroloopall.start())
 	{
 		do
@@ -131,7 +136,20 @@ skeleton::GraphSkel2d::Ptr algorithm::skeletonization::VoronoiSkeleton2d(const b
 					if(vert[i*3+2]==1.0)
 					{
 						corner(2) = (corner.block<2,1>(0,0)-center).norm();
-						indices[i] = grskel->addNode(corner);
+						bool isin=false;
+						for(std::map<unsigned int,Eigen::Vector3d>::iterator it = v_added.begin(); it != v_added.end() & !isin; it++)
+						{
+							if(it->second.isApprox(corner,std::numeric_limits<float>::epsilon()))
+							{
+								isin=true;
+								indices[i] = it->first;
+							}
+						}
+						if(!isin)
+						{
+							indices[i] = grskel->addNode(corner);
+							v_added[indices[i]] = corner;
+						}
 					}
 				}
 				
@@ -175,7 +193,7 @@ skeleton::GraphSkel2d::Ptr algorithm::skeletonization::VoronoiSkeleton2d(const b
 								{
 									grskel->addEdge(indices[i],indices[ind_j]);
 								}
-								else if(disbnd->getNext(voroloopall.pid())==ind_neigh)
+								else if(disbnd->getNext(ind_neigh)==(unsigned int)voroloopall.pid())
 								{
 									Eigen::Matrix2d mat;
 									mat.block<2,1>(0,0) = bndpts[ind_neigh].getCoords() - bndpts[voroloopall.pid()].getCoords();
@@ -201,11 +219,13 @@ skeleton::GraphSkel2d::Ptr algorithm::skeletonization::VoronoiSkeleton2d(const b
 						}
 					}
 				}
-
 			}
 		}while(voroloopall.inc());
 	}
 	
+	v_intsph.sort();
+	v_intsph.unique();
+
 	/*
 	 *  Separation into connected components
 	 */
@@ -218,9 +238,9 @@ skeleton::GraphSkel2d::Ptr algorithm::skeletonization::VoronoiSkeleton2d(const b
 		(*it)->getAllNodes(list_ver);
 
 		bool intern = false;
-		for(unsigned int i=0;i<v_intsph.size() && !intern;i++)
+		for(std::list<unsigned int>::iterator itl = v_intsph.begin(); itl != v_intsph.end() && !intern; itl++)
 		{
-			if( std::find(list_ver.begin(),list_ver.end(),v_intsph[i]) != list_ver.end() )
+			if( std::find(list_ver.begin(),list_ver.end(),*itl) != list_ver.end() )
 			{
 				intern=true;
 			}
