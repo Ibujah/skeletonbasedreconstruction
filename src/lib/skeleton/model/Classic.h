@@ -71,7 +71,7 @@ namespace skeleton
 				 *
 				 *  \param frame frame of the skeleton
 				 */
-				Classic(const typename mathtools::affine::Frame<Dim>::Ptr frame) : m_frame(frame) {}
+				Classic(const typename mathtools::affine::Frame<Dim>::Ptr frame = mathtools::affine::Frame<2>::CanonicFrame()) : m_frame(frame) {}
 				
 				/**
 				 *  \brief Frame getter
