@@ -74,6 +74,13 @@ namespace skeleton
 				Classic(const typename mathtools::affine::Frame<Dim>::Ptr frame = mathtools::affine::Frame<2>::CanonicFrame()) : m_frame(frame) {}
 				
 				/**
+				 *  \brief Copy constructor
+				 *
+				 *  \param model model to copy
+				 */
+				Classic(const Classic &model) : m_frame(model.m_frame) {}
+				
+				/**
 				 *  \brief Frame getter
 				 *
 				 *  \return frame of the model
