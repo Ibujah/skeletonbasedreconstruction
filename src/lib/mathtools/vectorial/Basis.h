@@ -145,6 +145,16 @@ namespace mathtools
 				{
 					return m_matrix_inv;
 				}
+
+				/**
+				 *  \brief Tests if the basis is in direct order or not
+				 *
+				 *  \return True if the basis is in direct order
+				 */
+				bool isDirect() const
+				{
+					return (m_matrix.det()>0);
+				}
 			
 			private:
 				/**
