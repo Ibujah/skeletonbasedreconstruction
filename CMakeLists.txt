@@ -12,13 +12,15 @@ find_package(EIGEN REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(VoroPlusPlus REQUIRED)
 
-set(MATHTOOLS_LIB "Mathtools")
-set(SHAPE_LIB     "Shape")
-set(BOUNDARY_LIB  "Boundary")
-set(CAMERA_LIB    "Camera")
-set(ALGORITHM_LIB "Algorithm")
+set(MATHTOOLS_LIB  "Mathtools")
+set(SHAPE_LIB      "Shape")
+set(BOUNDARY_LIB   "Boundary")
+set(CAMERA_LIB     "Camera")
+set(ALGORITHM_LIB  "Algorithm")
 
-set(USERINPUT_LIB "UserInput")
+set(USERINPUT_LIB  "UserInput")
+
+set(DISPLAYOCV_LIB "DisplayOCV")
 
 include_directories(${EIGEN_INCLUDE_DIRS})
 
