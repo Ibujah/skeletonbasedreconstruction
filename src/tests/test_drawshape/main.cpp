@@ -27,11 +27,11 @@ SOFTWARE.
  */
 
 #include <shape/DiscreteShape.h>
-#include <utils/DrawShape.h>
+#include <userinput/DrawShape.h>
 
 int main()
 {
-	shape::DiscreteShape<2>::Ptr dissh = utils::DrawShape(640,480);
+	shape::DiscreteShape<2>::Ptr dissh = userinput::DrawShape(640,480);
 
 	return 0;
 }

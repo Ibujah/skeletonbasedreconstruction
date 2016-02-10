@@ -34,9 +34,9 @@ SOFTWARE.
 #include <mathtools/affine/Frame.h>
 
 /**
- *  \brief Utilitary functions
+ *  \brief User input functions
  */
-namespace utils
+namespace userinput
 {
 	/**
 	 *  \brief Opens a window and draw a shape

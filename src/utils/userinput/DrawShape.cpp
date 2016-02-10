@@ -32,7 +32,7 @@ SOFTWARE.
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 
-using namespace utils;
+using namespace userinput;
 
 /**
  *  \brief Defines drawing image data
@@ -72,7 +72,7 @@ void shapeacqonMouse( int event, int xc, int yc, int, void* data )
     }
 }
 
-shape::DiscreteShape<2>::Ptr utils::DrawShape(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame)
+shape::DiscreteShape<2>::Ptr userinput::DrawShape(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame)
 {
 	shape::DiscreteShape<2>::Ptr disshape(new shape::DiscreteShape<2>(width, height, frame));
 	

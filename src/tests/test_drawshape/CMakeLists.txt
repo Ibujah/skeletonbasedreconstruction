@@ -1,5 +1,5 @@
 include_directories(${CMAKE_SOURCE_DIR}/src/lib)
-include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/src/utils)
 
 set(source_files main.cpp)
 
@@ -13,6 +13,6 @@ add_executable(${EXEC_NAME} ${source_files})
 
 target_link_libraries(${EXEC_NAME} ${MATHTOOLS_LIB}
 								   ${SHAPE_LIB}
-								   ${UTILS_LIB}
+								   ${USERINPUT_LIB}
 								   ${OpenCV_LIBS})
 

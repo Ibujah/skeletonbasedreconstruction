@@ -18,7 +18,7 @@ set(BOUNDARY_LIB  "Boundary")
 set(CAMERA_LIB    "Camera")
 set(ALGORITHM_LIB "Algorithm")
 
-set(UTILS_LIB     "Utils")
+set(USERINPUT_LIB "UserInput")
 
 include_directories(${EIGEN_INCLUDE_DIRS})
 
