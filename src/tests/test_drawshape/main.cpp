@@ -26,12 +26,33 @@ SOFTWARE.
  *  \author Bastien Durix
  */
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #include <shape/DiscreteShape.h>
+#include <boundary/DiscreteBoundary.h>
+#include <skeleton/Skeletons.h>
+
 #include <userinput/DrawShape.h>
+
+#include <algorithm/extractboundary/MarchingSquares.h>
+#include <algorithm/skeletonization/VoronoiSkeleton2D.h>
+
+#include <displayopencv/DisplayShapeOCV.h>
 
 int main()
 {
 	shape::DiscreteShape<2>::Ptr dissh = userinput::DrawShape(640,480);
+	
+	//boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(dissh,4);
+
+	//skeleton::GraphSkel2d::Ptr grskel = algorithm::skeletonization::VoronoiSkeleton2d(disbnd);
+	
+	cv::Mat image(480,640,CV_8UC3,cv::Scalar(0,0,0));
+
+	displayopencv::DisplayDiscreteShape(dissh,image,dissh->getFrame(),cv::Scalar(255,255,255));
+
+	cv::imwrite("res.png",image);
 
 	return 0;
 }
