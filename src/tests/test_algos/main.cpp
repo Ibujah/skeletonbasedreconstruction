@@ -22,17 +22,22 @@ SOFTWARE.
 
 
 /**
- *  \brief Provides tests for marching squares algorithm
+ *  \brief Provides tests for some algorithms
  *  \author Bastien Durix
  */
 
 #include <shape/DiscreteShape.h>
 #include <boundary/DiscreteBoundary.h>
+#include <skeleton/GraphCurveSkeleton.h>
 
 #include <algorithm/extractboundary/MarchingSquares.h>
+#include <algorithm/graphoperation/ConnectedComponents.h>
+#include <algorithm/skeletonization/VoronoiSkeleton2D.h>
+
+#include <iostream>
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE TestMarchingSquares
+#define BOOST_TEST_MODULE TestAlgos
 #include <boost/test/unit_test.hpp>
 
 void verifybound(const boundary::DiscreteBoundary<2>::Ptr disbnd, const std::vector<Eigen::Vector2d> &wantedbnd, const std::map<unsigned int,unsigned int> &wantedneigh)
@@ -166,4 +171,148 @@ BOOST_AUTO_TEST_CASE( MarchingSquares )
 	boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(disshp);
 	
 	verifybound(disbnd,wantedbnd,wantedneigh);
+}
+
+BOOST_AUTO_TEST_CASE( ComponentSeparation )
+{
+	skeleton::GraphSkel2d::Ptr grskel(new skeleton::GraphSkel2d(skeleton::model::Classic<2>{}));
+	
+	unsigned int ind0 = grskel->addNode(Eigen::Vector3d(1.0,1.0,0.5));
+	unsigned int ind1 = grskel->addNode(Eigen::Vector3d(2.0,1.0,0.5));
+	unsigned int ind2 = grskel->addNode(Eigen::Vector3d(3.0,1.0,0.5));
+	unsigned int ind3 = grskel->addNode(Eigen::Vector3d(4.0,1.0,0.5));
+	unsigned int ind4 = grskel->addNode(Eigen::Vector3d(5.0,1.0,0.5));
+	unsigned int ind5 = grskel->addNode(Eigen::Vector3d(6.0,1.0,0.5));
+	
+	std::vector<std::list<unsigned int> > list_nod(3);
+	// 0 (alone)
+	list_nod[0].push_back(ind0);
+	list_nod[0].sort();
+
+	// 1-2
+	grskel->addEdge(ind1,ind2);
+	list_nod[1].push_back(ind1);
+	list_nod[1].push_back(ind2);
+	list_nod[1].sort();
+
+	// 3-4-5
+	grskel->addEdge(ind4,ind3);
+	grskel->addEdge(ind4,ind5);
+	list_nod[2].push_back(ind3);
+	list_nod[2].push_back(ind4);
+	list_nod[2].push_back(ind5);
+	list_nod[2].sort();
+
+	std::list<skeleton::GraphSkel2d::Ptr> list_gr = algorithm::graphoperation::SeparateComponents(grskel);
+	
+	BOOST_REQUIRE(list_gr.size() == 3);
+
+	for(std::list<skeleton::GraphSkel2d::Ptr>::iterator it = list_gr.begin(); it != list_gr.end(); it++)
+	{
+		skeleton::GraphSkel2d::Ptr cur_skel = *it;
+		std::list<unsigned int> ind;
+		cur_skel->getAllNodes(ind);
+		unsigned int cur_list = 0;
+		if(ind.size() == 1) // 0
+		{
+			cur_list = 0;
+		}
+		else if(ind.size() == 2) // 1-2
+		{
+			cur_list = 1;
+		}
+		else if(ind.size() == 3) // 3-4-5
+		{
+			cur_list = 2;
+		}
+		else
+		{
+			BOOST_FAIL("Wrong number of nodes in the sub skeleton");
+		}
+		
+		ind.sort();
+		for(std::list<unsigned int>::iterator itl = list_nod[cur_list].begin(); itl != list_nod[cur_list].end(); itl++)
+		{
+			BOOST_REQUIRE(std::find(ind.begin(),ind.end(),*itl) != ind.end());
+		}
+	}
+}
+
+void verifyskel(const skeleton::GraphSkel2d::Ptr grskel, const std::vector<Eigen::Vector3d> &wantedskl, const std::list<std::pair<unsigned int,unsigned int> > &wantededg)
+{
+	std::vector<unsigned int> index(0);
+	grskel->getAllNodes(index);
+	
+	std::map<unsigned int, unsigned int> map_assoc;
+	for(unsigned int i = 0; i < wantedskl.size(); i++)
+	{
+		for(unsigned int j = 0; j < wantedskl.size(); j++)
+		{
+			if(grskel->getNode(index[i]).isApprox(wantedskl[j],std::numeric_limits<double>::epsilon()))
+				map_assoc[j] = i;
+		}
+	}
+
+	BOOST_REQUIRE(map_assoc.size() == wantedskl.size());
+
+	for(std::list<std::pair<unsigned int,unsigned int> >::const_iterator it = wantededg.begin(); it != wantededg.end(); it++)
+	{
+		BOOST_CHECK(grskel->areNeighbors(it->first,it->second));
+		BOOST_CHECK(grskel->areNeighbors(it->second,it->first));
+	}
+
+}
+
+BOOST_AUTO_TEST_CASE( Skeletonization )
+{
+	// image preparation
+	unsigned char img[4*4] = 
+	{
+	0,0,0,0,
+	0,1,1,0,
+	0,0,1,0,
+	0,0,0,0
+	};
+
+	//wanted boundary preparation
+	std::vector<Eigen::Vector2d> wantedbnd(8);
+	std::map<unsigned int,unsigned int> wantedneigh;
+	unsigned int num=0;
+	wantedbnd[num++] = Eigen::Vector2d(1.5,1.0);
+	wantedbnd[num++] = Eigen::Vector2d(2.5,1.0);
+	wantedbnd[num++] = Eigen::Vector2d(3.0,1.5);
+	wantedbnd[num++] = Eigen::Vector2d(3.0,2.5);
+	wantedbnd[num++] = Eigen::Vector2d(2.5,3.0);
+	wantedbnd[num++] = Eigen::Vector2d(2.0,2.5);
+	wantedbnd[num++] = Eigen::Vector2d(1.5,2.0);
+	wantedbnd[num++] = Eigen::Vector2d(1.0,1.5);
+	for(unsigned int i=0; i < 8; i++)
+		wantedneigh[i] = i+1;
+	wantedneigh[7] = 0;
+
+	shape::DiscreteShape<2>::Ptr disshp(new shape::DiscreteShape<2>(4,4));
+	
+	std::vector<unsigned char> &matbin = disshp->getContainer();
+	
+	for(unsigned int i=0; i < matbin.size(); i++)
+		matbin[i] = img[i];
+	
+	boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(disshp);
+	
+	verifybound(disbnd,wantedbnd,wantedneigh);
+
+	skeleton::GraphSkel2d::Ptr grskel = algorithm::skeletonization::VoronoiSkeleton2d(disbnd);
+	
+	std::vector<Eigen::Vector3d> wantedskl(5);
+	std::list<std::pair<unsigned int,unsigned int> > wantededg;
+	num=0;
+	wantedskl[num++] = Eigen::Vector3d(1.5 , 1.5 , 0.5);
+	wantedskl[num++] = Eigen::Vector3d(2.0 , 1.5 , sqrt(2.0)/2.0);
+	wantedskl[num++] = Eigen::Vector3d(2.25, 1.75, sqrt(10.0)/2.0);
+	wantedskl[num++] = Eigen::Vector3d(2.5 , 2.0 , sqrt(2.0)/2.0);
+	wantedskl[num++] = Eigen::Vector3d(2.5 , 2.5 , 0.5);
+	wantededg.push_back(std::pair<unsigned int, unsigned int>(0,1));
+	wantededg.push_back(std::pair<unsigned int, unsigned int>(1,2));
+	wantededg.push_back(std::pair<unsigned int, unsigned int>(2,3));
+	wantededg.push_back(std::pair<unsigned int, unsigned int>(3,4));
 }
