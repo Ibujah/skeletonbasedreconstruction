@@ -25,8 +25,10 @@ SOFTWARE.
 
 void displayopencv::DisplayDiscreteShape(const shape::DiscreteShape<2>::Ptr dissh, cv::Mat &img, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &color)
 {
+	#pragma omp parallel for
 	for(int x=0;x<img.cols;x++)
 	{
+		#pragma omp parallel for
 		for(int y=0;y<img.rows;y++)
 		{
 			if(dissh->isIn(mathtools::affine::Point<2>(x,y,frame)))
