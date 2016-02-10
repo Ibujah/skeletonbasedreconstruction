@@ -161,7 +161,12 @@ BOOST_AUTO_TEST_CASE( MarchingSquares )
 		wantedneigh[i+1] = i;
 	wantedneigh[50] = 55;
 	
-	shape::DiscreteShape<2>::Ptr disshp(new shape::DiscreteShape<2>(11,11));
+	mathtools::affine::Frame<2>::Ptr frame =
+		mathtools::affine::Frame<2>::CreateFrame(
+				Eigen::Vector2d(0,0),
+				mathtools::vectorial::Basis<2>::CreateBasis(Eigen::Vector2d(1,0),Eigen::Vector2d(0,-1)));
+
+	shape::DiscreteShape<2>::Ptr disshp(new shape::DiscreteShape<2>(11,11,frame));
 	
 	std::vector<unsigned char> &matbin = disshp->getContainer();
 	
@@ -290,7 +295,12 @@ BOOST_AUTO_TEST_CASE( Skeletonization )
 		wantedneigh[i] = i+1;
 	wantedneigh[7] = 0;
 
-	shape::DiscreteShape<2>::Ptr disshp(new shape::DiscreteShape<2>(4,4));
+	mathtools::affine::Frame<2>::Ptr frame =
+		mathtools::affine::Frame<2>::CreateFrame(
+				Eigen::Vector2d(0,0),
+				mathtools::vectorial::Basis<2>::CreateBasis(Eigen::Vector2d(1,0),Eigen::Vector2d(0,-1)));
+
+	shape::DiscreteShape<2>::Ptr disshp(new shape::DiscreteShape<2>(4,4,frame));
 	
 	std::vector<unsigned char> &matbin = disshp->getContainer();
 	
