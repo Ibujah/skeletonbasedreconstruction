@@ -439,6 +439,16 @@ namespace skeleton
 			}
 			
 			/**
+			 *  \brief Get the number of nodes in the skeleton
+			 *
+			 *  \return Number of nodes
+			 */
+			unsigned int getNbNodes() const
+			{
+				return boost::num_vertices(m_graph);
+			}
+			
+			/**
 			 *  \brief Test if the node inex is in the skeleton
 			 *
 			 *  \return true if the node is in the skeleton
