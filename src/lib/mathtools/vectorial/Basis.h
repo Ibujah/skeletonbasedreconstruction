@@ -153,7 +153,7 @@ namespace mathtools
 				 */
 				bool isDirect() const
 				{
-					return (m_matrix.det()>0);
+					return (m_matrix.determinant()>0);
 				}
 			
 			private:
