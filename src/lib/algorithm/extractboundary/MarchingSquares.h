@@ -47,10 +47,11 @@ namespace algorithm
 		 *  \brief Extract boundary with marching squares algorithm
 		 *
 		 *  \param dissh discrete shape
+		 *  \param step  step between each tested cell
 		 *
 		 *  \return boundary associated to dsicrete shape
 		 */
-		boundary::DiscreteBoundary<2>::Ptr MarchingSquare(const shape::DiscreteShape<2>::Ptr dissh);
+		boundary::DiscreteBoundary<2>::Ptr MarchingSquare(const shape::DiscreteShape<2>::Ptr dissh, unsigned int step = 1);
 	}
 }
 

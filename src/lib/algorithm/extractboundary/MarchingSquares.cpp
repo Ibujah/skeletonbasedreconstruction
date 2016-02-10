@@ -31,7 +31,7 @@ SOFTWARE.
 #include <map>
 #include <Eigen/Dense>
 
-boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(const shape::DiscreteShape<2>::Ptr dissh)
+boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(const shape::DiscreteShape<2>::Ptr dissh, unsigned int step)
 {
 	boundary::DiscreteBoundary<2>::Ptr bnd(new boundary::DiscreteBoundary<2>(dissh->getFrame()));
 	
@@ -39,14 +39,14 @@ boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(co
 	std::map<unsigned int, unsigned int> map_neigh; //map of nodes, linked in direct order
 
 	//first step: vertices adjacency computation
-	for(unsigned int c = 0; c < dissh->getWidth() - 1; c++)
+	for(unsigned int c = 0; c < dissh->getWidth() - step; c+=step)
 	{
-		for(unsigned int l = 0; l < dissh->getHeight() - 1; l++)
+		for(unsigned int l = 0; l < dissh->getHeight() - step; l+=step)
 		{
-			unsigned int ind1 = c     + dissh->getWidth() * l;
-			unsigned int ind2 = (c+1) + dissh->getWidth() * l;
-			unsigned int ind3 = (c+1) + dissh->getWidth() * (l+1);
-			unsigned int ind4 = c     + dissh->getWidth() * (l+1);
+			unsigned int ind1 = c        + dissh->getWidth() * l;
+			unsigned int ind2 = (c+step) + dissh->getWidth() * l;
+			unsigned int ind3 = (c+step) + dissh->getWidth() * (l+step);
+			unsigned int ind4 = c        + dissh->getWidth() * (l+step);
 			
 			unsigned char cellvalue = 0;
 			cellvalue += dissh->getContainer()[ind1]?1:0;
@@ -54,10 +54,10 @@ boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(co
 			cellvalue += dissh->getContainer()[ind3]?4:0;
 			cellvalue += dissh->getContainer()[ind4]?8:0;
 			
-			unsigned int down  = (c*2+1) + (dissh->getWidth()*2+2) * (l*2);
-			unsigned int right = (c*2+2) + (dissh->getWidth()*2+2) * (l*2+1);
-			unsigned int up  = (c*2+1) + (dissh->getWidth()*2+2) * (l*2+2);
-			unsigned int left  = (c*2)   + (dissh->getWidth()*2+2) * (l*2+1);
+			unsigned int down  = ((c/step)*2+1) + (dissh->getWidth()*2+2) * ((l/step)*2);
+			unsigned int right = ((c/step)*2+2) + (dissh->getWidth()*2+2) * ((l/step)*2+1);
+			unsigned int up    = ((c/step)*2+1) + (dissh->getWidth()*2+2) * ((l/step)*2+2);
+			unsigned int left  = ((c/step)*2)   + (dissh->getWidth()*2+2) * ((l/step)*2+1);
 			
 			map_vert[down]  = Eigen::Vector2d(0.5 + (double)c + 0.5, 0.5 + (double)l);
 			map_vert[right] = Eigen::Vector2d(0.5 + (double)c + 1.0, 0.5 + (double)l + 0.5);
