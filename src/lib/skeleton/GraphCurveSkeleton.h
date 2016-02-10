@@ -131,7 +131,7 @@ namespace skeleton
 			 *
 			 *  \param model initialisation of the model to use
 			 */
-			GraphCurveSkeleton(const Model &model) : GraphCurveSkeleton(new typename Model::Ptr(model)) {}
+			GraphCurveSkeleton(const Model &model) : GraphCurveSkeleton(typename Model::Ptr(new Model(model))) {}
 
 			/**
 			 *  \brief Copy constructor
