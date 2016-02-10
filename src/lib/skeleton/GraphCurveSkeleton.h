@@ -256,6 +256,7 @@ namespace skeleton
 					m_graph[v_desc].vec = vec;
 					if(m_last<index)
 						m_last = index;
+					added = true;
 				}
 				return added;
 			}
@@ -449,7 +450,7 @@ namespace skeleton
 			}
 			
 			/**
-			 *  \brief Test if the node inex is in the skeleton
+			 *  \brief Tests if the node index is in the skeleton
 			 *
 			 *  \return true if the node is in the skeleton
 			 */
@@ -457,6 +458,32 @@ namespace skeleton
 			{
 				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
 				return getDesc(index,v_desc);
+			}
+			
+			/**
+			 *  \brief Tests if the nodes are neighors
+			 *
+			 *  \param ind1 first node index
+			 *  \param ind2 second node index
+			 *
+			 *  \return true if they are neighors
+			 *
+			 *  \throws std::logic_error if one of the two nodes is not in the skeleton
+			 */
+			bool areNeighbors(unsigned int ind1, unsigned int ind2) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
+				if(!getDesc(ind1,ind2,v_desc1,v_desc2))
+					throw std::logic_error("skeleton::GraphCurveSkeleton::areNeighbors(): Node index is not in the skeleton");
+
+				typename boost::graph_traits<GraphType>::adjacency_iterator ai, ai_end;
+				
+				bool areneigh = false;
+				for(boost::tie(ai,ai_end) = boost::adjacent_vertices(v_desc1,m_graph); ai != ai_end && !areneigh; ai++)
+				{
+					if(*ai == v_desc2) areneigh = true;
+				}
+				return areneigh;
 			}
 
 			/**
