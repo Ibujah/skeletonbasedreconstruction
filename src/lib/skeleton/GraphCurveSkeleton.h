@@ -541,6 +541,26 @@ namespace skeleton
 					cont.push_back(m_graph[*vi].index);
 				}
 			}
+
+			/**
+			 *  \brief Get all the edges
+			 *
+			 *  \tparam Container container type
+			 *
+			 *  \param  cont container in which store the edges (couple of indices)
+			 */
+			template<typename Container>
+			void getAllEdges(Container &cont) const
+			{
+				typename boost::graph_traits<GraphType>::edge_iterator ei, ei_end;
+				for(boost::tie(ei,ei_end) = boost::edges(m_graph); ei != ei_end; ei++)
+				{
+					cont.push_back(
+							std::pair<unsigned int,unsigned int>(
+								m_graph[boost::source(*ei,m_graph)].index,
+								m_graph[boost::target(*ei,m_graph)].index));
+				}
+			}
 			
 			/**
 			 *  \brief Neighbors accessor
