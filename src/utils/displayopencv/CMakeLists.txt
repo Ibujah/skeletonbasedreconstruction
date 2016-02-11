@@ -1,6 +1,7 @@
 set(LIBRARY_NAME ${DISPLAYOCV_LIB})
 
-set(SOURCE_FILES DisplayShapeOCV.cpp)
+set(SOURCE_FILES DisplayShapeOCV.cpp
+                 DisplayBoundaryOCV.cpp)
 
 # make the library
 add_library(
@@ -13,6 +14,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/lib/)
 
 target_link_libraries(${LIBRARY_NAME} ${MATHTOOLS_LIB}
 									  ${SHAPE_LIB}
+									  ${BOUNDARY_LIB}
 									  ${OPENCV_LIBS})
 
 
