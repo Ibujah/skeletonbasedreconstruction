@@ -1,7 +1,8 @@
 set(LIBRARY_NAME ${DISPLAYOCV_LIB})
 
 set(SOURCE_FILES DisplayShapeOCV.cpp
-                 DisplayBoundaryOCV.cpp)
+                 DisplayBoundaryOCV.cpp
+                 DisplaySkeletonOCV.cpp)
 
 # make the library
 add_library(
