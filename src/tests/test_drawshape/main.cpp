@@ -39,18 +39,20 @@ SOFTWARE.
 #include <algorithm/skeletonization/VoronoiSkeleton2D.h>
 
 #include <displayopencv/DisplayShapeOCV.h>
+#include <displayopencv/DisplayBoundaryOCV.h>
 
 int main()
 {
 	shape::DiscreteShape<2>::Ptr dissh = userinput::DrawShape(640,480);
 	
-	//boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(dissh,4);
+	boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(dissh,2);
 
 	//skeleton::GraphSkel2d::Ptr grskel = algorithm::skeletonization::VoronoiSkeleton2d(disbnd);
 	
 	cv::Mat image(480,640,CV_8UC3,cv::Scalar(0,0,0));
 
 	displayopencv::DisplayDiscreteShape(dissh,image,dissh->getFrame(),cv::Scalar(255,255,255));
+	displayopencv::DisplayDiscreteBoundary(disbnd,image,dissh->getFrame(),cv::Scalar(0,0,255));
 
 	cv::imwrite("res.png",image);
 
