@@ -35,12 +35,14 @@ boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(co
 {
 	boundary::DiscreteBoundary<2>::Ptr bnd(new boundary::DiscreteBoundary<2>(dissh->getFrame()));
 	
-	std::map<unsigned int, Eigen::Vector2d> map_vert; //map of vertices
-	std::map<unsigned int, unsigned int> map_neigh; //map of nodes, linked in direct order
+	std::list<std::pair<unsigned int,unsigned int> > list_edg; //list of edges
 
+	//cf: https://en.wikipedia.org/wiki/Marching_squares
 	//first step: vertices adjacency computation
+	#pragma omp parallel for
 	for(unsigned int c = 0; c < dissh->getWidth() - step; c+=step)
 	{
+		#pragma omp parallel for
 		for(unsigned int l = 0; l < dissh->getHeight() - step; l+=step)
 		{
 			unsigned int ind1 = c        + dissh->getWidth() * l;
@@ -54,63 +56,58 @@ boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(co
 			cellvalue += dissh->getContainer()[ind3]?4:0;
 			cellvalue += dissh->getContainer()[ind4]?8:0;
 			
-			unsigned int down  = ((c/step)*2+1) + (dissh->getWidth()*2+2) * ((l/step)*2);
-			unsigned int right = ((c/step)*2+2) + (dissh->getWidth()*2+2) * ((l/step)*2+1);
-			unsigned int up    = ((c/step)*2+1) + (dissh->getWidth()*2+2) * ((l/step)*2+2);
-			unsigned int left  = ((c/step)*2)   + (dissh->getWidth()*2+2) * ((l/step)*2+1);
+			unsigned int down  = (c*2+1*step) + (dissh->getWidth()*2+2) * (l*2       );
+			unsigned int right = (c*2+2*step) + (dissh->getWidth()*2+2) * (l*2+1*step);
+			unsigned int up    = (c*2+1*step) + (dissh->getWidth()*2+2) * (l*2+2*step);
+			unsigned int left  = (c*2       ) + (dissh->getWidth()*2+2) * (l*2+1*step);
 			
-			map_vert[down]  = Eigen::Vector2d(0.5 + (double)c + 0.5, 0.5 + (double)l);
-			map_vert[right] = Eigen::Vector2d(0.5 + (double)c + 1.0, 0.5 + (double)l + 0.5);
-			map_vert[up]    = Eigen::Vector2d(0.5 + (double)c + 0.5, 0.5 + (double)l + 1.0);
-			map_vert[left]  = Eigen::Vector2d(0.5 + (double)c,       0.5 + (double)l + 0.5);
-			
-			//cf: https://en.wikipedia.org/wiki/Marching_squares
+			std::list<std::pair<unsigned int,unsigned int> > local_edg;
 
 			switch(cellvalue)
 			{
 				case 1:
-					map_neigh[down] = left;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(down,left));
 					break;
 				case 2:
-					map_neigh[right] = down;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(right,down));
 					break;
 				case 3:
-					map_neigh[right] = left;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(right,left));
 					break;
 				case 4:
-					map_neigh[up] = right;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(up,right));
 					break;
 				case 5:
-					map_neigh[left] = up;
-					map_neigh[right] = down;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(left,up));
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(right,down));
 					break;
 				case 6:
-					map_neigh[up] = down;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(up,down));
 					break;
 				case 7:
-					map_neigh[up] = left;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(up,left));
 					break;
 				case 8:
-					map_neigh[left] = up;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(left,up));
 					break;
 				case 9:
-					map_neigh[down] = up;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(down,up));
 					break;
 				case 10:
-					map_neigh[right] = up;
-					map_neigh[left] = down;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(right,up));
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(left,down));
 					break;
 				case 11:
-					map_neigh[right] = up;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(right,up));
 					break;
 				case 12:
-					map_neigh[left] = right;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(left,right));
 					break;
 				case 13:
-					map_neigh[down] = right;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(down,right));
 					break;
 				case 14:
-					map_neigh[left] = down;
+					local_edg.push_back(std::pair<unsigned int,unsigned int>(left,down));
 					break;
 
 				case 0:
@@ -118,8 +115,12 @@ boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(co
 				default:
 					break;
 			}
+			#pragma omp critical
+			list_edg.insert(list_edg.end(),local_edg.begin(),local_edg.end());
 		}
 	}
+
+	std::map<unsigned int, unsigned int> map_neigh(list_edg.begin(),list_edg.end()); //map of nodes, linked in direct order
 	
 	//second step: link all the vertices on the boundary
 	while(map_neigh.size() != 0)
@@ -130,7 +131,10 @@ boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(co
 
 		do
 		{
-			list_vert.push_back(map_vert[it->first]);
+			unsigned int l = ((it->first)/(dissh->getWidth()*2+2));
+			unsigned int c = ((it->first)%(dissh->getWidth()*2+2));
+			Eigen::Vector2d vec(0.5 + (double)(c)/2.0, 0.5 + (double)(l)/2.0);
+			list_vert.push_back(vec);
 			unsigned int val = it->second;
 			map_neigh.erase(it);
 			it = map_neigh.find(val);
