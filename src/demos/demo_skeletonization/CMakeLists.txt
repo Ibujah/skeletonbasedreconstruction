@@ -5,7 +5,7 @@ set(source_files main.cpp)
 
 #Déclaration de l'exécutable
 
-set(EXEC_NAME test_drawshape)
+set(EXEC_NAME demo_skeletonization)
 
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin/")
 
