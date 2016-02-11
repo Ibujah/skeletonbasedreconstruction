@@ -21,6 +21,12 @@ SOFTWARE.
 */
 
 
+/**
+ *  \file DisplayShapeOCV.cpp
+ *  \brief Displays shape with opencv
+ *  \author Bastien Durix
+ */
+
 #include "DisplayShapeOCV.h"
 
 void displayopencv::DisplayDiscreteShape(const shape::DiscreteShape<2>::Ptr dissh, cv::Mat &img, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &color)

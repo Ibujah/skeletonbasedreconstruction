@@ -21,14 +21,14 @@ SOFTWARE.
 */
 
 
-#ifndef _DISPLAYSHAPEOCV_H_
-#define _DISPLAYSHAPEOCV_H_
-
 /**
  *  \file DisplayShapeOCV.h
  *  \brief Displays shape with opencv
  *  \author Bastien Durix
  */
+
+#ifndef _DISPLAYSHAPEOCV_H_
+#define _DISPLAYSHAPEOCV_H_
 
 #include <shape/DiscreteShape.h>
 #include <mathtools/affine/Frame.h>
