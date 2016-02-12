@@ -204,7 +204,7 @@ skeleton::GraphSkel2d::Ptr algorithm::skeletonization::VoronoiSkeleton2d(const b
 									else
 										v_intsph.push_back(indices[i]);
 								}
-								else
+								else if(disbnd->getNext((unsigned int)voroloopall.pid())==ind_neigh && !disbnd->getFrame()->getBasis()->isDirect())
 								{
 									Eigen::Matrix2d mat;
 									mat.block<2,1>(0,0) = bndpts[ind_neigh].getCoords() - bndpts[voroloopall.pid()].getCoords();
