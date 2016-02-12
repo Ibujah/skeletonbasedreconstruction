@@ -133,7 +133,7 @@ boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(co
 		{
 			unsigned int l = ((it->first)/(dissh->getWidth()*2+2));
 			unsigned int c = ((it->first)%(dissh->getWidth()*2+2));
-			Eigen::Vector2d vec(0.5 + (double)(c)/2.0, 0.5 + (double)(l)/2.0);
+			Eigen::Vector2d vec(0.5*(double)step + (double)(c)/2.0, 0.5*(double)step + (double)(l)/2.0);
 			list_vert.push_back(vec);
 			unsigned int val = it->second;
 			map_neigh.erase(it);
