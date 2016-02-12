@@ -51,10 +51,10 @@ boundary::DiscreteBoundary<2>::Ptr algorithm::extractboundary::MarchingSquare(co
 			unsigned int ind4 = c        + dissh->getWidth() * (l+step);
 			
 			unsigned char cellvalue = 0;
-			cellvalue += dissh->getContainer()[ind1]?1:0;
-			cellvalue += dissh->getContainer()[ind2]?2:0;
-			cellvalue += dissh->getContainer()[ind3]?4:0;
-			cellvalue += dissh->getContainer()[ind4]?8:0;
+			if(c != 0                          && l != 0)                           cellvalue += dissh->getContainer()[ind1]?1:0;
+			if(c+step < dissh->getWidth()-step && l != 0)                           cellvalue += dissh->getContainer()[ind2]?2:0;
+			if(c+step < dissh->getWidth()-step && l+step < dissh->getHeight()-step) cellvalue += dissh->getContainer()[ind3]?4:0;
+			if(c != 0                          && l+step < dissh->getHeight()-step) cellvalue += dissh->getContainer()[ind4]?8:0;
 			
 			unsigned int down  = (c*2+1*step) + (dissh->getWidth()*2+2) * (l*2       );
 			unsigned int right = (c*2+2*step) + (dissh->getWidth()*2+2) * (l*2+1*step);
