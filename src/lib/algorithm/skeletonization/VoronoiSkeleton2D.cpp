@@ -46,28 +46,20 @@ skeleton::GraphSkel2d::Ptr algorithm::skeletonization::VoronoiSkeleton2d(const b
 	/**
 	 *  Get the points coordinates in skeleton frame
 	 */
+	double xinf = 0;
+	double xsup = 0;
+	double yinf = 0;
+	double ysup = 0;
 	for(unsigned int i=0; i< bndpts.size(); i++)
 	{
 		bndvec[i] = bndpts[i].getCoords(model->getFrame());
-	}
-	
-	/*
-	 *  Build bounding box
-	 */
-	double xinf = bndvec[0](0);
-	double xsup = bndvec[0](0);
-	double yinf = bndvec[0](1);
-	double ysup = bndvec[0](1);
-	
-	for(unsigned int i=0;i<bndpts.size();i++)
-	{
-		if(xinf>bndvec[i](0))
+		if(xinf>bndvec[i](0) || i==0)
 			xinf=bndvec[i](0);
-		if(yinf>bndvec[i](1))
+		if(yinf>bndvec[i](1) || i==0)
 			yinf=bndvec[i](1);
-		if(xsup<bndvec[i](0))
+		if(xsup<bndvec[i](0) || i==0)
 			xsup=bndvec[i](0);
-		if(ysup<bndvec[i](1))
+		if(ysup<bndvec[i](1) || i==0)
 			ysup=bndvec[i](1);
 	}
 	
@@ -128,13 +120,13 @@ skeleton::GraphSkel2d::Ptr algorithm::skeletonization::VoronoiSkeleton2d(const b
 				
 				Eigen::Vector2d center(x,y);
 				
-				std::vector<unsigned int> indices(vert.size()/3);
+				std::vector<unsigned int> indices(voroneigh.p);
 				
-				for(unsigned int i=0;i<vert.size()/3;i++)
+				for(unsigned int i=0;i<(unsigned int)voroneigh.p;i++)
 				{
-					Eigen::Vector3d corner(vert[i*3],vert[i*3+1],0.0);
 					if(vert[i*3+2]==1.0)
 					{
+						Eigen::Vector3d corner(vert[i*3],vert[i*3+1],0.0);
 						corner(2) = (corner.block<2,1>(0,0)-center).norm();
 						bool isin=false;
 						for(std::map<unsigned int,Eigen::Vector3d>::iterator it = v_added.begin(); it != v_added.end() & !isin; it++)
@@ -157,7 +149,7 @@ skeleton::GraphSkel2d::Ptr algorithm::skeletonization::VoronoiSkeleton2d(const b
 				 * Then link each corner to its neighbors
 				 * Except if there is a link between the two cells
 				 */
-				for(unsigned int i=0;i<vert.size()/3;i++)
+				for(unsigned int i=0;i<(unsigned int)voroneigh.p;i++)
 				{
 					if(vert[i*3+2]==1.0)
 					{
