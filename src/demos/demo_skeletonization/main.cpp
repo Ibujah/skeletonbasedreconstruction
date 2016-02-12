@@ -54,7 +54,7 @@ int main()
 	shape::DiscreteShape<2>::Ptr dissh = userinput::DrawShape(640,480);
 	
 	time(&start);
-	boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(dissh,2);
+	boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(dissh,4);
 	time(&end);
 	diff = difftime(end,start);
 	std::cout << "Boundary computation: " << std::setprecision(2) << diff << "s." << std::endl;
