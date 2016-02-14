@@ -11,7 +11,9 @@ add_library(
     ${SOURCE_FILES}
 	)
 
-include_directories(${CMAKE_SOURCE_DIR}/src/lib/)
+include_directories(${CMAKE_SOURCE_DIR}/src/lib/
+					${OpenCV_INCLUDE_DIRS}
+					${Boost_INCLUDE_DIR})
 
 target_link_libraries(${LIBRARY_NAME} ${MATHTOOLS_LIB}
 									  ${SHAPE_LIB}

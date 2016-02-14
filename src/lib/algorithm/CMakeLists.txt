@@ -1,6 +1,9 @@
 set(LIBRARY_NAME ${ALGORITHM_LIB})
 
-include_directories(${CMAKE_SOURCE_DIR}/src/lib)
+include_directories(${CMAKE_SOURCE_DIR}/src/lib
+					${VOROPLUSPLUS_INCLUDE_DIR}
+					${Boost_INCLUDE_DIR})
+					
 set(SOURCE_FILES    extractboundary/MarchingSquares.cpp
 					graphoperation/ConnectedComponents.cpp
 					skeletonization/VoronoiSkeleton2D.cpp)

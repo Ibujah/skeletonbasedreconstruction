@@ -1,4 +1,5 @@
-include_directories(${CMAKE_SOURCE_DIR}/src/lib)
+include_directories(${CMAKE_SOURCE_DIR}/src/lib
+					${Boost_INCLUDE_DIR})
 
 set(source_files main.cpp)
 
