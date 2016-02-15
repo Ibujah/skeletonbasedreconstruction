@@ -22,57 +22,15 @@ SOFTWARE.
 
 
 /**
- *  \file  Intrinsics.h
+ *  \file  Intrinsics.cpp
  *  \brief Defines intrinsic camera parameters
  *  \author Bastien Durix
  */
 
-#ifndef _INTRINSICS_H_
-#define _INTRINSICS_H_
+#include "Intrinsics.h"
 
-#include <memory>
+camera::Intrinsics::Intrinsics(unsigned int width, unsigned int height) : m_width(width), m_height(height)
+{}
 
-/**
- *  \brief Camera tools
- */
-namespace camera
-{
-	/**
-	 *  \brief Defines intrinsic camera parameters
-	 */
-	class Intrinsics
-	{
-		public:
-			/**
-			 *  \brief Shared pointer definition
-			 */
-			using Ptr = std::shared_ptr<Intrinsics>;
-
-		protected:
-			/**
-			 *  \brief Image width
-			 */
-			unsigned int m_width;
-			
-			/**
-			 *  \brief Image height
-			 */
-			unsigned int m_height;
-			
-		public:
-			/**
-			 *  \brief Constructor
-			 *
-			 *  \param width   image width
-			 *  \param height  image height
-			 */
-			Intrinsics(unsigned int width, unsigned int height);
-
-			/**
-			 *  \brief Virtual destructor
-			 */
-			virtual ~Intrinsics();
-	};
-}
-
-#endif //_INTRINSICS_H_
+camera::Intrinsics::~Intrinsics()
+{}

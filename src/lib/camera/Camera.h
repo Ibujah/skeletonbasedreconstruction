@@ -48,13 +48,35 @@ namespace camera
 			/**
 			 *  \brief Camera intrinsic parameters
 			 */
-			std::shared_ptr<Intrinsics> m_intrinsics;
+			Intrinsics::Ptr m_intrinsics;
 			
 			/**
 			 *  \brief Camera extrinsic parameters
 			 */
-			std::shared_ptr<Extrinsics> m_extrinsics;
+			Extrinsics::Ptr m_extrinsics;
+		
+		public:
+			/**
+			 *  \brief Constructor
+			 *
+			 *  \param intrinsics intrinsic parameters of the camera
+			 *  \param extrinsics extrinsic parameters of the camera
+			 */
+			Camera(const Intrinsics::Ptr intrinsics, const Extrinsics::Ptr extrinsics);
 			
+			/**
+			 *  \brief Intrinsics getter
+			 *
+			 *  \return intrinsic parameters
+			 */
+			const Intrinsics::Ptr getIntrinsics() const;
+			
+			/**
+			 *  \brief Extrinsics getter
+			 *
+			 *  \return extrinsic parameters
+			 */
+			const Extrinsics::Ptr getExtrinsics() const;
 	};
 }
 

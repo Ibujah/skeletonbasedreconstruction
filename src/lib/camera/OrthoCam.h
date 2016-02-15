@@ -31,6 +31,7 @@ SOFTWARE.
 #define _ORTHOCAM_H_
 
 #include "Intrinsics.h"
+#include <mathtools/affine/Frame.h>
 
 /**
  *  \brief Camera tools
@@ -42,7 +43,28 @@ namespace camera
 	 */
 	class OrthoCam : public Intrinsics
 	{
-		
+		protected:
+			/**
+			 *  \brief Camera frame
+			 */
+			mathtools::affine::Frame<2>::Ptr m_frame;
+
+		public:
+			/**
+			 *  \brief Constructor
+			 *
+			 *  \param width   image width
+			 *  \param height  image height
+			 *  \param frame   image frame
+			 */
+			OrthoCam(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame = mathtools::affine::Frame<2>::CanonicFrame());
+
+			/**
+			 *  \brief Frame getter
+			 *
+			 *  \return image frame
+			 */
+			const mathtools::affine::Frame<2>::Ptr getFrame() const;
 	};
 }
 

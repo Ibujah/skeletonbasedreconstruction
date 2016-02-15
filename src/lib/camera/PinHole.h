@@ -74,8 +74,7 @@ namespace camera
 			 *  \param ku      focal ratio along x-axis
 			 *  \param kv      focal ratio along y-axis
 			 */
-			PinHole(unsigned int width, unsigned int height, double u0, double v0, double ku, double kv) :
-				Intrinsics(width,height), m_u0(u0), m_v0(v0), m_ku(ku), m_kv(kv) {}
+			PinHole(unsigned int width, unsigned int height, double u0, double v0, double ku, double kv);
 	};
 }
 

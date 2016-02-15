@@ -22,57 +22,14 @@ SOFTWARE.
 
 
 /**
- *  \file  Intrinsics.h
- *  \brief Defines intrinsic camera parameters
+ *  \file  PinHole.cpp
+ *  \brief Defines pinhole camera parameters
  *  \author Bastien Durix
  */
 
-#ifndef _INTRINSICS_H_
-#define _INTRINSICS_H_
+#include "PinHole.h"
 
-#include <memory>
 
-/**
- *  \brief Camera tools
- */
-namespace camera
-{
-	/**
-	 *  \brief Defines intrinsic camera parameters
-	 */
-	class Intrinsics
-	{
-		public:
-			/**
-			 *  \brief Shared pointer definition
-			 */
-			using Ptr = std::shared_ptr<Intrinsics>;
-
-		protected:
-			/**
-			 *  \brief Image width
-			 */
-			unsigned int m_width;
-			
-			/**
-			 *  \brief Image height
-			 */
-			unsigned int m_height;
-			
-		public:
-			/**
-			 *  \brief Constructor
-			 *
-			 *  \param width   image width
-			 *  \param height  image height
-			 */
-			Intrinsics(unsigned int width, unsigned int height);
-
-			/**
-			 *  \brief Virtual destructor
-			 */
-			virtual ~Intrinsics();
-	};
-}
-
-#endif //_INTRINSICS_H_
+camera::PinHole::PinHole(unsigned int width, unsigned int height, double u0, double v0, double ku, double kv) :
+	Intrinsics(width,height), m_u0(u0), m_v0(v0), m_ku(ku), m_kv(kv)
+{}

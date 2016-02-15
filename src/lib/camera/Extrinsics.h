@@ -43,11 +43,17 @@ namespace camera
 	 */
 	class Extrinsics
 	{
+		public:
+			/**
+			 *  \brief Shared pointer definition
+			 */
+			using Ptr = std::shared_ptr<Extrinsics>;
+
 		protected:
 			/**
 			 *  \brief Camera frame
 			 */
-			std::shared_ptr<mathtools::affine::Frame<3> > m_frame;
+			mathtools::affine::Frame<3>::Ptr m_frame;
 
 		public:
 			/**

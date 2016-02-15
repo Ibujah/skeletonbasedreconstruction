@@ -1,8 +1,11 @@
 set(LIBRARY_NAME ${CAMERA_LIB})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/lib)
-set(SOURCE_FILES    Extrinsics.cpp)
-
+set(SOURCE_FILES    Camera.cpp
+					Extrinsics.cpp
+					Intrinsics.cpp
+					OrthoCam.cpp
+					PinHole.cpp)
 # make the library
 add_library(
     ${LIBRARY_NAME}

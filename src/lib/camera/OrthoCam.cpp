@@ -22,57 +22,17 @@ SOFTWARE.
 
 
 /**
- *  \file  Intrinsics.h
- *  \brief Defines intrinsic camera parameters
+ *  \file  OrthoCam.cpp
+ *  \brief Defines orthographic camera parameters
  *  \author Bastien Durix
  */
 
-#ifndef _INTRINSICS_H_
-#define _INTRINSICS_H_
+#include "OrthoCam.h"
 
-#include <memory>
-
-/**
- *  \brief Camera tools
- */
-namespace camera
+camera::OrthoCam::OrthoCam(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame) :
+	camera::Intrinsics::Intrinsics(width,height), m_frame(frame)
+{}
+const mathtools::affine::Frame<2>::Ptr camera::OrthoCam::getFrame() const
 {
-	/**
-	 *  \brief Defines intrinsic camera parameters
-	 */
-	class Intrinsics
-	{
-		public:
-			/**
-			 *  \brief Shared pointer definition
-			 */
-			using Ptr = std::shared_ptr<Intrinsics>;
-
-		protected:
-			/**
-			 *  \brief Image width
-			 */
-			unsigned int m_width;
-			
-			/**
-			 *  \brief Image height
-			 */
-			unsigned int m_height;
-			
-		public:
-			/**
-			 *  \brief Constructor
-			 *
-			 *  \param width   image width
-			 *  \param height  image height
-			 */
-			Intrinsics(unsigned int width, unsigned int height);
-
-			/**
-			 *  \brief Virtual destructor
-			 */
-			virtual ~Intrinsics();
-	};
+	return m_frame;
 }
-
-#endif //_INTRINSICS_H_
