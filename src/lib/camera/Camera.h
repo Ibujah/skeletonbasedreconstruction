@@ -44,6 +44,11 @@ namespace camera
 	 */
 	class Camera
 	{
+		public:
+			/**
+			 *  \brief Camera shared ponter
+			 */
+			using Ptr = std::shared_ptr<Camera>;
 		protected:
 			/**
 			 *  \brief Camera intrinsic parameters
