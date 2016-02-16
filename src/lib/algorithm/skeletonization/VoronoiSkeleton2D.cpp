@@ -415,6 +415,7 @@ skeleton::GraphProjSkel::Ptr algorithm::skeletonization::ProjectiveVoronoi(const
 		case camera::Intrinsics::Type::pinhole:
 			model = skeleton::model::Projective::Ptr(new skeleton::model::Orthographic(camera->getExtrinsics()->getFrame()));
 			grskel = skeleton::GraphProjSkel::Ptr(new skeleton::GraphProjSkel(model));
+			VoronoiPersp(grskel,disbnd);
 			break;
 	}
 	
