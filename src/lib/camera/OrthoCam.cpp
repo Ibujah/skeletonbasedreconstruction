@@ -30,9 +30,5 @@ SOFTWARE.
 #include "OrthoCam.h"
 
 camera::OrthoCam::OrthoCam(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame) :
-	camera::Intrinsics::Intrinsics(width,height), m_frame(frame)
+	camera::Intrinsics::Intrinsics(width,height,frame)
 {}
-const mathtools::affine::Frame<2>::Ptr camera::OrthoCam::getFrame() const
-{
-	return m_frame;
-}

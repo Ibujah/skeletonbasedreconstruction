@@ -29,8 +29,23 @@ SOFTWARE.
 
 #include "Intrinsics.h"
 
-camera::Intrinsics::Intrinsics(unsigned int width, unsigned int height) : m_width(width), m_height(height)
+camera::Intrinsics::Intrinsics(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame) : m_width(width), m_height(height), m_frame(frame)
 {}
 
 camera::Intrinsics::~Intrinsics()
 {}
+
+unsigned int camera::Intrinsics::getWidth() const
+{
+	return m_width;
+}
+
+unsigned int camera::Intrinsics::getHeight() const
+{
+	return m_height;
+}
+
+const mathtools::affine::Frame<2>::Ptr camera::Intrinsics::getFrame() const
+{
+	return m_frame;
+}

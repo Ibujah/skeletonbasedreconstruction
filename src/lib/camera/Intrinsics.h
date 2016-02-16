@@ -31,6 +31,7 @@ SOFTWARE.
 #define _INTRINSICS_H_
 
 #include <memory>
+#include <mathtools/affine/Frame.h>
 
 /**
  *  \brief Camera tools
@@ -59,6 +60,11 @@ namespace camera
 			 */
 			unsigned int m_height;
 			
+			/**
+			 *  \brief Image frame
+			 */
+			mathtools::affine::Frame<2>::Ptr m_frame;
+
 		public:
 			/**
 			 *  \brief Constructor
@@ -66,12 +72,27 @@ namespace camera
 			 *  \param width   image width
 			 *  \param height  image height
 			 */
-			Intrinsics(unsigned int width, unsigned int height);
-
+			Intrinsics(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame = mathtools::affine::Frame<2>::CanonicFrame());
+			
 			/**
 			 *  \brief Virtual destructor
 			 */
 			virtual ~Intrinsics();
+
+			/**
+			 *  \brief Image width getter
+			 */
+			unsigned int getWidth() const;
+
+			/**
+			 *  \brief Image height getter
+			 */
+			unsigned int getHeight() const;
+
+			/**
+			 *  \brief Image frame getter
+			 */
+			const mathtools::affine::Frame<2>::Ptr getFrame() const;
 	};
 }
 

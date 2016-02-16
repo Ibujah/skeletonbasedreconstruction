@@ -42,27 +42,6 @@ namespace camera
 	 */
 	class PinHole : public Intrinsics
 	{
-		protected:
-			/**
-			 *  \brief x-coordinate of principal point
-			 */
-			double m_u0;
-			
-			/**
-			 *  \brief y-coordinate of principal point
-			 */
-			double m_v0;
-			
-			/**
-			 *  \brief focal ratio along x-axis
-			 */
-			double m_ku;
-			
-			/**
-			 *  \brief focal ratio along y-axis
-			 */
-			double m_kv;
-		
 		public:
 			/**
 			 *  \brief Constructor

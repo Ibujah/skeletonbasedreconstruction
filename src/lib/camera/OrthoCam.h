@@ -43,12 +43,6 @@ namespace camera
 	 */
 	class OrthoCam : public Intrinsics
 	{
-		protected:
-			/**
-			 *  \brief Camera frame
-			 */
-			mathtools::affine::Frame<2>::Ptr m_frame;
-
 		public:
 			/**
 			 *  \brief Constructor
@@ -58,13 +52,6 @@ namespace camera
 			 *  \param frame   image frame
 			 */
 			OrthoCam(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame = mathtools::affine::Frame<2>::CanonicFrame());
-
-			/**
-			 *  \brief Frame getter
-			 *
-			 *  \return image frame
-			 */
-			const mathtools::affine::Frame<2>::Ptr getFrame() const;
 	};
 }
 
