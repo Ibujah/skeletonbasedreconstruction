@@ -32,6 +32,7 @@ SOFTWARE.
 
 #include "GraphCurveSkeleton.h"
 #include "model/Classic.h"
+#include "model/Projective.h"
 
 /**
  *  \brief Skeleton representations
@@ -47,6 +48,11 @@ namespace skeleton
 	 *  \brief Defines classical 3d curve skeleton
 	 */
 	using GraphSkel3d = GraphCurveSkeleton<model::Classic<3> >;
+
+	/**
+	 *  \brief Defines projective skeleton, used in reconstruction
+	 */
+	using GraphProjSkel = GraphCurveSkeleton<model::Projective>;
 }
 
 #endif //_SKELETONS_H_
