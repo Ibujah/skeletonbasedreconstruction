@@ -48,6 +48,15 @@ namespace camera
 			 *  \brief Shared pointer definition
 			 */
 			using Ptr = std::shared_ptr<Intrinsics>;
+			
+			/**
+			 *  \brief Camera type
+			 */
+			enum class Type
+			{
+				pinhole,
+				ortho
+			};
 
 		protected:
 			/**
@@ -93,6 +102,11 @@ namespace camera
 			 *  \brief Image frame getter
 			 */
 			const mathtools::affine::Frame<2>::Ptr getFrame() const;
+
+			/**
+			 *  \brief Camera type getter
+			 */
+			virtual Type getType() const = 0;
 	};
 }
 

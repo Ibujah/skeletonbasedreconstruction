@@ -54,6 +54,11 @@ namespace camera
 			 *  \param kv      focal ratio along y-axis
 			 */
 			PinHole(unsigned int width, unsigned int height, double u0, double v0, double ku, double kv);
+
+			/**
+			 *  \brief Camera type getter
+			 */
+			virtual Intrinsics::Type getType() const;
 	};
 }
 

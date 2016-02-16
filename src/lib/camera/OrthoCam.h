@@ -52,6 +52,11 @@ namespace camera
 			 *  \param frame   image frame
 			 */
 			OrthoCam(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame = mathtools::affine::Frame<2>::CanonicFrame());
+
+			/**
+			 *  \brief Camera type getter
+			 */
+			virtual Intrinsics::Type getType() const;
 	};
 }
 

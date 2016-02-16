@@ -32,3 +32,8 @@ SOFTWARE.
 camera::OrthoCam::OrthoCam(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame) :
 	camera::Intrinsics::Intrinsics(width,height,frame)
 {}
+
+camera::Intrinsics::Type camera::OrthoCam::getType() const
+{
+	return camera::Intrinsics::Type::ortho;
+}

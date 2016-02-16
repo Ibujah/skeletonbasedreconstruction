@@ -33,3 +33,8 @@ SOFTWARE.
 camera::PinHole::PinHole(unsigned int width, unsigned int height, double u0, double v0, double ku, double kv) :
 	Intrinsics(width,height,mathtools::affine::Frame<2>::CreateFrame(Eigen::Vector2d(u0,v0), Eigen::Vector2d(ku,0), Eigen::Vector2d(0,kv)))
 {}
+
+camera::Intrinsics::Type camera::PinHole::getType() const
+{
+	return camera::Intrinsics::Type::pinhole;
+}
