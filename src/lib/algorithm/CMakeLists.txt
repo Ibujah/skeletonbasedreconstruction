@@ -20,5 +20,6 @@ target_link_libraries(${LIBRARY_NAME} ${MATHTOOLS_LIB}
 									  ${SHAPE_LIB}
 									  ${SKELETON_LIB}
 									  ${BOUNDARY_LIB}
+									  ${CAMERA_LIB}
 									  ${VOROPLUSPLUS_LIBRARY})
 

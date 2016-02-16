@@ -32,6 +32,7 @@ SOFTWARE.
 
 #include <skeleton/Skeletons.h>
 #include <boundary/DiscreteBoundary.h>
+#include <camera/Camera.h>
 
 /**
  *  \brief Lots of algorithms
@@ -51,6 +52,16 @@ namespace algorithm
 		 *  \return pointer to the computed 2d graph skeleton
 		 */
 		skeleton::GraphSkel2d::Ptr VoronoiSkeleton2d(const boundary::DiscreteBoundary<2>::Ptr disbnd);
+
+		/**
+		 *  \brief Projective skeletonization (perspective or orthographic)
+		 *
+		 *  \param disbnd  discrete boundary of the shape
+		 *  \param camera  camera model
+		 *
+		 *  \return pointer to the computed projective graph skeleton
+		 */
+		skeleton::GraphProjSkel::Ptr ProjectiveVoronoi(const boundary::DiscreteBoundary<2>::Ptr disbnd, const camera::Camera::Ptr camera);
 	}
 }
 
