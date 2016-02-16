@@ -80,6 +80,7 @@ namespace camera
 			 *
 			 *  \param width   image width
 			 *  \param height  image height
+			 *  \param frame   image frame
 			 */
 			Intrinsics(unsigned int width, unsigned int height, const mathtools::affine::Frame<2>::Ptr frame = mathtools::affine::Frame<2>::CanonicFrame());
 			
