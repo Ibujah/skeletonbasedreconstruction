@@ -50,6 +50,15 @@ namespace algorithm
 		 *  \return list of connected components
 		 */
 		std::list<skeleton::GraphSkel2d::Ptr> SeparateComponents(const skeleton::GraphSkel2d::Ptr grskel);
+
+		/**
+		 *  \brief Separate skeleton into connected components
+		 *
+		 *  \param grskel skeleton to separate
+		 *
+		 *  \return list of connected components
+		 */
+		std::list<skeleton::GraphProjSkel::Ptr> SeparateComponents(const skeleton::GraphProjSkel::Ptr grskel);
 	}
 }
 

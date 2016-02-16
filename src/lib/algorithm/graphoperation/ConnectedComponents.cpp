@@ -160,3 +160,8 @@ std::list<skeleton::GraphSkel2d::Ptr> algorithm::graphoperation::SeparateCompone
 {
 	return SeparateComponents_helper<skeleton::GraphSkel2d>(grskel);
 }
+
+std::list<skeleton::GraphProjSkel::Ptr> algorithm::graphoperation::SeparateComponents(const skeleton::GraphProjSkel::Ptr grskel)
+{
+	return SeparateComponents_helper<skeleton::GraphProjSkel>(grskel);
+}
