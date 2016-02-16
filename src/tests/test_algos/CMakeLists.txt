@@ -14,5 +14,6 @@ add_executable(${EXEC_NAME} ${source_files})
 target_link_libraries(${EXEC_NAME} ${MATHTOOLS_LIB}
 								   ${BOUNDARY_LIB}
 								   ${SHAPE_LIB}
+								   ${SKELETON_LIB}
 								   ${ALGORITHM_LIB}
 								   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
