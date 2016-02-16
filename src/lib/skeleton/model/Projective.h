@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+
 /**
  *  \file Projective.h
  *  \brief Defines skeleton projective model
@@ -31,6 +32,9 @@ SOFTWARE.
 
 #include <memory>
 #include "MetaModel.h"
+#include <mathtools/affine/Frame.h>
+#include <mathtools/affine/Point.h>
+#include <mathtools/geometry/euclidian/HyperSphere.h>
 
 /**
  *  \brief Skeleton representations
@@ -42,19 +46,7 @@ namespace skeleton
 	 */
 	namespace model
 	{
-		/**
-		 *  \brief Describe projective skeleton model
-		 */
-		class Projective
-		{
-			public:
-				/**
-				 *  \brief Shared pointer to the model
-				 */
-				using Ptr = std::shared_ptr<Projective>;
-
-			
-		};
+		class Projective;
 		
 		/**
 		 *  \brief Describe Projective model meta data
@@ -66,6 +58,123 @@ namespace skeleton
 			 *  \brief Describe storage dimension of the model
 			 */
 			static constexpr unsigned int stordim = 3;
+		};
+
+		/**
+		 *  \brief Describe projective skeleton model
+		 */
+		class Projective
+		{
+			public:
+				/**
+				 *  \brief Shared pointer to the model
+				 */
+				using Ptr = std::shared_ptr<Projective>;
+				
+				/**
+				 *  \brief Projective skeleton type
+				 */
+				enum class Type
+				{
+					perspective,
+					orthographic
+				};
+
+			protected:
+				/**
+				 *  \brief Frame of the skeleton
+				 */
+				mathtools::affine::Frame<3>::Ptr m_frame;
+
+			public:
+				/**
+				 *  \brief Constructor
+				 *
+				 *  \param frame skeleton frame
+				 */
+				Projective(const mathtools::affine::Frame<3>::Ptr frame = mathtools::affine::Frame<3>::CanonicFrame());
+
+				/**
+				 *  \brief Copy constructor
+				 *
+				 *  \param model model to copy
+				 */
+				Projective(const Projective &model);
+
+				/**
+				 *  \brief Frame getter
+				 *
+				 *  \return skeleton frame
+				 */
+				const mathtools::affine::Frame<3>::Ptr getFrame();
+
+				/**
+				 *  \brief Converts an object into a vector
+				 *
+				 *  \tparam TypeObj type of the object to convert
+				 *
+				 *  \param obj object to convert
+				 *
+				 *  \return vector associated to obj
+				 */
+				template<typename TypeObj>
+				Eigen::Matrix<double,meta<Projective>::stordim,1> toVec(const TypeObj &obj)
+				{
+					return toVec(obj);
+				}
+
+				/**
+				 *  \brief Converts a vector into an object
+				 *
+				 *  \tparam TypeObj type of the object to convert in
+				 *
+				 *  \param vec vector to convert
+				 *
+				 *  \return object associated to vec
+				 */
+				template<typename TypeObj>
+				TypeObj toObj(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec)
+				{
+					return toObj(vec,TypeObj{});
+				}
+				
+				/**
+				 *  \brief Skeleton type getter
+				 *
+				 *  \return Skeleton type
+				 */
+				virtual Type getType() const = 0;
+
+			protected:
+				/**
+				 *  \brief Conversion function from hypersphere to vector
+				 *
+				 *  \param sph hypersphere to convert
+				 *
+				 *  \return vector associated to hyperpshere
+				 */
+				virtual Eigen::Matrix<double,meta<Projective>::stordim,1> toVec(const mathtools::geometry::euclidian::HyperSphere<2> &sph);
+
+				/**
+				 *  \brief Associate the center of the sphere to a vector
+				 *
+				 *  \param vec vector to convert
+				 *
+				 *  \return center associated to vec
+				 */
+				virtual mathtools::affine::Point<2> toObj(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec,
+														  const mathtools::affine::Point<2> &);
+
+				/**
+				 *  \brief Associate an hypersphere to a vector
+				 *
+				 *  \param vec vector to convert
+				 *
+				 *  \return hypersphere
+				 */
+				virtual mathtools::geometry::euclidian::HyperSphere<2> toObj(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec,
+																			 const mathtools::geometry::euclidian::HyperSphere<2> &);
+
 		};
 	}
 }
