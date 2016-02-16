@@ -29,6 +29,7 @@ SOFTWARE.
 #ifndef _PROJECTIVEMODEL_H_
 #define _PROJECTIVEMODEL_H_
 
+#include <memory>
 #include "MetaModel.h"
 
 /**
@@ -46,6 +47,12 @@ namespace skeleton
 		 */
 		class Projective
 		{
+			public:
+				/**
+				 *  \brief Shared pointer to the model
+				 */
+				using Ptr = std::shared_ptr<Projective>;
+
 			
 		};
 		
