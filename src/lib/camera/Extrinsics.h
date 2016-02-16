@@ -69,6 +69,13 @@ namespace camera
 			 *  \param frame camera frame
 			 */
 			Extrinsics(const mathtools::affine::Frame<3> &frame);
+
+			/**
+			 *  \brief Frame getter
+			 *
+			 *  \return camera frame
+			 */
+			const mathtools::affine::Frame<3>::Ptr getFrame();
 	};
 }
 

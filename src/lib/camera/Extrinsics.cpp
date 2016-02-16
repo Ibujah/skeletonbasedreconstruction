@@ -35,3 +35,7 @@ camera::Extrinsics::Extrinsics(const mathtools::affine::Frame<3>::Ptr frame) : m
 camera::Extrinsics::Extrinsics(const mathtools::affine::Frame<3> &frame) : Extrinsics(mathtools::affine::Frame<3>::Ptr(new mathtools::affine::Frame<3>(frame)))
 {}
 
+const mathtools::affine::Frame<3>::Ptr camera::Extrinsics::getFrame()
+{
+	return m_frame;
+}
