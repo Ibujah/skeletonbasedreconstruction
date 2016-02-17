@@ -37,8 +37,10 @@ SOFTWARE.
 #include <algorithm/graphoperation/ConnectedComponents.h>
 
 template<typename Model>
-void VoronoiOrtho(typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, const boundary::DiscreteBoundary<2>::Ptr disbnd, const mathtools::affine::Frame<2>::Ptr frame)
+void VoronoiOrtho(typename skeleton::GraphCurveSkeleton<Model>::Ptr skel_int, const boundary::DiscreteBoundary<2>::Ptr disbnd, const mathtools::affine::Frame<2>::Ptr frame)
 {
+	typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel(new skeleton::GraphCurveSkeleton<Model>(skel_int->getModel()));
+
 	std::vector<mathtools::affine::Point<2> > bndpts(0);
 	disbnd->getVerticesPoint(bndpts);
 	std::vector<Eigen::Vector2d> bndvec(bndpts.size());
@@ -223,7 +225,6 @@ void VoronoiOrtho(typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, cons
 	 */
 	std::list<typename skeleton::GraphCurveSkeleton<Model>::Ptr> list_comp = algorithm::graphoperation::SeparateComponents(grskel);
 
-	typename skeleton::GraphCurveSkeleton<Model>::Ptr skel_int(new skeleton::GraphCurveSkeleton<Model>(grskel->getModel()));
 	for(typename std::list<typename skeleton::GraphCurveSkeleton<Model>::Ptr>::iterator it = list_comp.begin(); it!=list_comp.end(); it++)
 	{
 		std::list<unsigned int> list_ver;
@@ -245,8 +246,9 @@ void VoronoiOrtho(typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, cons
 	}
 }
 
-void VoronoiPersp(skeleton::GraphProjSkel::Ptr grskel, const boundary::DiscreteBoundary<2>::Ptr disbnd)
+void VoronoiPersp(skeleton::GraphProjSkel::Ptr skel_int, const boundary::DiscreteBoundary<2>::Ptr disbnd)
 {
+	skeleton::GraphProjSkel::Ptr grskel(new skeleton::GraphProjSkel(skel_int->getModel()));
 	std::vector<mathtools::affine::Point<2> > bndpts(0);
 	disbnd->getVerticesPoint(bndpts);
 	std::vector<Eigen::Vector2d> bndvec(bndpts.size());
@@ -369,7 +371,6 @@ void VoronoiPersp(skeleton::GraphProjSkel::Ptr grskel, const boundary::DiscreteB
 	 */
 	std::list<skeleton::GraphProjSkel::Ptr> list_comp = algorithm::graphoperation::SeparateComponents(grskel);
 
-	skeleton::GraphProjSkel::Ptr skel_int(new skeleton::GraphProjSkel(grskel->getModel()));
 	for(std::list<skeleton::GraphProjSkel::Ptr>::iterator it = list_comp.begin(); it!=list_comp.end(); it++)
 	{
 		std::list<unsigned int> list_ver;
