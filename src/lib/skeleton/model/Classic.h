@@ -172,7 +172,7 @@ namespace skeleton
 				 *  \return hypersphere
 				 */
 				inline mathtools::geometry::euclidian::HyperSphere<Dim> toObj(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec,
-																			  const mathtools::geometry::euclidian::HyperSphere<Dim> &)
+																			  const mathtools::geometry::euclidian::HyperSphere<Dim> &) const
 				{
 					return mathtools::geometry::euclidian::HyperSphere<Dim>(
 								mathtools::affine::Point<Dim>(vec.template block<Dim,1>(0,0),m_frame),
