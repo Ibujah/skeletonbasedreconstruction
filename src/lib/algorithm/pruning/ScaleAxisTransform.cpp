@@ -44,9 +44,9 @@ bool ScaledIsIn(const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, 
 }
 
 template<typename Model>
-inline typename skeleton::GraphCurveSkeleton<Model>::Ptr ScaleAxisTransform_helper(const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskl, const double &scale)
+inline typename skeleton::GraphCurveSkeleton<Model>::Ptr ScaleAxisTransform_helper(const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, const double &scale)
 {
-	typename skeleton::GraphCurveSkeleton<Model>::Ptr grsimp(new skeleton::GraphCurveSkeleton<Model>(*grskl));
+	typename skeleton::GraphCurveSkeleton<Model>::Ptr grsimp(new skeleton::GraphCurveSkeleton<Model>(*grskel));
 
 	std::list<unsigned int> list_ind;
 	grsimp->getAllNodes(list_ind);
@@ -101,12 +101,12 @@ inline typename skeleton::GraphCurveSkeleton<Model>::Ptr ScaleAxisTransform_help
 	return grsimp;
 }
 
-skeleton::GraphSkel2d::Ptr algorithm::pruning::ScaleAxisTransform(const skeleton::GraphSkel2d::Ptr grskl, const double &scale)
+skeleton::GraphSkel2d::Ptr algorithm::pruning::ScaleAxisTransform(const skeleton::GraphSkel2d::Ptr grskel, const double &scale)
 {
-	return ScaleAxisTransform_helper<skeleton::model::Classic<2> >(grskl,scale);
+	return ScaleAxisTransform_helper<skeleton::model::Classic<2> >(grskel,scale);
 }
 
-skeleton::GraphProjSkel::Ptr algorithm::pruning::ScaleAxisTransform(const skeleton::GraphProjSkel::Ptr grskl, const double &scale)
+skeleton::GraphProjSkel::Ptr algorithm::pruning::ScaleAxisTransform(const skeleton::GraphProjSkel::Ptr grskel, const double &scale)
 {
-	return ScaleAxisTransform_helper<skeleton::model::Projective>(grskl,scale);
+	return ScaleAxisTransform_helper<skeleton::model::Projective>(grskel,scale);
 }

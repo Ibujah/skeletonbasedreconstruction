@@ -50,7 +50,7 @@ namespace algorithm
 		 *
 		 *  \return Pruned skeleton
 		 */
-		skeleton::GraphSkel2d::Ptr ScaleAxisTransform(const skeleton::GraphSkel2d::Ptr grskl, const double &scale = 1.2);
+		skeleton::GraphSkel2d::Ptr ScaleAxisTransform(const skeleton::GraphSkel2d::Ptr grskel, const double &scale = 1.2);
 		
 		/**
 		 *  \brief Scale Axis Transform pruning of projective skeleton
@@ -60,7 +60,7 @@ namespace algorithm
 		 *
 		 *  \return Pruned skeleton
 		 */
-		skeleton::GraphProjSkel::Ptr ScaleAxisTransform(const skeleton::GraphProjSkel::Ptr grskl, const double &scale = 1.2);
+		skeleton::GraphProjSkel::Ptr ScaleAxisTransform(const skeleton::GraphProjSkel::Ptr grskel, const double &scale = 1.2);
 	}
 }
 
