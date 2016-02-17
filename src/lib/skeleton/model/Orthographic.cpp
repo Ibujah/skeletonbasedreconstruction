@@ -35,12 +35,19 @@ skeleton::model::Orthographic::Orthographic(const mathtools::affine::Frame<3>::P
 skeleton::model::Orthographic::Orthographic(const Orthographic &model) : skeleton::model::Projective(model.m_frame)
 {}
 
-skeleton::model::Projective::Type skeleton::model::Orthographic::getType() const
+skeleton::model::Orthographic::Type skeleton::model::Orthographic::getType() const
 {
-	return skeleton::model::Projective::Type::orthographic;
+	return skeleton::model::Orthographic::Type::orthographic;
 }
 
-double skeleton::model::Orthographic::getSize(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec) const
+double skeleton::model::Orthographic::getSize(const Eigen::Matrix<double,meta<Orthographic>::stordim,1> &vec) const
 {
 	return vec(2);
+}
+
+Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Orthographic>::stordim,1> skeleton::model::Orthographic::resize(const Eigen::Matrix<double,meta<Orthographic>::stordim,1> &vec, double size) const
+{
+	Eigen::Matrix<double,meta<Orthographic>::stordim,1> resized = vec;
+	resized(meta<Orthographic>::stordim-1,0) *= size;
+	return resized;
 }

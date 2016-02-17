@@ -133,6 +133,22 @@ namespace skeleton
 					return vec(meta<Classic>::stordim-1,0);
 				}
 
+				/**
+				 *  \brief Resize an object from its vector
+				 *
+				 *  \param vec  vector of object to resize
+				 *  \param size new relative size
+				 *
+				 *  \return resized vector
+				 */
+				Eigen::Matrix<double,meta<Classic>::stordim,1> resize(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec, double size) const
+				{
+					Eigen::Matrix<double,meta<Classic>::stordim,1> resized = vec;
+					resized(meta<Classic>::stordim-1,0) *= size;
+					return resized;
+				}
+
+
 			protected:
 				/**
 				 *  \brief Conversion function from hypersphere to vector

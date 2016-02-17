@@ -44,3 +44,10 @@ double skeleton::model::Perspective::getSize(const Eigen::Matrix<double,meta<Pro
 {
 	return vec(2)/sqrt(vec(0)*vec(0) + vec(1)*vec(1) + 1.0*1.0);
 }
+
+Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Perspective>::stordim,1> skeleton::model::Perspective::resize(const Eigen::Matrix<double,meta<Perspective>::stordim,1> &vec, double size) const
+{
+	Eigen::Matrix<double,meta<Projective>::stordim,1> resized = vec;
+	resized(meta<Projective>::stordim-1,0) *= size;
+	return resized;
+}

@@ -96,6 +96,16 @@ namespace skeleton
 				 *  \return size associated to vec
 				 */
 				virtual double getSize(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec) const;
+
+				/**
+				 *  \brief Resize an object from its vector
+				 *
+				 *  \param vec  vector of object to resize
+				 *  \param size new relative size
+				 *
+				 *  \return resized vector
+				 */
+				virtual Eigen::Matrix<double,meta<Perspective>::stordim,1> resize(const Eigen::Matrix<double,meta<Perspective>::stordim,1> &vec, double size) const;
 		};
 	}
 }

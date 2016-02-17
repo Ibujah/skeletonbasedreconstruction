@@ -154,6 +154,16 @@ namespace skeleton
 				 */
 				virtual double getSize(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec) const = 0;
 
+				/**
+				 *  \brief Resize an object from its vector
+				 *
+				 *  \param vec  vector of object to resize
+				 *  \param size new relative size
+				 *
+				 *  \return resized vector
+				 */
+				virtual Eigen::Matrix<double,meta<Projective>::stordim,1> resize(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec, double size) const = 0;
+
 			protected:
 				/**
 				 *  \brief Conversion function from hypersphere to vector
