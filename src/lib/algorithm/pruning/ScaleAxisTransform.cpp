@@ -46,15 +46,15 @@ bool ScaledIsIn(const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, 
 template<typename Model>
 inline typename skeleton::GraphCurveSkeleton<Model>::Ptr ScaleAxisTransform_helper(const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskl, const double &scale)
 {
-	typename skeleton::GraphCurveSkeleton<Model>::Ptr grsimp(new skeleton::GraphCurveSkeleton<Model>(grskl->getModel()));
+	typename skeleton::GraphCurveSkeleton<Model>::Ptr grsimp(new skeleton::GraphCurveSkeleton<Model>(*grskl));
 
 	std::list<unsigned int> list_ind;
-	grskl->getAllNodes(list_ind);
+	grsimp->getAllNodes(list_ind);
 
 	std::list<std::pair<unsigned int,double> > list_ind_size;
 	for(std::list<unsigned int>::iterator it = list_ind.begin(); it != list_ind.end(); it++)
 	{
-		list_ind_size.push_back(std::pair<unsigned int,double>(*it,grskl->getModel()->getSize(grskl->getNode(*it))));
+		list_ind_size.push_back(std::pair<unsigned int,double>(*it,grsimp->getModel()->getSize(grsimp->getNode(*it))));
 	}
 
 	//sort nodes in decreasing order
