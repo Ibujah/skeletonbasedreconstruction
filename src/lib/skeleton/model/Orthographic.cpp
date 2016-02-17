@@ -51,3 +51,11 @@ Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Orthographic>::stord
 	resized(meta<Orthographic>::stordim-1,0) *= size;
 	return resized;
 }
+
+bool skeleton::model::Orthographic::included(const Eigen::Matrix<double,meta<Orthographic>::stordim,1> &vec1, const Eigen::Matrix<double,meta<Orthographic>::stordim,1> &vec2) const
+{
+	return (vec1.template block<meta<Orthographic>::stordim-1,1>(0,0) - vec2.template block<meta<Orthographic>::stordim-1,1>(0,0)).norm()
+		+ vec2(meta<Orthographic>::stordim-1,0)
+		<=
+		vec1(meta<Orthographic>::stordim-1,0);
+}

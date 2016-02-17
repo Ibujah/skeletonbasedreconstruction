@@ -148,6 +148,21 @@ namespace skeleton
 					return resized;
 				}
 
+				/**
+				 *  \brief Tests if a object is included into another one
+				 *
+				 *  \param vec1 first object vector
+				 *  \param vec2 second object vector
+				 *
+				 *  \return true is first object is in second object
+				 */
+				bool included(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec1, const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec2) const
+				{
+					return (vec1.template block<meta<Classic>::stordim-1,1>(0,0) - vec2.template block<meta<Classic>::stordim-1,1>(0,0)).norm()
+								+ vec2(meta<Classic>::stordim-1,0)
+								<=
+								vec1(meta<Classic>::stordim-1,0);
+				}
 
 			protected:
 				/**

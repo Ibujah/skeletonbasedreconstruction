@@ -106,6 +106,16 @@ namespace skeleton
 				 *  \return resized vector
 				 */
 				virtual Eigen::Matrix<double,meta<Perspective>::stordim,1> resize(const Eigen::Matrix<double,meta<Perspective>::stordim,1> &vec, double size) const;
+
+				/**
+				 *  \brief Tests if a object is included into another one
+				 *
+				 *  \param vec1 first object vector
+				 *  \param vec2 second object vector
+				 *
+				 *  \return true is first object is in second object
+				 */
+				virtual bool included(const Eigen::Matrix<double,meta<Perspective>::stordim,1> &vec1, const Eigen::Matrix<double,meta<Perspective>::stordim,1> &vec2) const;
 		};
 	}
 }

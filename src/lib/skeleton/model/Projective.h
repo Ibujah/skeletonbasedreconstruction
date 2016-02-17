@@ -164,6 +164,16 @@ namespace skeleton
 				 */
 				virtual Eigen::Matrix<double,meta<Projective>::stordim,1> resize(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec, double size) const = 0;
 
+				/**
+				 *  \brief Tests if a object is included into another one
+				 *
+				 *  \param vec1 first object vector
+				 *  \param vec2 second object vector
+				 *
+				 *  \return true is first object is in second object
+				 */
+				virtual bool included(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec1, const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec2) const = 0;
+
 			protected:
 				/**
 				 *  \brief Conversion function from hypersphere to vector

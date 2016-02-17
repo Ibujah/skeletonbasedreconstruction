@@ -51,3 +51,18 @@ Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Perspective>::stordi
 	resized(meta<Projective>::stordim-1,0) *= size;
 	return resized;
 }
+
+bool skeleton::model::Perspective::included(const Eigen::Matrix<double,meta<Perspective>::stordim,1> &vec1, const Eigen::Matrix<double,meta<Perspective>::stordim,1> &vec2) const
+{
+	double nor1 = sqrt(vec1(0)*vec1(0) + vec1(1)*vec1(1) + 1.0*1.0); 
+	double nor2 = sqrt(vec2(0)*vec2(0) + vec2(1)*vec2(1) + 1.0*1.0); 
+	
+	// construction of point projected on sphere
+	Eigen::Vector3d ctr1(vec1(0)/nor1,vec1(1)/nor1,1.0/nor1);
+	Eigen::Vector3d ctr2(vec2(0)/nor2,vec2(1)/nor2,1.0/nor2);
+
+	double rad1 = vec1(2)/nor1;
+	double rad2 = vec2(2)/nor2;
+
+	return ((ctr1-ctr2).norm()+rad2 <= rad1);
+}
