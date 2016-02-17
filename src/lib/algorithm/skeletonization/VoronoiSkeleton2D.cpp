@@ -299,6 +299,7 @@ void VoronoiPersp(skeleton::GraphProjSkel::Ptr skel_int, const boundary::Discret
 		if(sqnorm<1.0)
 		{
 			isIn[i]=1;
+			// projection of the point on the plane z=1
 			Eigen::Vector3d vec_dir(corner.x()/corner.z(),corner.y()/corner.z(),sqrt(sqnorm-1./4.)/corner.z());
 			indices[i] = grskel->addNode(vec_dir);
 		}
