@@ -293,7 +293,10 @@ namespace skeleton
 
 				// second step, remove the node
 				if(v_found)
+				{
+					boost::clear_vertex(v_desc,m_graph);
 					boost::remove_vertex(v_desc,m_graph);
+				}
 
 				return v_found;
 			}
