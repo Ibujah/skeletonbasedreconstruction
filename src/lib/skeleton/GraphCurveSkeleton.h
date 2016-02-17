@@ -311,14 +311,17 @@ namespace skeleton
 			 */
 			bool addEdge(unsigned int ind1, unsigned int ind2)
 			{
-				// first step, get the descriptors corresponding to indices
-				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
-				bool v_found = getDesc(ind1,ind2,v_desc1,v_desc2);
+				bool v_found = false;
+				if(ind1 != ind2)
+				{
+					// first step, get the descriptors corresponding to indices
+					typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
+					v_found = getDesc(ind1,ind2,v_desc1,v_desc2);
 
-				// second step, add the edge
-				if(v_found)
-					boost::add_edge(v_desc1,v_desc2,m_graph);
-
+					// second step, add the edge
+					if(v_found)
+						boost::add_edge(v_desc1,v_desc2,m_graph);
+				}
 				return v_found;
 			}
 			
