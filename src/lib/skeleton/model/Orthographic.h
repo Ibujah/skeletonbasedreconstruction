@@ -88,6 +88,15 @@ namespace skeleton
 				 *  \return Skeleton type
 				 */
 				virtual Type getType() const;
+
+				/**
+				 *  \brief Size getter (used in nodes comparison)
+				 *
+				 *  \param vec voctor to evaluate the size
+				 *
+				 *  \return size associated to vec
+				 */
+				virtual double getSize(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec) const;
 		};
 	}
 }

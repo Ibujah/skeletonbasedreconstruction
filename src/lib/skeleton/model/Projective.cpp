@@ -35,27 +35,27 @@ skeleton::model::Projective::Projective(const mathtools::affine::Frame<3>::Ptr f
 skeleton::model::Projective::Projective(const Projective &model) : m_frame(model.m_frame)
 {}
 
-const mathtools::affine::Frame<3>::Ptr skeleton::model::Projective::getFrame()
+const mathtools::affine::Frame<3>::Ptr skeleton::model::Projective::getFrame() const
 {
 	return m_frame;
 }
 
 Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> skeleton::model::Projective::toVec(
-		const mathtools::geometry::euclidian::HyperSphere<2> &)
+		const mathtools::geometry::euclidian::HyperSphere<2> &) const
 {
 	throw std::logic_error("skeleton::model::Projective::toVec: not implemented in that skeleton type");
 }
 
 mathtools::affine::Point<2> skeleton::model::Projective::toObj(
 		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &,
-		const mathtools::affine::Point<2> &)
+		const mathtools::affine::Point<2> &) const
 {
 	throw std::logic_error("skeleton::model::Projective::toObj: not implemented in that skeleton type");
 }
 
 mathtools::geometry::euclidian::HyperSphere<2> skeleton::model::Projective::toObj(
 		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &,
-		const mathtools::geometry::euclidian::HyperSphere<2> &)
+		const mathtools::geometry::euclidian::HyperSphere<2> &) const
 {
 	throw std::logic_error("skeleton::model::Projective::toObj: not implemented in that skeleton type");
 }

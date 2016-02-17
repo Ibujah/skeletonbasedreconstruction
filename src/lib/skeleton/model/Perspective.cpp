@@ -39,3 +39,8 @@ skeleton::model::Projective::Type skeleton::model::Perspective::getType() const
 {
 	return skeleton::model::Projective::Type::perspective;
 }
+
+double skeleton::model::Perspective::getSize(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec) const
+{
+	return vec(2)/sqrt(vec(0)*vec(0) + vec(1)*vec(1) + 1.0*1.0);
+}

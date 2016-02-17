@@ -39,3 +39,8 @@ skeleton::model::Projective::Type skeleton::model::Orthographic::getType() const
 {
 	return skeleton::model::Projective::Type::orthographic;
 }
+
+double skeleton::model::Orthographic::getSize(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec) const
+{
+	return vec(2);
+}

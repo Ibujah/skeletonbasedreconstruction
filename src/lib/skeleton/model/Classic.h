@@ -101,7 +101,7 @@ namespace skeleton
 				 *  \return vector associated to obj
 				 */
 				template<typename TypeObj>
-				Eigen::Matrix<double,meta<Classic>::stordim,1> toVec(const TypeObj &obj)
+				Eigen::Matrix<double,meta<Classic>::stordim,1> toVec(const TypeObj &obj) const
 				{
 					return toVec(obj);
 				}
@@ -116,9 +116,21 @@ namespace skeleton
 				 *  \return object associated to vec
 				 */
 				template<typename TypeObj>
-				TypeObj toObj(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec)
+				TypeObj toObj(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec) const
 				{
 					return toObj(vec,TypeObj{});
+				}
+
+				/**
+				 *  \brief Size getter (used in nodes comparison)
+				 *
+				 *  \param vec voctor to evaluate the size
+				 *
+				 *  \return size associated to vec
+				 */
+				double getSize(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec) const
+				{
+					return vec(meta<Classic>::stordim-1,0);
 				}
 
 			protected:
@@ -129,7 +141,7 @@ namespace skeleton
 				 *
 				 *  \return vector associated to hyperpshere
 				 */
-				Eigen::Matrix<double,meta<Classic>::stordim,1> toVec(const mathtools::geometry::euclidian::HyperSphere<Dim> &sph)
+				Eigen::Matrix<double,meta<Classic>::stordim,1> toVec(const mathtools::geometry::euclidian::HyperSphere<Dim> &sph) const
 				{
 					if(!sph.getFrame()->getBasis()->getMatrix().isApprox(m_frame->getBasis()->getMatrix(),std::numeric_limits<double>::epsilon()))
 						throw std::logic_error("skeleton::model::Classic::toVec: hypersphere coordinates cannot be expressed in this model");
@@ -147,7 +159,7 @@ namespace skeleton
 				 *  \return center associated to vec
 				 */
 				inline mathtools::affine::Point<Dim> toObj(const Eigen::Matrix<double,meta<Classic>::stordim,1> &vec,
-														   const mathtools::affine::Point<Dim> &)
+														   const mathtools::affine::Point<Dim> &) const
 				{
 					return mathtools::affine::Point<Dim>(vec.template block<Dim,1>(0,0),m_frame);
 				}

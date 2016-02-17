@@ -106,7 +106,7 @@ namespace skeleton
 				 *
 				 *  \return skeleton frame
 				 */
-				const mathtools::affine::Frame<3>::Ptr getFrame();
+				const mathtools::affine::Frame<3>::Ptr getFrame() const;
 
 				/**
 				 *  \brief Converts an object into a vector
@@ -118,7 +118,7 @@ namespace skeleton
 				 *  \return vector associated to obj
 				 */
 				template<typename TypeObj>
-				Eigen::Matrix<double,meta<Projective>::stordim,1> toVec(const TypeObj &obj)
+				Eigen::Matrix<double,meta<Projective>::stordim,1> toVec(const TypeObj &obj) const
 				{
 					return toVec(obj);
 				}
@@ -133,7 +133,7 @@ namespace skeleton
 				 *  \return object associated to vec
 				 */
 				template<typename TypeObj>
-				TypeObj toObj(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec)
+				TypeObj toObj(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec) const
 				{
 					return toObj(vec,TypeObj{});
 				}
@@ -145,6 +145,15 @@ namespace skeleton
 				 */
 				virtual Type getType() const = 0;
 
+				/**
+				 *  \brief Size getter (used in nodes comparison)
+				 *
+				 *  \param vec voctor to evaluate the size
+				 *
+				 *  \return size associated to vec
+				 */
+				virtual double getSize(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec) const = 0;
+
 			protected:
 				/**
 				 *  \brief Conversion function from hypersphere to vector
@@ -153,7 +162,7 @@ namespace skeleton
 				 *
 				 *  \return vector associated to hyperpshere
 				 */
-				virtual Eigen::Matrix<double,meta<Projective>::stordim,1> toVec(const mathtools::geometry::euclidian::HyperSphere<2> &sph);
+				virtual Eigen::Matrix<double,meta<Projective>::stordim,1> toVec(const mathtools::geometry::euclidian::HyperSphere<2> &sph) const;
 
 				/**
 				 *  \brief Associate the center of the sphere to a vector
@@ -163,7 +172,7 @@ namespace skeleton
 				 *  \return center associated to vec
 				 */
 				virtual mathtools::affine::Point<2> toObj(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec,
-														  const mathtools::affine::Point<2> &);
+														  const mathtools::affine::Point<2> &) const;
 
 				/**
 				 *  \brief Associate an hypersphere to a vector
@@ -173,7 +182,7 @@ namespace skeleton
 				 *  \return hypersphere
 				 */
 				virtual mathtools::geometry::euclidian::HyperSphere<2> toObj(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec,
-																			 const mathtools::geometry::euclidian::HyperSphere<2> &);
+																			 const mathtools::geometry::euclidian::HyperSphere<2> &) const;
 
 		};
 	}
