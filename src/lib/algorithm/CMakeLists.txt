@@ -6,7 +6,8 @@ include_directories(${CMAKE_SOURCE_DIR}/src/lib
 					
 set(SOURCE_FILES    extractboundary/MarchingSquares.cpp
 					graphoperation/ConnectedComponents.cpp
-					skeletonization/VoronoiSkeleton2D.cpp)
+					skeletonization/VoronoiSkeleton2D.cpp
+					pruning/ScaleAxisTransform.cpp)
 # make the library
 add_library(
     ${LIBRARY_NAME}
