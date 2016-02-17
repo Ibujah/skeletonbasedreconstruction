@@ -41,6 +41,7 @@ SOFTWARE.
 
 #include <algorithm/extractboundary/MarchingSquares.h>
 #include <algorithm/skeletonization/VoronoiSkeleton2D.h>
+#include <algorithm/pruning/ScaleAxisTransform.h>
 
 #include <displayopencv/DisplayShapeOCV.h>
 #include <displayopencv/DisplayBoundaryOCV.h>
@@ -52,19 +53,24 @@ int main()
 	double diff;
 
 	shape::DiscreteShape<2>::Ptr dissh = userinput::DrawShape(640,480);
-	
+
 	time(&start);
 	boundary::DiscreteBoundary<2>::Ptr disbnd = algorithm::extractboundary::MarchingSquare(dissh,4);
 	time(&end);
 	diff = difftime(end,start);
 	std::cout << "Boundary computation: " << std::setprecision(2) << diff << "s." << std::endl;
-	
+
 	time(&start);
 	skeleton::GraphSkel2d::Ptr grskel = algorithm::skeletonization::VoronoiSkeleton2d(disbnd);
 	time(&end);
 	diff = difftime(end,start);
 	std::cout << "Skeleton computation: " << std::setprecision(2) << diff << "s." << std::endl;
-	
+
+	time(&start);
+	grskel = algorithm::pruning::ScaleAxisTransform(grskel);
+	time(&end);
+	diff = difftime(end,start);
+	std::cout << "Pruning computation: " << std::setprecision(2) << diff << "s." << std::endl;
 	cv::Mat image(480,640,CV_8UC3,cv::Scalar(0,0,0));
 
 	time(&start);
@@ -72,22 +78,21 @@ int main()
 	time(&end);
 	diff = difftime(end,start);
 	std::cout << "Shape display: " << std::setprecision(2) << diff << "s." << std::endl;
-	
+
 	time(&start);
 	displayopencv::DisplayDiscreteBoundary(disbnd,image,dissh->getFrame(),cv::Scalar(0,0,255));
 	time(&end);
 	diff = difftime(end,start);
 	std::cout << "Boundary display: " << std::setprecision(2) << diff << "s." << std::endl;
-	
+
 	time(&start);
 	displayopencv::DisplayGraphSkeleton(grskel,image,dissh->getFrame(),cv::Scalar(255,0,0));
 	time(&end);
 	diff = difftime(end,start);
 	std::cout << "Skeleton display: " << std::setprecision(2) << diff << "s." << std::endl;
-	
+
 	cv::imwrite("res.png",image);
 	std::cout << "Saved image at res.png" << std::endl;
-
 	return 0;
 }
 
