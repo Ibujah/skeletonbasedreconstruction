@@ -11,7 +11,19 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 find_package(EIGEN REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(VoroPlusPlus REQUIRED)
+
+find_package(VoroPlusPlus)
+
+if (NOT VOROPLUSPLUS_INCLUDE_DIR)
+	MESSAGE("Including 3rdparty voro++ library")
+	set(VOROPLUSPLUS_INCLUDE_DIR   ${CMAKE_SOURCE_DIR}/3rdparty/Voro++)
+	set(VOROPLUSPLUS_LIBRARY       "Vorolib")
+	add_subdirectory(3rdparty/Voro++)
+endif ()
+
+
+
+
 
 # Enable OpenMP
 find_package(OpenMP)

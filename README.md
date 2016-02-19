@@ -15,4 +15,4 @@ Towards Skeleton Based Reconstruction: From Projective Skeletonization to Canal 
  * [Boost](http://www.boost.org/)
  * [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) (header only)
  * [OpenCV](http://opencv.org/)
- * [Voro++](http://math.lbl.gov/voro++/)
+ * [Voro++](http://math.lbl.gov/voro++/) (already in 3rdparty) from Chris H. Rycroft
