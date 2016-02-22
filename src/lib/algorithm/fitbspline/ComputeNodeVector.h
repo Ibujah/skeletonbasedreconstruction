@@ -42,7 +42,7 @@ namespace algorithm
 	/*
 	 *  \brief Defines tools to compute Bsplines
 	 */
-	namespace bsplinefitting
+	namespace fitbspline
 	{
 		/**
 		 *  \brief Computes approximative node vector for a set of successive points

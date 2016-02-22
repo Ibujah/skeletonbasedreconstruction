@@ -30,22 +30,22 @@ SOFTWARE.
 #include "ComputeNodeVector.h"
 
 
-unsigned int algorithm::bsplinefitting::MaxDegree(const unsigned int nb_approx)
+unsigned int algorithm::fitbspline::MaxDegree(const unsigned int nb_approx)
 {
 	return nb_approx-1;
 }
 
-unsigned int algorithm::bsplinefitting::MaxCtrlPts(const unsigned int &nb_approx, const unsigned int &degree)
+unsigned int algorithm::fitbspline::MaxCtrlPts(const unsigned int &nb_approx, const unsigned int &degree)
 {
 	return nb_approx-degree+1;
 }
 
-unsigned int algorithm::bsplinefitting::MinCtrlPts(const unsigned int &degree)
+unsigned int algorithm::fitbspline::MinCtrlPts(const unsigned int &degree)
 {
 	return degree+1;
 }
 
-Eigen::Matrix<double,1,Eigen::Dynamic> algorithm::bsplinefitting::ComputeNodeVec(const Eigen::Matrix<double,1,Eigen::Dynamic> &vec_approxnod, const unsigned int &degree, const unsigned int &nb_ctr_pt)
+Eigen::Matrix<double,1,Eigen::Dynamic> algorithm::fitbspline::ComputeNodeVec(const Eigen::Matrix<double,1,Eigen::Dynamic> &vec_approxnod, const unsigned int &degree, const unsigned int &nb_ctr_pt)
 {
 	unsigned int nb_nod = nb_ctr_pt + degree - 1;
 	Eigen::Matrix<double,1,Eigen::Dynamic> vec_nod(1,nb_nod);
