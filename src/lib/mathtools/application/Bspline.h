@@ -126,6 +126,26 @@ namespace mathtools
 
 					return res;
 				}
+				
+				/**
+				 *  \brief Inferior boundary accessor
+				 *
+				 *  \return Inferior boundary
+				 */
+				double getInfBound() const
+				{
+					return m_nodevec(0,m_degree-1);
+				}
+				
+				/**
+				 *  \brief Superior boundary accessor
+				 *
+				 *  \return Superior boundary
+				 */
+				double getSupBound() const
+				{
+					return m_nodevec(0,m_nodevec.cols()-m_degree);
+				}
 		};
 	}
 }
