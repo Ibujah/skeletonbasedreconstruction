@@ -1,7 +1,8 @@
 set(LIBRARY_NAME ${USERINPUT_LIB})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/lib)
-set(SOURCE_FILES    DrawShape.cpp)
+set(SOURCE_FILES    DrawShape.cpp
+					ClickWindow.cpp)
 
 # make the library
 add_library(
