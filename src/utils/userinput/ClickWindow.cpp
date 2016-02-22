@@ -70,13 +70,18 @@ std::vector<mathtools::affine::Point<2> > userinput::ClickPoints(cv::Mat &img, u
 	
 	do
 	{
-		for(;nb_draw<nbpts;nb_draw++)
+		for(;nb_draw<vec_pt_cv.size();nb_draw++)
 		{
 			cv::circle(img,vec_pt_cv[nb_draw],10,cv::Scalar(0,255,0),-1);
 		}
 		cv::imshow("Click",img);
 		cv::waitKey(10);
 	}while(vec_pt.size() != nbpts);
+
+	for(;nb_draw<vec_pt_cv.size();nb_draw++)
+	{
+		cv::circle(img,vec_pt_cv[nb_draw],10,cv::Scalar(0,255,0),-1);
+	}
 
 	cv::setMouseCallback("Click",NULL);
 	cv::destroyWindow("Click");
