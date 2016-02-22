@@ -51,7 +51,7 @@ namespace algorithm
 		 *  
 		 *  \tparam Dim : Space dimension
 		 * 
-		 *  \param approx_vec : Vectors to approxime
+		 *  \param approx_vec : Vectors to approximate
 		 *  \param approx_nod : Param associated to each vector
 		 *  \param nod_vec    : Node vector to use
 		 *  \param degree     : Bspline degree
