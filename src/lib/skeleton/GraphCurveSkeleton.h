@@ -46,7 +46,7 @@ namespace skeleton
 	/**
 	 *  \brief Describes graph curve skeleton
 	 *
-	 *  \tparam Model : Class giving a meaning to the skeleton (dimensions, geometric interpretation...)
+	 *  \tparam Model Class giving a meaning to the skeleton (dimensions, geometric interpretation...)
 	 */
 	template<typename Model>
 	class GraphCurveSkeleton
@@ -64,21 +64,7 @@ namespace skeleton
 			
 		protected:
 			/**
-			 *  \brief Name of storage property in boost graph
-			 */
-			struct vertex_vec_t
-			{
-				/**
-				 *  \brief Define a vertex tag for the property
-				 */
-				typedef boost::vertex_property_tag kind;
-			};
-			
-			/**
 			 *  \brief Vertex property
-			 *
-			 *  \details Creates a property called vertex_index_t of type unsigned int
-			 *           and a property called vertex_stor of type Stor
 			 */
 			struct VertexProperty 
 			{
