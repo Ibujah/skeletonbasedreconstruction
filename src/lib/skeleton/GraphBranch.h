@@ -49,12 +49,119 @@ namespace skeleton
 			 *  \brief Graph skeletal branch shared pointer
 			 */
 			using Ptr = std::shared_ptr<GraphBranch<Model> >;
-
+			
 			/**
 			 *  \brief Storage type of the objects in the skeleton
 			 */
 			using Stor = Eigen::Matrix<double,model::meta<Model>::stordim,1>;
-		
-		
+			
+		protected:
+			/**
+			 *  \brief Model used to give a meaning to the skeleton
+			 *
+			 *  \details This class will not be modified inside the skeleton:
+			 *			 once it is created, it should not be changed
+			 */
+			typename Model::Ptr m_model;
+			
+			/**
+ 			 *  \brief Vector of nodes in the branch
+ 			 */
+			std::vector<Stor> m_nodes;
+			
+		public:
+			/**
+			 *  \brief Constructor
+			 *
+			 *  \param model initialisation of the model to use
+			 */
+			GraphBranch(const typename Model::Ptr model, const std::vector<Stor> &nodes = std::vector<Stor>(0)) : m_model(model), m_nodes(nodes) {}
+			
+			/**
+			 *  \brief Constructor
+			 *
+			 *  \param model initialisation of the model to use
+			 */
+			GraphBranch(const Model &model, const std::vector<Stor> &nodes = std::vector<Stor>(0)) : GraphBranch(typename Model::Ptr(new Model(model)),nodes) {}
+			
+			/**
+			 *  \brief Copy constructor
+			 *
+			 *  \param grbr skeleton to copy
+			 */
+			GraphBranch(const GraphBranch<Model> &grbr) :
+				m_model(grbr.m_model), m_nodes(grbr.m_nodes) {}
+			
+			/**
+			 *  \brief Model getter
+			 *
+			 *  \return Const shared pointer to skeleton model
+			 */
+			inline const typename Model::Ptr getModel() const
+			{
+				return m_model;
+			}
+			
+			/**
+			 *  \brief Give node number
+			 *
+			 *  \return node number
+			 */
+			unsigned int getNbNodes() const
+			{
+				return m_nodes.size();
+			}
+			
+			/**
+			 *  \brief Node getter by index
+			 *
+			 *  \param index index of the node to get
+			 *
+			 *  \return storage associated to the node
+			 */
+			const Stor& getNode(unsigned int index) const
+			{
+				if(index < getNbNodes())
+				{
+					throw new std::logic_error("skeleton::GraphBranch::getNode(): Node index is not in the skeleton");
+				}
+				return m_nodes[index];
+			}
+			
+			/**
+			 *  \brief Node getter by index
+			 *
+			 *  \tparam TypeNode type of the node to get
+			 *
+			 *  \param index index of the node to get
+			 *
+			 *  \return node associated to index
+			 */
+			template<typename TypeNode>
+			const TypeNode getNode(unsigned int index) const
+			{
+				if(index < getNbNodes())
+				{
+					throw new std::logic_error("skeleton::GraphBranch::getNode(): Node index is not in the skeleton");
+				}
+				
+				return m_model->template toObj<TypeNode>(m_nodes[index]);
+			}
+			
+			/**
+			 *  \brief Get the indices of all nodes
+			 *
+			 *  \tparam Container container type
+			 *
+			 *  \param  cont container in which store the indices
+			 */
+			template<typename Container>
+			void getAllNodes(Container &cont) const
+			{
+				for(typename std::vector<Stor>::const_iterator it = m_nodes.begin(); it != m_nodes.end(); it++)
+				{
+					cont.push_back(*it);
+				}
+			}
 	};
 }
