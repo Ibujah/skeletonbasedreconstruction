@@ -70,9 +70,9 @@ namespace skeleton
 			std::shared_ptr<std::vector<Stor> > m_nodes;
 
 			/**
- 			 *  \brief Reverse the order of the nodes in the branch
+ 			 *  \brief Revert the order of the nodes in the branch
  			 */
-			bool m_reversed;
+			bool m_reverted;
 			
 		public:
 			/**
@@ -80,14 +80,16 @@ namespace skeleton
 			 *
 			 *  \param model initialisation of the model to use
 			 */
-			GraphBranch(const typename Model::Ptr model, const std::vector<Stor> &nodes = std::vector<Stor>(0)) : m_model(model), m_nodes(new std::vector<Stor>(nodes)), m_reversed(false) {}
+			GraphBranch(const typename Model::Ptr model, const std::vector<Stor> &nodes = std::vector<Stor>(0)) :
+				m_model(model), m_nodes(new std::vector<Stor>(nodes)), m_reverted(false) {}
 			
 			/**
 			 *  \brief Constructor
 			 *
 			 *  \param model initialisation of the model to use
 			 */
-			GraphBranch(const Model &model, const std::vector<Stor> &nodes = std::vector<Stor>(0)) : GraphBranch(typename Model::Ptr(new Model(model)),nodes) {}
+			GraphBranch(const Model &model, const std::vector<Stor> &nodes = std::vector<Stor>(0)) :
+				GraphBranch(typename Model::Ptr(new Model(model)),nodes) {}
 			
 			/**
 			 *  \brief Copy constructor
@@ -95,7 +97,7 @@ namespace skeleton
 			 *  \param grbr skeleton to copy
 			 */
 			GraphBranch(const GraphBranch<Model> &grbr) :
-				m_model(grbr.m_model), m_nodes(grbr.m_nodes), m_reversed(false) {}
+				m_model(grbr.m_model), m_nodes(grbr.m_nodes), m_reverted(false) {}
 			
 			/**
 			 *  \brief Model getter
@@ -130,6 +132,8 @@ namespace skeleton
 				{
 					throw new std::logic_error("skeleton::GraphBranch::getNode(): Node index is not in the skeleton");
 				}
+				if(m_reverted)
+					index = getNbNodes()-index-1;
 				return (*m_nodes)[index];
 			}
 			
@@ -145,12 +149,7 @@ namespace skeleton
 			template<typename TypeNode>
 			const TypeNode getNode(unsigned int index) const
 			{
-				if(index < getNbNodes())
-				{
-					throw new std::logic_error("skeleton::GraphBranch::getNode(): Node index is not in the skeleton");
-				}
-				
-				return m_model->template toObj<TypeNode>((*m_nodes)[index]);
+				return m_model->template toObj<TypeNode>(getNode(index));
 			}
 			
 			/**
@@ -163,10 +162,32 @@ namespace skeleton
 			template<typename Container>
 			void getAllNodes(Container &cont) const
 			{
-				for(typename std::vector<Stor>::const_iterator it = m_nodes->begin(); it != m_nodes->end(); it++)
+				if(m_reverted)
 				{
-					cont.push_back(*it);
+					for(typename std::vector<Stor>::const_iterator it = m_nodes->rbegin(); it != m_nodes->rend(); it++)
+					{
+						cont.push_back(*it);
+					}
 				}
+				else
+				{
+					for(typename std::vector<Stor>::const_iterator it = m_nodes->begin(); it != m_nodes->end(); it++)
+					{
+						cont.push_back(*it);
+					}
+				}
+			}
+
+			/**
+ 			 *  \brief Reverted branch getter
+ 			 *
+ 			 *  \return Reverted branch
+ 			 */
+			const GraphBranch<Model>::Ptr reverted()
+			{
+				GraphBranch<Model>::Ptr rev(new GraphBranch<Model>(*this));
+				rev->m_reverted = !m_reverted;
+				return rev;
 			}
 	};
 }
