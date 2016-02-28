@@ -67,7 +67,12 @@ namespace skeleton
 			/**
  			 *  \brief Vector of nodes in the branch
  			 */
-			std::vector<Stor> m_nodes;
+			std::shared_ptr<std::vector<Stor> > m_nodes;
+
+			/**
+ 			 *  \brief Reverse the order of the nodes in the branch
+ 			 */
+			bool m_reversed;
 			
 		public:
 			/**
@@ -75,7 +80,7 @@ namespace skeleton
 			 *
 			 *  \param model initialisation of the model to use
 			 */
-			GraphBranch(const typename Model::Ptr model, const std::vector<Stor> &nodes = std::vector<Stor>(0)) : m_model(model), m_nodes(nodes) {}
+			GraphBranch(const typename Model::Ptr model, const std::vector<Stor> &nodes = std::vector<Stor>(0)) : m_model(model), m_nodes(new std::vector<Stor>(nodes)), m_reversed(false) {}
 			
 			/**
 			 *  \brief Constructor
@@ -90,7 +95,7 @@ namespace skeleton
 			 *  \param grbr skeleton to copy
 			 */
 			GraphBranch(const GraphBranch<Model> &grbr) :
-				m_model(grbr.m_model), m_nodes(grbr.m_nodes) {}
+				m_model(grbr.m_model), m_nodes(grbr.m_nodes), m_reversed(false) {}
 			
 			/**
 			 *  \brief Model getter
@@ -109,7 +114,7 @@ namespace skeleton
 			 */
 			unsigned int getNbNodes() const
 			{
-				return m_nodes.size();
+				return m_nodes->size();
 			}
 			
 			/**
@@ -125,7 +130,7 @@ namespace skeleton
 				{
 					throw new std::logic_error("skeleton::GraphBranch::getNode(): Node index is not in the skeleton");
 				}
-				return m_nodes[index];
+				return (*m_nodes)[index];
 			}
 			
 			/**
@@ -145,7 +150,7 @@ namespace skeleton
 					throw new std::logic_error("skeleton::GraphBranch::getNode(): Node index is not in the skeleton");
 				}
 				
-				return m_model->template toObj<TypeNode>(m_nodes[index]);
+				return m_model->template toObj<TypeNode>((*m_nodes)[index]);
 			}
 			
 			/**
@@ -158,7 +163,7 @@ namespace skeleton
 			template<typename Container>
 			void getAllNodes(Container &cont) const
 			{
-				for(typename std::vector<Stor>::const_iterator it = m_nodes.begin(); it != m_nodes.end(); it++)
+				for(typename std::vector<Stor>::const_iterator it = m_nodes->begin(); it != m_nodes->end(); it++)
 				{
 					cont.push_back(*it);
 				}
