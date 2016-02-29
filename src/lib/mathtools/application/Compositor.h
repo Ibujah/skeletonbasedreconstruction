@@ -30,8 +30,9 @@ SOFTWARE.
 #ifndef _COMPOSITOR_H_
 #define _COMPOSITOR_H_
 
-#include "Application.h"
 #include <Eigen/Dense>
+#include <memory>
+#include "Application.h"
 
 /**
  *  \brief Mathematical tools
@@ -57,26 +58,42 @@ namespace mathtools
 				 *  \brief Out type of result funtion
 				 */
 				using outType = typename Fct::outType;
+
 				/**
 				 *  \brief In type of result funtion
 				 */
 				using inType = typename Fct::inType;
+
+				/**
+				 *  \brief Shared pointer definition
+				 */
+				using Ptr = std::shared_ptr<Compositor>;
+
 			protected:
 				/**
 				 *  \brief Current function
 				 */
-				Fct m_fct;
+				typename Fct::Ptr m_fct;
+
 			public:
 				/**
 				 *  \brief Constructor
 				 */
-				Compositor() : m_fct() {};
+				Compositor() : m_fct(new Fct()) {};
+
 				/**
 				 *  \brief Constructor
 				 *
 				 *  \param fct reference to function to compose
 				 */
-				Compositor(const Fct &fct) : m_fct(fct) {};
+				Compositor(const typename Fct::Ptr fct) : m_fct(fct) {};
+
+				/**
+				 *  \brief Constructor
+				 *
+				 *  \param fct reference to function to compose
+				 */
+				Compositor(const Fct &fct) : Compositor(typename Fct::Ptr(new Fct(fct))) {};
 
 				/**
 				 *  \brief Function call
@@ -86,7 +103,7 @@ namespace mathtools
 				 */
 				outType operator()(const inType &t) const
 				{
-					return m_fct(t);
+					return (*m_fct)(t);
 				};
 
 				/**
@@ -98,7 +115,7 @@ namespace mathtools
 				template<typename Out = outType, typename In = inType>
 				Eigen::Matrix<double,dimension<Out>::value,dimension<In>::value> jac(const inType &t) const
 				{
-					return m_fct.jac(t);
+					return m_fct->jac(t);
 				}
 		};
 
@@ -117,15 +134,23 @@ namespace mathtools
 				 *  \brief Out type of result funtion
 				 */
 				using outType = typename Fct::outType;
+
 				/**
 				 *  \brief In type of result funtion
 				 */
 				using inType = typename Compositor<Fct_,Args...>::inType;
+
+				/**
+				 *  \brief Shared pointer definition
+				 */
+				using Ptr = std::shared_ptr<Compositor>;
+
 			protected:
 				/**
 				 *  \brief Current function
 				 */
-				Fct m_fct;
+				typename Fct::Ptr m_fct;
+
 				/**
 				 * \brief Compositor contain all the next functions
 				 */
@@ -135,8 +160,7 @@ namespace mathtools
 				/**
 				 *  \brief Constructor
 				 */
-				Compositor() :  m_fct(), m_next() {};
-
+				Compositor() : m_fct(new Fct()), m_next() {};
 
 				/**
 				 *  \brief Constructor
@@ -145,7 +169,16 @@ namespace mathtools
 				 *  \param fct_  reference to second function to compose
 				 *  \param fcts  next function arguments
 				 */
-				Compositor(const Fct &fct, const Fct_ &fct_, const Args&... fcts) :  m_fct(fct), m_next(fct_, fcts...) {};
+				Compositor(const typename Fct::Ptr &fct, const typename Fct_::Ptr &fct_, const Args&... fcts) :  m_fct(fct), m_next(fct_, fcts...) {};
+
+				/**
+				 *  \brief Constructor
+				 *
+				 *  \param fct   reference to first function to compose
+				 *  \param fct_  reference to second function to compose
+				 *  \param fcts  next function arguments
+				 */
+				Compositor(const Fct &fct, const Fct_ &fct_, const Args&... fcts) :  m_fct(new Fct(fct)), m_next(fct_, fcts...) {};
 
 				/**
 				 *  \brief Function call
@@ -155,7 +188,7 @@ namespace mathtools
 				 */
 				outType operator()(const inType &t) const
 				{
-					return m_fct(  m_next(t) );
+					return (*m_fct)(  m_next(t) );
 				};
 
 				/**
@@ -167,7 +200,7 @@ namespace mathtools
 				template<typename Out = outType, typename In = inType>
 				Eigen::Matrix<double,dimension<Out>::value,dimension<In>::value> jac(const inType &t) const
 				{
-					return m_fct.jac( m_next(t) ) * m_next.jac(t);
+					return m_fct->jac( m_next(t) ) * m_next.jac(t);
 				}
 
 				/**

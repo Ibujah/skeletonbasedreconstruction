@@ -31,6 +31,7 @@ SOFTWARE.
 #define _APPLICATION_H_
 
 #include <Eigen/Dense>
+#include <memory>
 
 /**
  *  \brief Mathematical tools
@@ -56,10 +57,16 @@ namespace mathtools
 				 *  \brief Out type of result funtion
 				 */
 				using outType = OutType;
+
 				/**
 				 *  \brief In type of result funtion
 				 */
 				using inType = InType;
+
+				/**
+				 *  \brief Shared pointer definition
+				 */
+				using Ptr = std::shared_ptr<Application>;
 
 			public:
 				/**

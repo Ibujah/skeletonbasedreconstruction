@@ -30,9 +30,10 @@ SOFTWARE.
 #ifndef _BSPLINE_H_
 #define _BSPLINE_H_
 
+#include <Eigen/Dense>
+#include <memory>
 #include "Application.h"
 #include "BsplineUtils.h"
-#include <Eigen/Dense>
 
 /**
  *  \brief Mathematical tools
@@ -57,10 +58,16 @@ namespace mathtools
 				 *  \brief Out type of result funtion
 				 */
 				using outType = Eigen::Matrix<double,Dim,1>;
+
 				/**
 				 *  \brief In type of result funtion
 				 */
 				using inType = double;
+
+				/**
+				 *  \brief Shared pointer definition
+				 */
+				using Ptr = std::shared_ptr<Bspline>;
 
 			protected:
 				/**
