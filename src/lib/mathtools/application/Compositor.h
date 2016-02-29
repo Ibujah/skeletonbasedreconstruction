@@ -117,6 +117,16 @@ namespace mathtools
 				{
 					return m_fct->jac(t);
 				}
+				
+				/**
+				 *  \brief Function getter
+				 *
+				 *  \return current function associated to compositor
+				 */
+				const typename Fct::Ptr getFun() const
+				{
+					return m_fct;
+				}
 		};
 
 		/**
@@ -211,6 +221,16 @@ namespace mathtools
 				inline const Compositor<Fct_,Args...>& next() const
 				{
 					return m_next;
+				}
+				
+				/**
+				 *  \brief Function getter
+				 *
+				 *  \return current function associated to compositor
+				 */
+				const typename Fct::Ptr getFun() const
+				{
+					return m_fct;
 				}
 		};
 	}
