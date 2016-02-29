@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Ibujah/skeletonbasedreconstruction.svg?branch=master)](https://travis-ci.org/Ibujah/skeletonbasedreconstruction)
+
 # Skeleton based reconstruction
 
 This software is an implementation of the skeleton-based reconstruction.
