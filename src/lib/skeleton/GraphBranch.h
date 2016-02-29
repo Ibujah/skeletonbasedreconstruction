@@ -27,6 +27,9 @@ SOFTWARE.
  *  \author Bastien Durix
  */
 
+#ifndef _GRAPHBRANCH_H_
+#define _GRAPHBRANCH_H_
+
 #include <memory>
 #include <Eigen/Dense>
 #include "model/MetaModel.h"
@@ -79,6 +82,7 @@ namespace skeleton
 			 *  \brief Constructor
 			 *
 			 *  \param model initialisation of the model to use
+			 *  \param nodes nodes of the branch
 			 */
 			GraphBranch(const typename Model::Ptr model, const std::vector<Stor> &nodes = std::vector<Stor>(0)) :
 				m_model(model), m_nodes(new std::vector<Stor>(nodes)), m_reverted(false) {}
@@ -87,6 +91,7 @@ namespace skeleton
 			 *  \brief Constructor
 			 *
 			 *  \param model initialisation of the model to use
+			 *  \param nodes nodes of the branch
 			 */
 			GraphBranch(const Model &model, const std::vector<Stor> &nodes = std::vector<Stor>(0)) :
 				GraphBranch(typename Model::Ptr(new Model(model)),nodes) {}
@@ -97,7 +102,7 @@ namespace skeleton
 			 *  \param grbr skeleton to copy
 			 */
 			GraphBranch(const GraphBranch<Model> &grbr) :
-				m_model(grbr.m_model), m_nodes(grbr.m_nodes), m_reverted(false) {}
+				m_model(grbr.m_model), m_nodes(grbr.m_nodes), m_reverted(grbr.m_reverted) {}
 			
 			/**
 			 *  \brief Model getter
@@ -191,3 +196,5 @@ namespace skeleton
 			}
 	};
 }
+
+#endif //_GRAPHBRANCH_H_
