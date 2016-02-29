@@ -183,7 +183,7 @@ namespace skeleton
  			 *
  			 *  \return Reverted branch
  			 */
-			const GraphBranch<Model>::Ptr reverted()
+			const GraphBranch<Model>::Ptr reverted() const
 			{
 				GraphBranch<Model>::Ptr rev(new GraphBranch<Model>(*this));
 				rev->m_reverted = !m_reverted;
