@@ -21,4 +21,4 @@ install:
 
 script:
   - mkdir build && cd build && cmake .. && make
-  - cd ../bin && ok=true; for i in `echo test*`; do; "./"$i; if [ $? -ne 0 ]; then; ok=false; fi; done; $ok;
+  - cd ../bin && ok=true; for i in `echo test*`; do "./"$i; if [ $? -ne 0 ]; then ok=false; fi; done; $ok;
