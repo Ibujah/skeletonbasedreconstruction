@@ -35,6 +35,7 @@ SOFTWARE.
 #include "model/MetaModel.h"
 #include <mathtools/application/Application.h>
 #include <mathtools/application/Compositor.h>
+#include <mathtools/application/AffineFun.h>
 
 /**
  *  \brief Skeleton representations
@@ -63,8 +64,12 @@ namespace skeleton
 			/*
 			 *  \brief Node function type
 			 */
-			using NodeFun = mathtools::application::Compositor<mathtools::application::Application<Stor,double>,
-															   mathtools::application::Application<double,double> >;
+			using NodeFun = mathtools::application::Application<Stor,double>;
+
+			/**
+			 *  \brief Revert function type
+			 */
+			using RevFun = mathtools::application::AffineFun;
 			
 		protected:
 			/**
@@ -78,7 +83,17 @@ namespace skeleton
 			/**
  			 *  \brief Function giving nodes in the branch
  			 */
-			std::shared_ptr<NodeFun> m_nodefun;
+			typename mathtools::application::Compositor<NodeFun,RevFun>::Ptr m_nodefun;
+			
+			/**
+			 *  \brief Constructor
+			 *
+			 *  \param model   initialisation of the model to use
+			 *  \param nodefun node function
+			 *  \param revfun  reverse function
+			 */
+			ContinuousBranch(const typename Model::Ptr model, const typename NodeFun::Ptr nodefun, const typename RevFun::Ptr revfun) :
+				m_model(model), m_nodefun(new mathtools::application::Compositor<NodeFun,RevFun>(nodefun,revfun)) {}
 			
 		public:
 			/**
@@ -87,8 +102,8 @@ namespace skeleton
 			 *  \param model initialisation of the model to use
 			 *  \param nodefun node function
 			 */
-			ContinuousBranch(const typename Model::Ptr model, const std::shared_ptr<NodeFun> nodefun) :
-				m_model(model), m_nodefun(new std::vector<Stor>(nodefun)) {}
+			ContinuousBranch(const typename Model::Ptr model, const typename NodeFun::Ptr nodefun) :
+				m_model(model), m_nodefun(new mathtools::application::Compositor<NodeFun,RevFun>(nodefun,RevFun(nodefun->getSupBound()-nodefun->getInfBound(),nodefun->getInfBound()))) {}
 			
 			/**
 			 *  \brief Constructor
@@ -97,7 +112,7 @@ namespace skeleton
 			 *  \param nodefun node function
 			 */
 			ContinuousBranch(const Model &model, const NodeFun &nodefun) :
-				ContinuousBranch(typename Model::Ptr(new Model(model)),std::shared_ptr<NodeFun>(new NodeFun(nodefun))) {}
+				ContinuousBranch(typename Model::Ptr(new Model(model)), typename NodeFun::Ptr(new NodeFun(nodefun))) {}
 			
 			/**
 			 *  \brief Copy constructor
@@ -142,6 +157,18 @@ namespace skeleton
 			const TypeNode getNode(double t) const
 			{
 				return m_model->template toObj<TypeNode>(getNode(t));
+			}
+
+			/**
+ 			 *  \brief Reverted branch getter
+ 			 *
+ 			 *  \return Reverted branch
+ 			 */
+			const ContinuousBranch<Model>::Ptr reverted() const
+			{
+				RevFun::Ptr revfun(new RevFun(m_nodefun->getFun()->getInfBound() - m_nodefun->getFun()->getSupBound(),m_nodefun->getSupBound()));
+				ContinuousBranch<Model>::Ptr rev(new ContinuousBranch<Model>(m_model,m_nodefun->getFun(),revfun));
+				return rev;
 			}
 	};
 }
