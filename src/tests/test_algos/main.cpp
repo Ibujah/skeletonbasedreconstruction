@@ -249,21 +249,21 @@ void verifyskel(const skeleton::GraphSkel2d::Ptr grskel, const std::vector<Eigen
 	grskel->getAllNodes(index);
 	
 	std::map<unsigned int, unsigned int> map_assoc;
-	for(unsigned int i = 0; i < wantedskl.size(); i++)
+	for(unsigned int i = 0; i < index.size(); i++)
 	{
 		for(unsigned int j = 0; j < wantedskl.size(); j++)
 		{
-			if(grskel->getNode(index[i]).isApprox(wantedskl[j],std::numeric_limits<double>::epsilon()))
-				map_assoc[j] = i;
+			if(grskel->getNode(index[i]).isApprox(wantedskl[j],std::numeric_limits<float>::epsilon()))
+				map_assoc[j] = index[i];
 		}
 	}
-
+	
 	BOOST_REQUIRE(map_assoc.size() == wantedskl.size());
 
 	for(std::list<std::pair<unsigned int,unsigned int> >::const_iterator it = wantededg.begin(); it != wantededg.end(); it++)
 	{
-		BOOST_CHECK(grskel->areNeighbors(it->first,it->second));
-		BOOST_CHECK(grskel->areNeighbors(it->second,it->first));
+		BOOST_CHECK(grskel->areNeighbors(map_assoc[it->first],map_assoc[it->second]));
+		BOOST_CHECK(grskel->areNeighbors(map_assoc[it->second],map_assoc[it->first]));
 	}
 
 }
@@ -298,7 +298,7 @@ BOOST_AUTO_TEST_CASE( Skeletonization )
 	mathtools::affine::Frame<2>::Ptr frame =
 		mathtools::affine::Frame<2>::CreateFrame(
 				Eigen::Vector2d(0,0),
-				mathtools::vectorial::Basis<2>::CreateBasis(Eigen::Vector2d(1,0),Eigen::Vector2d(0,-1)));
+				mathtools::vectorial::Basis<2>::CreateBasis(Eigen::Vector2d(1,0),Eigen::Vector2d(0,1)));
 
 	shape::DiscreteShape<2>::Ptr disshp(new shape::DiscreteShape<2>(4,4,frame));
 	
@@ -318,11 +318,13 @@ BOOST_AUTO_TEST_CASE( Skeletonization )
 	num=0;
 	wantedskl[num++] = Eigen::Vector3d(1.5 , 1.5 , 0.5);
 	wantedskl[num++] = Eigen::Vector3d(2.0 , 1.5 , sqrt(2.0)/2.0);
-	wantedskl[num++] = Eigen::Vector3d(2.25, 1.75, sqrt(10.0)/2.0);
+	wantedskl[num++] = Eigen::Vector3d(2.25, 1.75, sqrt(10.0)/4.0);
 	wantedskl[num++] = Eigen::Vector3d(2.5 , 2.0 , sqrt(2.0)/2.0);
 	wantedskl[num++] = Eigen::Vector3d(2.5 , 2.5 , 0.5);
 	wantededg.push_back(std::pair<unsigned int, unsigned int>(0,1));
 	wantededg.push_back(std::pair<unsigned int, unsigned int>(1,2));
 	wantededg.push_back(std::pair<unsigned int, unsigned int>(2,3));
 	wantededg.push_back(std::pair<unsigned int, unsigned int>(3,4));
+
+	verifyskel(grskel,wantedskl,wantededg);
 }
