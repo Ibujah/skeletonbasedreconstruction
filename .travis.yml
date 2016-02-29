@@ -8,7 +8,7 @@ before_install:
   - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
 
   - sudo apt-get update -qq
-  - sudo apt-get install cmake libboost-dev eigen libopencv-dev libcv-dev
+  - sudo apt-get install cmake libboost-dev libeigen3-dev libopencv-dev libcv-dev
 
 install:
   # g++4.8.1
