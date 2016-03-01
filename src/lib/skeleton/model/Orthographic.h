@@ -66,6 +66,11 @@ namespace skeleton
 				 *  \brief Shared pointer to the model
 				 */
 				using Ptr = std::shared_ptr<Orthographic>;
+
+				/**
+				 *  \brief Storage type
+				 */
+				using Stor = Eigen::Matrix<double,meta<Orthographic>::stordim,1>;
 				
 			public:
 				/**

@@ -65,6 +65,11 @@ namespace skeleton
 				 *  \brief Shared pointer to the model
 				 */
 				using Ptr = std::shared_ptr<Perspective>;
+
+				/**
+				 *  \brief Storage type
+				 */
+				using Stor = Eigen::Matrix<double,meta<Perspective>::stordim,1>;
 				
 			public:
 				/**
