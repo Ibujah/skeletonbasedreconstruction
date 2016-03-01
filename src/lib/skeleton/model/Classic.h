@@ -60,6 +60,11 @@ namespace skeleton
 				 */
 				using Ptr = std::shared_ptr<Classic<Dim> >;
 
+				/**
+				 *  \brief Storage type
+				 */
+				using Stor = Eigen::Matrix<double,meta<Classic<Dim> >::stordim,1>;
+
 			protected:
 				/**
 				 *  \brief Frame of the skeleton
