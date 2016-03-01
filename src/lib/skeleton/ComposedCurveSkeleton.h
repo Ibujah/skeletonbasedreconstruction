@@ -233,6 +233,184 @@ namespace skeleton
 				}
 				return v_found;
 			}
+
+		public://non modifying functions
+			/**
+			 *  \brief Get the number of nodes in the skeleton
+			 *
+			 *  \return Number of nodes
+			 */
+			unsigned int getNbNodes() const
+			{
+				return boost::num_vertices(m_graph);
+			}
+			
+			/**
+			 *  \brief Tests if the node index is in the skeleton
+			 *
+			 *  \return true if the node is in the skeleton
+			 */
+			bool isNodeIn(unsigned int index) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
+				return getDesc(index,v_desc);
+			}
+			
+			/**
+			 *  \brief Tests if the nodes are neighors
+			 *
+			 *  \param ind1 first node index
+			 *  \param ind2 second node index
+			 *
+			 *  \return true if they are neighors
+			 *
+			 *  \throws std::logic_error if one of the two nodes is not in the skeleton
+			 */
+			bool areNeighbors(unsigned int ind1, unsigned int ind2) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
+				if(!getDesc(ind1,ind2,v_desc1,v_desc2))
+					throw std::logic_error("skeleton::ComposedCurveSkeleton::areNeighbors(): Node index is not in the skeleton");
+
+				typename boost::graph_traits<GraphType>::edge_iterator ei;
+				
+				bool areneigh = false;
+
+				boost::tie(ei,areneigh) = boost::edge(v_desc1,v_desc2,m_graph);
+				if(!areneigh)
+				{
+					boost::tie(ei,areneigh) = boost::edge(v_desc1,v_desc2,m_graph);
+				}
+
+				return areneigh;
+			}
+
+			/**
+			 *  \brief Node degree getter by index
+			 *
+			 *  \param index index of the node to get
+			 *
+			 *  \return degree of the node
+			 */
+			unsigned int getNodeDegree(unsigned int index) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
+				if(!getDesc(index,v_desc))
+				{
+					throw new std::logic_error("skeleton::ComposedCurveSkeleton::getNodeDegree(): Node index is not in the skeleton");
+				}
+				
+				return boost::out_degree(v_desc,m_graph)+boost::in_degree(v_desc,m_graph);
+			}
+
+			/**
+			 *  \brief Get the indices of all nodes
+			 *
+			 *  \tparam Container container type
+			 *
+			 *  \param  cont container in which store the indices
+			 */
+			template<typename Container>
+			void getAllNodes(Container &cont) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
+				for(boost::tie(vi,vi_end) = boost::vertices(m_graph); vi != vi_end; vi++)
+				{
+					cont.push_back(m_graph[*vi].index);
+				}
+			}
+
+			/**
+			 *  \brief Get the indices of all nodes, by degree
+			 *
+			 *  \tparam Container container type
+			 *
+			 *  \param degree node degree to get
+			 *  \param cont   container in which store the indices
+			 */
+			template<typename Container>
+			void getNodesByDegree(unsigned int degree, Container &cont) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
+				for(boost::tie(vi,vi_end) = boost::vertices(m_graph); vi != vi_end; vi++)
+				{
+					if(boost::out_degree(*vi,m_graph)+boost::in_degree(*vi,m_graph) == degree)
+						cont.push_back(m_graph[*vi].index);
+				}
+			}
+			
+			/**
+			 *  \brief Neighbors accessor
+			 *
+			 *  \tparam Container container type
+			 *  
+			 *  \param  index index of the node
+			 *  \param  cont  container in which store the indices
+			 */
+			template<typename Container>
+			void getNeighbors(unsigned int index, Container &cont) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
+				if(getDesc(index,v_desc))
+				{
+					typename boost::graph_traits<GraphType>::adjacency_iterator ai, ai_end;
+
+					for(boost::tie(ai,ai_end) = boost::adjacent_vertices(v_desc,m_graph); ai != ai_end; ai++)
+					{
+						cont.push_back(m_graph[*ai].index);
+					}
+
+					typename boost::graph_traits<GraphType>::inv_adjacency_iterator aiinv, aiinv_end;
+
+					for(boost::tie(aiinv,aiinv_end) = boost::inv_adjacent_vertices(v_desc,m_graph); aiinv != aiinv_end; aiinv++)
+					{
+						cont.push_back(m_graph[*aiinv].index);
+					}
+				}
+			}
+
+			/**
+			 *  \brief Branch getter
+			 *
+			 *  \param ind1 first node index
+			 *  \param ind2 second node index
+			 *  
+			 *  \return branch from node ind1 to node ind2
+			 *  
+			 *  \throws std::logic_error if ind1 or ind2 or edge (ind1,ind2) is not in the skeleton
+			 */
+			const typename BranchType::Ptr getEdge(unsigned int ind1, unsigned int ind2) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
+				if(!getDesc(ind1,ind2,v_desc1,v_desc2))
+					throw std::logic_error("skeleton::ComposedCurveSkeleton::getEdge(): Node index is not in the skeleton");
+
+				typename boost::graph_traits<GraphType>::edge_iterator ei;
+				
+				typename BranchType::Ptr br(NULL);
+
+				bool areneigh = false;
+
+				boost::tie(ei,areneigh) = boost::edge(v_desc1,v_desc2,m_graph);
+				
+				if(areneigh)
+				{
+					br = m_graph[ei].branch;
+				}
+				if(!areneigh)
+				{
+					boost::tie(ei,areneigh) = boost::edge(v_desc2,v_desc1,m_graph);
+					if(areneigh)
+					{
+						br = m_graph[ei].branch->reverted();
+					}
+				}
+				
+				if(!areneigh)
+					throw std::logic_error("skeleton::ComposedCurveSkeleton::getEdge(): Edge is not in the skeleton");
+
+				return br;
+			}
 	};
 }
 
