@@ -31,6 +31,9 @@ SOFTWARE.
 #define _SKELETONS_H_
 
 #include "GraphCurveSkeleton.h"
+#include "ComposedCurveSkeleton.h"
+#include "GraphBranch.h"
+#include "ContinuousBranch.h"
 #include "model/Classic.h"
 #include "model/Projective.h"
 
@@ -53,6 +56,36 @@ namespace skeleton
 	 *  \brief Defines projective skeleton, used in reconstruction
 	 */
 	using GraphProjSkel = GraphCurveSkeleton<model::Projective>;
+
+	/**
+	 *  \brief Defines classical 2d composed skeleton
+	 */
+	using CompGraphSkel2d = ComposedCurveSkeleton<GraphBranch<model::Classic<2> > >;
+
+	/**
+	 *  \brief Defines classical 3d composed skeleton
+	 */
+	using CompGraphSkel3d = ComposedCurveSkeleton<GraphBranch<model::Classic<3> > >;
+
+	/**
+	 *  \brief Defines projective composed skeleton, used in reconstruction
+	 */
+	using CompGraphProjSkel = ComposedCurveSkeleton<GraphBranch<model::Projective> >;
+
+	/**
+	 *  \brief Defines classical 2d composed skeleton, with continuous branches
+	 */
+	using CompContSkel2d = ComposedCurveSkeleton<ContinuousBranch<model::Classic<2> > >;
+
+	/**
+	 *  \brief Defines classical 3d composed skeleton, with continuous branches
+	 */
+	using CompContSkel3d = ComposedCurveSkeleton<ContinuousBranch<model::Classic<3> > >;
+
+	/**
+	 *  \brief Defines projective composed skeleton, used in reconstruction, with continuous branches
+	 */
+	using CompContProjSkel = ComposedCurveSkeleton<ContinuousBranch<model::Projective> >;
 }
 
 #endif //_SKELETONS_H_
