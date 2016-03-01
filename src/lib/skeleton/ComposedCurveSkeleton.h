@@ -166,6 +166,30 @@ namespace skeleton
 				return v1_found && v2_found;
 			}
 
+			/**
+			 *  \brief Get the edge descriptor associated to an edge index
+			 *
+			 *  \param index  edge index
+			 *  \param e_desc out edge descriptor
+			 *
+			 *  \return false if the index is not in the skeleton
+			 */
+			bool getDesc(unsigned int index, typename boost::graph_traits<GraphType>::edge_descriptor &e_desc) const
+			{
+				typename boost::graph_traits<GraphType>::edge_iterator ei, ei_end;
+				bool e_found = false;
+				for(boost::tie(ei,ei_end) = boost::edges(m_graph); ei != ei_end && !e_found; ei++)
+				{
+					if(m_graph[*ei].index == index)
+					{
+						e_desc = *ei;
+						e_found = true;
+					}
+				}
+				
+				return e_found;
+			}
+
 		public://modifying functions
 			/**
 			 *  \brief Adding node function
@@ -379,7 +403,7 @@ namespace skeleton
 			 *  
 			 *  \throws std::logic_error if ind1 or ind2 or edge (ind1,ind2) is not in the skeleton
 			 */
-			const typename BranchType::Ptr getEdge(unsigned int ind1, unsigned int ind2) const
+			const typename BranchType::Ptr getBranch(unsigned int ind1, unsigned int ind2) const
 			{
 				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
 				if(!getDesc(ind1,ind2,v_desc1,v_desc2))
@@ -411,6 +435,47 @@ namespace skeleton
 
 				return br;
 			}
+
+			/**
+			 *  \brief Get the extremities of an edge
+			 *
+			 *  \param index index of the edge
+			 *
+			 *  \return pair containing index of extremities
+			 *
+			 *  \throws std::logic_error if edge is not in the skeleton
+			 */
+			std::pair<unsigned int,unsigned int> getExtremities(unsigned int index) const
+			{
+				typename boost::graph_traits<GraphType>::edge_descriptor e_desc;
+				if(!getDesc(index,e_desc))
+					throw std::logic_error("skeleton::ComposedCurveSkeleton::getExtremities(): Edge index is not in the skeleton");
+
+				std::pair<unsigned int,unsigned int> ext;
+
+				ext.first  = m_graph[boost::source(e_desc,m_graph)].index;
+				ext.second = m_graph[boost::target(e_desc,m_graph)].index;
+				
+				return ext;
+			}
+
+			/**
+			 *  \brief Get the indices of all edges
+			 *
+			 *  \tparam Container container type
+			 *
+			 *  \param  cont container in which store the indices
+			 */
+			template<typename Container>
+			void getAllEdges(Container &cont) const
+			{
+				typename boost::graph_traits<GraphType>::edge_iterator ei, ei_end;
+				for(boost::tie(ei,ei_end) = boost::edges(m_graph); ei != ei_end; ei++)
+				{
+					cont.push_back(m_graph[*ei].index);
+				}
+			}
+
 	};
 }
 
