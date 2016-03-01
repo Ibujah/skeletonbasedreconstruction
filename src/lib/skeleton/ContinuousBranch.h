@@ -63,6 +63,8 @@ namespace skeleton
 
 			/*
 			 *  \brief Node function type
+			 *
+			 *  \details parameter varies between 0 and 1
 			 */
 			using NodeFun = mathtools::application::Application<Stor,double>;
 
@@ -103,7 +105,7 @@ namespace skeleton
 			 *  \param nodefun node function
 			 */
 			ContinuousBranch(const typename Model::Ptr model, const typename NodeFun::Ptr nodefun) :
-				m_model(model), m_nodefun(new mathtools::application::Compositor<NodeFun,RevFun>(nodefun,RevFun(nodefun->getSupBound()-nodefun->getInfBound(),nodefun->getInfBound()))) {}
+				m_model(model), m_nodefun(new mathtools::application::Compositor<NodeFun,RevFun>(nodefun,RevFun(1,0))) {}
 			
 			/**
 			 *  \brief Constructor
@@ -166,7 +168,7 @@ namespace skeleton
  			 */
 			const ContinuousBranch<Model>::Ptr reverted() const
 			{
-				RevFun::Ptr revfun(new RevFun(m_nodefun->getFun()->getInfBound() - m_nodefun->getFun()->getSupBound(),m_nodefun->getSupBound()));
+				RevFun::Ptr revfun(new RevFun(-m_nodefun->next()->getFun()->getSlope(),1-m_nodefun->next()->getFun()->getYIntercept()));
 				ContinuousBranch<Model>::Ptr rev(new ContinuousBranch<Model>(m_model,m_nodefun->getFun(),revfun));
 				return rev;
 			}
