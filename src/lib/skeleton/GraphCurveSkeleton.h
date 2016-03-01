@@ -535,6 +535,25 @@ namespace skeleton
 			}
 
 			/**
+			 *  \brief Get the indices of all nodes, by degree
+			 *
+			 *  \tparam Container container type
+			 *
+			 *  \param cont   container in which store the indices
+			 *  \param degree node degree to get
+			 */
+			template<typename Container>
+			void getNodesByDegree(Container &cont, unsigned int degree) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
+				for(boost::tie(vi,vi_end) = boost::vertices(m_graph); vi != vi_end; vi++)
+				{
+					if(boost::out_degree(*vi,m_graph) == degree)
+						cont.push_back(m_graph[*vi].index);
+				}
+			}
+
+			/**
 			 *  \brief Get all the edges
 			 *
 			 *  \tparam Container container type
