@@ -6,6 +6,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/lib
 					
 set(SOURCE_FILES    extractboundary/MarchingSquares.cpp
 					graphoperation/ConnectedComponents.cpp
+					graphoperation/SeparateBranches.cpp
 					skeletonization/VoronoiSkeleton2D.cpp
 					pruning/ScaleAxisTransform.cpp
 					fitbspline/ComputeNodeVector.cpp)
