@@ -107,6 +107,26 @@ namespace mathtools
 				{
 					return m_a;
 				}
+
+				/**
+				 *  \brief Slope getter
+				 *
+				 *  \return slope
+				 */
+				double getSlope() const
+				{
+					return m_a;
+				}
+
+				/**
+				 *  \brief Y-intercept getter
+				 *
+				 *  \return y-intercept
+				 */
+				double getYIntercept() const
+				{
+					return m_b;
+				}
 		};
 	}
 }
