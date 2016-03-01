@@ -532,7 +532,7 @@ namespace skeleton
 					throw new std::logic_error("skeleton::GraphCurveSkeleton::getNodeDegree(): Node index is not in the skeleton");
 				}
 				
-				return boost::out_degree(vdesc,m_graph);
+				return boost::out_degree(v_desc,m_graph);
 			}
 
 			/**
