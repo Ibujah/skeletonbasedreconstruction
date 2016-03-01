@@ -518,6 +518,24 @@ namespace skeleton
 			}
 
 			/**
+			 *  \brief Node degree getter by index
+			 *
+			 *  \param index index of the node to get
+			 *
+			 *  \return degree of the node
+			 */
+			unsigned int getNodeDegree(unsigned int index) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc;
+				if(!getDesc(index,v_desc))
+				{
+					throw new std::logic_error("skeleton::GraphCurveSkeleton::getNodeDegree(): Node index is not in the skeleton");
+				}
+				
+				return boost::out_degree(vdesc,m_graph);
+			}
+
+			/**
 			 *  \brief Get the indices of all nodes
 			 *
 			 *  \tparam Container container type
@@ -539,11 +557,11 @@ namespace skeleton
 			 *
 			 *  \tparam Container container type
 			 *
-			 *  \param cont   container in which store the indices
 			 *  \param degree node degree to get
+			 *  \param cont   container in which store the indices
 			 */
 			template<typename Container>
-			void getNodesByDegree(Container &cont, unsigned int degree) const
+			void getNodesByDegree(unsigned int degree, Container &cont) const
 			{
 				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
 				for(boost::tie(vi,vi_end) = boost::vertices(m_graph); vi != vi_end; vi++)
