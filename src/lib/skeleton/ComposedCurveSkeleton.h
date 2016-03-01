@@ -133,6 +133,39 @@ namespace skeleton
 				return v_found;
 			}
 
+			/**
+			 *  \brief Get the vertex descriptors associated to two vertex indices
+			 *
+			 *  \param ind1    first vertex index
+			 *  \param ind2    second vertex index
+			 *  \param v_desc1 out first vertex descriptor
+			 *  \param v_desc2 out second vertex descriptor
+			 *
+			 *  \return false if one of the indices is not in the skeleton
+			 */
+			bool getDesc(unsigned int ind1, unsigned int ind2,
+						 typename boost::graph_traits<GraphType>::vertex_descriptor &v_desc1,
+						 typename boost::graph_traits<GraphType>::vertex_descriptor &v_desc2) const
+			{
+				typename boost::graph_traits<GraphType>::vertex_iterator vi, vi_end;
+				bool v1_found = false, v2_found = false;
+				for(boost::tie(vi,vi_end) = boost::vertices(m_graph); vi != vi_end && (!v1_found || !v2_found); vi++)
+				{
+					if(m_graph[*vi].index == ind1)
+					{
+						v_desc1 = *vi;
+						v1_found = true;
+					}
+					if(m_graph[*vi].index == ind2)
+					{
+						v_desc2 = *vi;
+						v2_found = true;
+					}
+				}
+				
+				return v1_found && v2_found;
+			}
+
 		public://modifying functions
 			/**
 			 *  \brief Adding node function
@@ -189,9 +222,13 @@ namespace skeleton
 					if(v_found)
 					{
 						typename boost::graph_traits<GraphType>::edge_descriptor e_desc;
-						e_desc = boost::add_edge(v_desc1,v_desc2,m_graph);
-						m_graph[e_desc].index = m_edgelast++;
-						m_graph[e_desc].branch = BranchType::Ptr(new BranchType(branch));
+						bool added;
+						boost::tie(e_desc,added) = boost::add_edge(v_desc1,v_desc2,m_graph);
+						if(added)
+						{
+							m_graph[e_desc].index = m_edgelast++;
+							m_graph[e_desc].branch = typename BranchType::Ptr(new BranchType(branch));
+						}
 					}
 				}
 				return v_found;
