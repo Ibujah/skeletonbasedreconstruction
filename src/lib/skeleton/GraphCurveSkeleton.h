@@ -553,6 +553,43 @@ namespace skeleton
 			}
 
 			/**
+			 *  \brief Get the storage associated to indices
+			 *
+			 *  \tparam IndContainer indice container type
+			 *  \tparam StoContainer stor container type
+			 *
+			 *  \param  indcont in indice container
+			 *  \param  stocont out stor container
+			 */
+			template<typename IndContainer, typename StoContainer>
+			void getNodes(const IndContainer &indcont, StoContainer &stocont) const
+			{
+				for(typename IndContainer::const_iterator it = indcont.begin(); it != indcont.end(); it++)
+				{
+					stocont.push_back(getNode(*it));
+				}
+			}
+
+			/**
+			 *  \brief Get the storage associated to indices
+			 *
+			 *  \tparam TypeNode type of the node to get
+			 *  \tparam IndContainer indice container type
+			 *  \tparam StoContainer stor container type
+			 *
+			 *  \param  indcont in indice container
+			 *  \param  stocont out stor container
+			 */
+			template<typename TypeNode, typename IndContainer, typename StoContainer>
+			void getNodes(const IndContainer &indcont, StoContainer &stocont) const
+			{
+				for(typename IndContainer::const_iterator it = indcont.begin(); it != indcont.end(); it++)
+				{
+					stocont.push_back(getNode<TypeNode>(*it));
+				}
+			}
+
+			/**
 			 *  \brief Get the indices of all nodes, by degree
 			 *
 			 *  \tparam Container container type
