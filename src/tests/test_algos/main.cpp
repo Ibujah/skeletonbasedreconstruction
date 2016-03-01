@@ -28,11 +28,12 @@ SOFTWARE.
 
 #include <shape/DiscreteShape.h>
 #include <boundary/DiscreteBoundary.h>
-#include <skeleton/GraphCurveSkeleton.h>
+#include <skeleton/Skeletons.h>
 
 #include <algorithm/extractboundary/MarchingSquares.h>
 #include <algorithm/graphoperation/ConnectedComponents.h>
 #include <algorithm/skeletonization/VoronoiSkeleton2D.h>
+#include <algorithm/graphoperation/SeparateBranches.h>
 
 #include <iostream>
 
@@ -327,4 +328,69 @@ BOOST_AUTO_TEST_CASE( Skeletonization )
 	wantededg.push_back(std::pair<unsigned int, unsigned int>(3,4));
 
 	verifyskel(grskel,wantedskl,wantededg);
+}
+
+BOOST_AUTO_TEST_CASE( ComposedSkeletonConversion )
+{
+	skeleton::GraphSkel2d::Ptr grskel(new skeleton::GraphSkel2d(skeleton::model::Classic<2>()));
+	
+	unsigned int ind0 = grskel->addNode(Eigen::Vector3d(0.0,0.0,1.0));
+
+	unsigned int ind1 = grskel->addNode(Eigen::Vector3d(1.0,0.0,1.0));
+	unsigned int ind2 = grskel->addNode(Eigen::Vector3d(2.0,0.0,1.0));
+	unsigned int ind3 = grskel->addNode(Eigen::Vector3d(2.0,0.0,1.0));
+
+	unsigned int ind4 = grskel->addNode(Eigen::Vector3d(0.0,1.0,1.0));
+	unsigned int ind5 = grskel->addNode(Eigen::Vector3d(0.0,2.0,1.0));
+
+	unsigned int ind6 = grskel->addNode(Eigen::Vector3d(0.0,-1.0,1.0));
+	
+	grskel->addEdge(ind0,ind1);
+	grskel->addEdge(ind1,ind2);
+	grskel->addEdge(ind2,ind3);
+
+	grskel->addEdge(ind0,ind4);
+	grskel->addEdge(ind4,ind5);
+	
+	grskel->addEdge(ind0,ind6);
+
+	skeleton::CompGraphSkel2d::Ptr compskel = algorithm::graphoperation::SeparateBranches(grskel);
+	
+	BOOST_REQUIRE(compskel->getNbNodes() == 4);
+	
+	std::list<unsigned int> l_edges;
+	compskel->getAllEdges(l_edges);
+	
+	for(std::list<unsigned int>::iterator it = l_edges.begin(); it != l_edges.end(); it++)
+	{
+		unsigned int first, second;
+		boost::tie(first,second) = compskel->getExtremities(*it);
+		skeleton::GraphBranch<skeleton::model::Classic<2> >::Ptr br;
+
+		if(compskel->getNodeDegree(first) == 1)
+			br = compskel->getBranch(second,first);
+		else
+			br = compskel->getBranch(first,second);
+
+		std::vector<Eigen::Vector3d> vecnodes(0);
+		br->getAllNodes(vecnodes);
+		if(vecnodes.size() == 4)
+		{
+			BOOST_CHECK(vecnodes[0].isApprox(grskel->getNode(ind0),std::numeric_limits<double>::epsilon()));
+			BOOST_CHECK(vecnodes[1].isApprox(grskel->getNode(ind1),std::numeric_limits<double>::epsilon()));
+			BOOST_CHECK(vecnodes[2].isApprox(grskel->getNode(ind2),std::numeric_limits<double>::epsilon()));
+			BOOST_CHECK(vecnodes[3].isApprox(grskel->getNode(ind3),std::numeric_limits<double>::epsilon()));
+		}
+		if(vecnodes.size() == 3)
+		{
+			BOOST_CHECK(vecnodes[0].isApprox(grskel->getNode(ind0),std::numeric_limits<double>::epsilon()));
+			BOOST_CHECK(vecnodes[1].isApprox(grskel->getNode(ind4),std::numeric_limits<double>::epsilon()));
+			BOOST_CHECK(vecnodes[2].isApprox(grskel->getNode(ind5),std::numeric_limits<double>::epsilon()));
+		}
+		if(vecnodes.size() == 2)
+		{
+			BOOST_CHECK(vecnodes[0].isApprox(grskel->getNode(ind0),std::numeric_limits<double>::epsilon()));
+			BOOST_CHECK(vecnodes[1].isApprox(grskel->getNode(ind6),std::numeric_limits<double>::epsilon()));
+		}
+	}
 }
