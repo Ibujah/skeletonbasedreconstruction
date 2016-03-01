@@ -61,10 +61,10 @@ namespace skeleton
 			 */
 			using Stor = Eigen::Matrix<double,model::meta<Model>::stordim,1>;
 
-			/*
+			/**
 			 *  \brief Node function type
 			 *
-			 *  \details parameter varies between 0 and 1
+			 *  \details Parameter varies between 0 and 1
 			 */
 			using NodeFun = mathtools::application::Application<Stor,double>;
 
@@ -119,7 +119,7 @@ namespace skeleton
 			/**
 			 *  \brief Copy constructor
 			 *
-			 *  \param grbr skeleton to copy
+			 *  \param grcont continuous branch to copy
 			 */
 			ContinuousBranch(const ContinuousBranch<Model> &grcont) :
 				m_model(grcont.m_model), m_nodefun(grcont.m_nodefun) {}
