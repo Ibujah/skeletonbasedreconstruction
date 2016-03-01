@@ -169,7 +169,7 @@ namespace skeleton
 			{
 				if(m_reverted)
 				{
-					for(typename std::vector<Stor>::const_iterator it = m_nodes->rbegin(); it != m_nodes->rend(); it++)
+					for(typename std::vector<Stor>::const_reverse_iterator it = m_nodes->rbegin(); it != m_nodes->rend(); it++)
 					{
 						cont.push_back(*it);
 					}

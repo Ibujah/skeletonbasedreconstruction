@@ -85,7 +85,7 @@ namespace skeleton
 			 *
 			 *  \details Creates a undirected graph with vertices using VertexProperty
 			 */
-			using GraphType = boost::adjacency_list<boost::listS,boost::listS,boost::directedS,VertexProperty,EdgeProperty>;
+			using GraphType = boost::adjacency_list<boost::listS,boost::listS,boost::bidirectionalS,VertexProperty,EdgeProperty>;
 
 			/**
 			 *  \brief Graph of the composed skeleton
@@ -324,7 +324,7 @@ namespace skeleton
 					throw new std::logic_error("skeleton::ComposedCurveSkeleton::getNodeDegree(): Node index is not in the skeleton");
 				}
 				
-				return boost::out_degree(v_desc,m_graph)+boost::in_degree(v_desc,m_graph);
+				return (unsigned int)boost::out_degree(v_desc,m_graph) + (unsigned int)boost::in_degree(v_desc,m_graph);
 			}
 
 			/**
@@ -409,7 +409,7 @@ namespace skeleton
 				if(!getDesc(ind1,ind2,v_desc1,v_desc2))
 					throw std::logic_error("skeleton::ComposedCurveSkeleton::getEdge(): Node index is not in the skeleton");
 
-				typename boost::graph_traits<GraphType>::edge_iterator ei;
+				typename boost::graph_traits<GraphType>::edge_descriptor ei;
 				
 				typename BranchType::Ptr br(NULL);
 
