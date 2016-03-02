@@ -141,7 +141,7 @@ namespace skeleton
 			 *
 			 *  \return storage associated to the node
 			 */
-			const Stor& getNode(double t) const
+			const Stor getNode(double t) const
 			{
 				return (*m_nodefun)(t);
 			}
@@ -168,7 +168,7 @@ namespace skeleton
  			 */
 			const ContinuousBranch<Model>::Ptr reverted() const
 			{
-				RevFun::Ptr revfun(new RevFun(-m_nodefun->next()->getFun()->getSlope(),1-m_nodefun->next()->getFun()->getYIntercept()));
+				RevFun::Ptr revfun(new RevFun(-m_nodefun->next().getFun()->getSlope(),1-m_nodefun->next().getFun()->getYIntercept()));
 				ContinuousBranch<Model>::Ptr rev(new ContinuousBranch<Model>(m_model,m_nodefun->getFun(),revfun));
 				return rev;
 			}
