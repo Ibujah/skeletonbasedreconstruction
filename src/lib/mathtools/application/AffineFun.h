@@ -57,6 +57,12 @@ namespace mathtools
 				 */
 				using inType = double;
 
+				/**
+				 *  \brief Shared pointer definition
+				 */
+				using Ptr = std::shared_ptr<AffineFun>;
+
+
 			protected:
 				/**
 				 *  \brief slope
@@ -95,7 +101,7 @@ namespace mathtools
 				 */
 				virtual double operator()(const double &t) const
 				{
-					return m_a * t;
+					return m_a * t + m_b;
 				}
 
 				/**
