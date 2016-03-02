@@ -35,7 +35,7 @@ SOFTWARE.
 #include <iostream>
 
 /**
- *  \brief Defines a lot of algorithms using skeletons!
+ *  \brief Lots of algorithms
  */
 namespace algorithm
 {
