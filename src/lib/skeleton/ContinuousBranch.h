@@ -105,7 +105,7 @@ namespace skeleton
 			 *  \param nodefun node function
 			 */
 			ContinuousBranch(const typename Model::Ptr model, const typename NodeFun::Ptr nodefun) :
-				m_model(model), m_nodefun(new mathtools::application::Compositor<NodeFun,RevFun>(nodefun,RevFun(1,0))) {}
+				m_model(model), m_nodefun(new mathtools::application::Compositor<NodeFun,RevFun>(nodefun,typename RevFun::Ptr(new RevFun(1,0)))) {}
 			
 			/**
 			 *  \brief Constructor
