@@ -258,6 +258,40 @@ namespace skeleton
 				return v_found;
 			}
 
+			/**
+			 *  \brief Adding edge function
+			 *
+			 *  \param ind1   first node index
+			 *  \param ind2   second node index
+			 *  \param branch branch to add
+			 *
+			 *  \return false if one of the two nodes is not in the skeleton
+			 */
+			bool addEdge(unsigned int ind1, unsigned int ind2, const typename BranchType::Ptr branch)
+			{
+				bool v_found = false;
+				if(ind1 != ind2)
+				{
+					// first step, get the descriptors corresponding to indices
+					typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
+					v_found = getDesc(ind1,ind2,v_desc1,v_desc2);
+
+					// second step, add the edge
+					if(v_found)
+					{
+						typename boost::graph_traits<GraphType>::edge_descriptor e_desc;
+						bool added;
+						boost::tie(e_desc,added) = boost::add_edge(v_desc1,v_desc2,m_graph);
+						if(added)
+						{
+							m_graph[e_desc].index = m_edgelast++;
+							m_graph[e_desc].branch = branch;
+						}
+					}
+				}
+				return v_found;
+			}
+
 		public://non modifying functions
 			/**
 			 *  \brief Get the number of nodes in the skeleton
