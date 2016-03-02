@@ -29,6 +29,8 @@ SOFTWARE.
 
 #include "Perspective.h"
 
+constexpr unsigned int skeleton::model::meta<skeleton::model::Perspective>::stordim;
+
 skeleton::model::Perspective::Perspective(const mathtools::affine::Frame<3>::Ptr frame) : skeleton::model::Projective(frame)
 {}
 

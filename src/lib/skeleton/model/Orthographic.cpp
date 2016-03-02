@@ -29,6 +29,8 @@ SOFTWARE.
 
 #include "Orthographic.h"
 
+constexpr unsigned int skeleton::model::meta<skeleton::model::Orthographic>::stordim;
+
 skeleton::model::Orthographic::Orthographic(const mathtools::affine::Frame<3>::Ptr frame) : skeleton::model::Projective(frame)
 {}
 

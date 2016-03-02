@@ -230,6 +230,8 @@ namespace skeleton
 			 */
 			static constexpr unsigned int stordim = Dim+1;
 		};
+
+		template<unsigned int Dim> constexpr unsigned int meta<Classic<Dim> >::stordim;
 	}
 }
 

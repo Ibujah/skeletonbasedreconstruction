@@ -29,6 +29,8 @@ SOFTWARE.
 
 #include "Projective.h"
 
+constexpr unsigned int skeleton::model::meta<skeleton::model::Projective>::stordim;
+
 skeleton::model::Projective::Projective(const mathtools::affine::Frame<3>::Ptr frame) : m_frame(frame)
 {}
 

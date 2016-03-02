@@ -56,6 +56,7 @@ namespace skeleton
 			static constexpr unsigned int stordim = 3;
 		};
 
+
 		/**
 		 *  \brief Describe perspective skeleton model
 		 */
