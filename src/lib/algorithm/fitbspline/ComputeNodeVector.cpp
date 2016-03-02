@@ -32,7 +32,7 @@ SOFTWARE.
 
 unsigned int algorithm::fitbspline::MaxDegree(const unsigned int nb_approx)
 {
-	return nb_approx-1;
+	return nb_approx/2;
 }
 
 unsigned int algorithm::fitbspline::MaxCtrlPts(const unsigned int &nb_approx, const unsigned int &degree)
