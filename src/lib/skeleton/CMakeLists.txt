@@ -1,7 +1,8 @@
 set(LIBRARY_NAME ${SKELETON_LIB})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/lib)
-set(SOURCE_FILES    model/Projective.cpp
+set(SOURCE_FILES    ReconstructionBranch.cpp
+					model/Projective.cpp
 					model/Perspective.cpp
 					model/Orthographic.cpp)
 # make the library

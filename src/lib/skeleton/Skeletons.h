@@ -34,6 +34,7 @@ SOFTWARE.
 #include "ComposedCurveSkeleton.h"
 #include "GraphBranch.h"
 #include "ContinuousBranch.h"
+#include "ReconstructionBranch.h"
 #include "model/Classic.h"
 #include "model/Projective.h"
 
@@ -124,6 +125,12 @@ namespace skeleton
 	 *  \brief Defines projective composed skeleton, used in reconstruction, with continuous branches
 	 */
 	using CompContProjSkel = ComposedCurveSkeleton<ContinuousBranch<model::Projective> >;
+
+
+	/**
+	 *  \brief Defines composed reconstruction skeleton
+	 */
+	using ReconstructionSkeleton = ComposedCurveSkeleton<ReconstructionBranch>;
 }
 
 #endif //_SKELETONS_H_
