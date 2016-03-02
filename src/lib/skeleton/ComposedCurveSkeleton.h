@@ -292,6 +292,24 @@ namespace skeleton
 				return v_found;
 			}
 
+			/**
+			 *  \brief Branch getter
+			 *
+			 *  \param index edge index
+			 *  
+			 *  \return branche associated to index
+			 *  
+			 *  \throws std::logic_error if index is not in the skeleton
+			 */
+			typename BranchType::Ptr getBranch(unsigned int index)
+			{
+				typename boost::graph_traits<GraphType>::edge_descriptor e_desc;
+				if(!getDesc(index,e_desc))
+					throw std::logic_error("skeleton::ComposedCurveSkeleton::getBranch(): Edge index is not in the skeleton");
+
+				return m_graph[e_desc].branch;
+			}
+
 		public://non modifying functions
 			/**
 			 *  \brief Get the number of nodes in the skeleton
@@ -441,7 +459,7 @@ namespace skeleton
 			{
 				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
 				if(!getDesc(ind1,ind2,v_desc1,v_desc2))
-					throw std::logic_error("skeleton::ComposedCurveSkeleton::getEdge(): Node index is not in the skeleton");
+					throw std::logic_error("skeleton::ComposedCurveSkeleton::getBranch(): Node index is not in the skeleton");
 
 				typename boost::graph_traits<GraphType>::edge_descriptor ei;
 				
@@ -462,6 +480,8 @@ namespace skeleton
 					{
 						br = m_graph[ei].branch->reverted();
 					}
+					if(!br)
+						br = m_graph[ei].branch;
 				}
 				
 				if(!areneigh)
