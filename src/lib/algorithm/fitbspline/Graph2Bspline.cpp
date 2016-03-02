@@ -46,8 +46,8 @@ typename skeleton::ContinuousBranch<Model>::Ptr Graph2Bspline_helper(const typen
 		Eigen::Matrix<double,skeleton::model::meta<Model>::stordim,Eigen::Dynamic> ctrl_vec(skeleton::model::meta<Model>::stordim,2);
 		Eigen::Matrix<double,1,Eigen::Dynamic> node_vec(1,2);
 
-		ctrl_vec.block(0,0,skeleton::model::meta<Model>::stordim,1) = nodes[0];
-		ctrl_vec.block(0,1,skeleton::model::meta<Model>::stordim,1) = nodes[0];
+		ctrl_vec.template block<skeleton::model::meta<Model>::stordim,1>(0,0) = nodes[0];
+		ctrl_vec.template block<skeleton::model::meta<Model>::stordim,1>(0,1) = nodes[0];
 		node_vec(0,0) = 0;
 		node_vec(0,1) = 1;
 
