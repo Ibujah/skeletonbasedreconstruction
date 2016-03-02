@@ -9,7 +9,8 @@ set(SOURCE_FILES    extractboundary/MarchingSquares.cpp
 					graphoperation/SeparateBranches.cpp
 					skeletonization/VoronoiSkeleton2D.cpp
 					pruning/ScaleAxisTransform.cpp
-					fitbspline/ComputeNodeVector.cpp)
+					fitbspline/ComputeNodeVector.cpp
+					fitbspline/Graph2Bspline.cpp)
 # make the library
 add_library(
     ${LIBRARY_NAME}
