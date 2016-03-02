@@ -34,6 +34,7 @@ SOFTWARE.
 #include <algorithm/graphoperation/ConnectedComponents.h>
 #include <algorithm/skeletonization/VoronoiSkeleton2D.h>
 #include <algorithm/graphoperation/SeparateBranches.h>
+#include <algorithm/fitbspline/Graph2Bspline.h>
 
 #include <iostream>
 
@@ -355,8 +356,10 @@ BOOST_AUTO_TEST_CASE( ComposedSkeletonConversion )
 	grskel->addEdge(ind0,ind6);
 
 	skeleton::CompGraphSkel2d::Ptr compskel = algorithm::graphoperation::SeparateBranches(grskel);
+	skeleton::CompContSkel2d::Ptr contskel = algorithm::fitbspline::Graph2Bspline(compskel);
 	
 	BOOST_REQUIRE(compskel->getNbNodes() == 4);
+	BOOST_REQUIRE(contskel->getNbNodes() == 4);
 	
 	std::list<unsigned int> l_edges;
 	compskel->getAllEdges(l_edges);
@@ -366,11 +369,18 @@ BOOST_AUTO_TEST_CASE( ComposedSkeletonConversion )
 		unsigned int first, second;
 		boost::tie(first,second) = compskel->getExtremities(*it);
 		skeleton::GraphBranch<skeleton::model::Classic<2> >::Ptr br;
+		skeleton::ContinuousBranch<skeleton::model::Classic<2> >::Ptr brcont;
 
 		if(compskel->getNodeDegree(first) == 1)
-			br = compskel->getBranch(second,first);
+		{
+			br     = compskel->getBranch(second,first);
+			brcont = contskel->getBranch(second,first);
+		}
 		else
-			br = compskel->getBranch(first,second);
+		{
+			br     = compskel->getBranch(first,second);
+			brcont = contskel->getBranch(first,second);
+		}
 
 		std::vector<Eigen::Vector3d> vecnodes(0);
 		br->getAllNodes(vecnodes);
@@ -392,5 +402,9 @@ BOOST_AUTO_TEST_CASE( ComposedSkeletonConversion )
 			BOOST_CHECK(vecnodes[0].isApprox(grskel->getNode(ind0),std::numeric_limits<double>::epsilon()));
 			BOOST_CHECK(vecnodes[1].isApprox(grskel->getNode(ind6),std::numeric_limits<double>::epsilon()));
 		}
+		
+		BOOST_CHECK(vecnodes[0].isApprox(brcont->getNode(0),std::numeric_limits<double>::epsilon()));
+		BOOST_CHECK(vecnodes[vecnodes.size()-1].isApprox(brcont->getNode(1),std::numeric_limits<double>::epsilon()));
 	}
+	
 }
