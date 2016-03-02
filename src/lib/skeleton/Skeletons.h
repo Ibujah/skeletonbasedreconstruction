@@ -57,6 +57,25 @@ namespace skeleton
 	 */
 	using GraphProjSkel = GraphCurveSkeleton<model::Projective>;
 
+
+
+	/**
+	 *  \brief Defines classical 2d branch
+	 */
+	using BranchGraphSkel2d = GraphBranch<model::Classic<2> >;
+
+	/**
+	 *  \brief Defines classical 3d branch
+	 */
+	using BranchGraphSkel3d = GraphBranch<model::Classic<3> >;
+
+	/**
+	 *  \brief Defines projective branch, used in reconstruction
+	 */
+	using BranchGraphProjSkel = GraphBranch<model::Projective>;
+
+
+
 	/**
 	 *  \brief Defines classical 2d composed skeleton
 	 */
@@ -71,6 +90,25 @@ namespace skeleton
 	 *  \brief Defines projective composed skeleton, used in reconstruction
 	 */
 	using CompGraphProjSkel = ComposedCurveSkeleton<GraphBranch<model::Projective> >;
+
+
+
+	/**
+	 *  \brief Defines classical 2d continuous branch
+	 */
+	using BranchContSkel2d = ContinuousBranch<model::Classic<2> >;
+
+	/**
+	 *  \brief Defines classical 3d continuous branch
+	 */
+	using BranchContSkel3d = ContinuousBranch<model::Classic<3> >;
+
+	/**
+	 *  \brief Defines projective continuous branch, used in reconstruction
+	 */
+	using BranchContProjSkel = ContinuousBranch<model::Projective>;
+
+
 
 	/**
 	 *  \brief Defines classical 2d composed skeleton, with continuous branches
