@@ -43,7 +43,6 @@ void SkelMatchingGraph(
 {
 	unsigned int size_map = options.nb_triang;
 	Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> map_energy(size_map,size_map);
-	Eigen::Matrix<Eigen::Vector4d,Eigen::Dynamic,Eigen::Dynamic> map_sphere(size_map,size_map);
 	
 	double max_ener = 0;
 	for(unsigned int i = 0;i<size_map;i++)
@@ -56,17 +55,13 @@ void SkelMatchingGraph(
 			mathtools::geometry::euclidian::Line<4> line1 = projbr1->getNode<mathtools::geometry::euclidian::Line<4> >(t1);
 			mathtools::geometry::euclidian::Line<4> line2 = projbr2->getNode<mathtools::geometry::euclidian::Line<4> >(t2);
 			
-			double dist;
-			mathtools::affine::Point<4> point;
-
-			boost::tie(point,dist) = mathtools::geometry::euclidian::Triangulate(line1,line2);
-			map_energy(i,j) = dist;
-			map_sphere(i,j) = point.getCoords();
+			map_energy(i,j) = mathtools::geometry::euclidian::Triangulate(line1,line2).second;
 			if(map_energy(i,j)>max_ener)
 				max_ener = map_energy(i,j);
 		}
 	}
 	
+	//graph construction
 	typedef boost::adjacency_list < boost::listS, boost::vecS, boost::directedS,
 			boost::no_property, boost::property < boost::edge_weight_t, double > > graph_t;
 	typedef boost::graph_traits < graph_t >::vertex_descriptor vertex_descriptor;
@@ -117,6 +112,7 @@ void SkelMatchingGraph(
 	std::vector<double> d(num_vertices(g));
 	vertex_descriptor s = vertex(0, g);
 	
+	//dijkstra computation
 	dijkstra_shortest_paths(g, s, boost::predecessor_map(&p[0]).distance_map(&d[0]));
 	
 	std::list<Eigen::Vector2d> l_t;
