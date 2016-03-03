@@ -68,3 +68,18 @@ bool skeleton::model::Perspective::included(const Eigen::Matrix<double,meta<Pers
 
 	return ((ctr1-ctr2).norm()+rad2 <= rad1);
 }
+
+mathtools::geometry::euclidian::Line<4> skeleton::model::Perspective::toObj(
+		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
+		const mathtools::geometry::euclidian::Line<4> &) const
+{
+	Eigen::Vector4d origin;
+	origin.block<3,1>(0,0) = m_frame->getOrigin();
+	origin(3) = 0;
+
+	Eigen::Vector4d vecdir;
+	origin.block<3,1>(0,0) = m_frame->getBasis()->getMatrix()*Eigen::Vector3d(vec(0),vec(1),1.0);
+	origin(3) = vec(2);
+
+	return mathtools::geometry::euclidian::Line<4>(origin,vecdir);
+}

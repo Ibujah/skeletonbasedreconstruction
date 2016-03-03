@@ -61,3 +61,18 @@ bool skeleton::model::Orthographic::included(const Eigen::Matrix<double,meta<Ort
 		<=
 		vec1(meta<Orthographic>::stordim-1,0);
 }
+
+mathtools::geometry::euclidian::Line<4> skeleton::model::Orthographic::toObj(
+		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
+		const mathtools::geometry::euclidian::Line<4> &) const
+{
+	Eigen::Vector4d origin;
+	origin.block<3,1>(0,0) = m_frame->getBasis()->getMatrix()*Eigen::Vector3d(vec(0),vec(1),0.0) + m_frame->getOrigin();
+	origin(3) = vec(2);
+
+	Eigen::Vector4d vecdir;
+	origin.block<3,1>(0,0) = m_frame->getBasis()->getMatrix()*Eigen::Vector3d(0.0,0.0,1.0);
+	origin(3) = 0.0;
+
+	return mathtools::geometry::euclidian::Line<4>(origin,vecdir);
+}

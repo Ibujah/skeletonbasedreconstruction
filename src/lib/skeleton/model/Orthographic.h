@@ -123,6 +123,17 @@ namespace skeleton
 				 *  \return true is first object is in second object
 				 */
 				virtual bool included(const Eigen::Matrix<double,meta<Orthographic>::stordim,1> &vec1, const Eigen::Matrix<double,meta<Orthographic>::stordim,1> &vec2) const;
+
+			protected:
+				/**
+				 *  \brief Associate a line to a vector
+				 *
+				 *  \param vec vector to convert
+				 *
+				 *  \return line
+				 */
+				virtual mathtools::geometry::euclidian::Line<4> toObj(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec,
+																	  const mathtools::geometry::euclidian::Line<4> &) const;
 		};
 	}
 }
