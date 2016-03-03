@@ -30,7 +30,7 @@ SOFTWARE.
 #include "ReconstructionBranch.h"
 
 skeleton::ReconstructionBranch::ReconstructionBranch(const std::vector<unsigned int> &indskel, const std::vector<unsigned int> &firstext, const std::vector<unsigned int> &lastext) :
-	m_indskel(indskel), m_firstext(firstext), m_lastext(lastext)
+	m_indskel(indskel), m_firstext(firstext), m_lastext(lastext), m_matched(false) 
 {}
 
 
@@ -54,7 +54,13 @@ const std::vector<Eigen::Matrix<double,Eigen::Dynamic,1> >& skeleton::Reconstruc
 	return m_match;
 }
 
+bool skeleton::ReconstructionBranch::isMatched() const
+{
+	return m_matched;
+}
+
 void skeleton::ReconstructionBranch::setMatch(const std::vector<Eigen::Matrix<double,Eigen::Dynamic,1> >& match)
 {
+	m_matched = true;
 	m_match = match;
 }

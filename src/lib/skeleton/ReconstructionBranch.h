@@ -72,6 +72,11 @@ namespace skeleton
 			 *  \brief Matching vector
 			 */
 			std::vector<Eigen::Matrix<double,Eigen::Dynamic,1> > m_match;
+			
+			/**
+			 *  \brief Tell if the branches have been matched or not
+			 */
+			bool m_matched;
 
 		public:
 			/**
@@ -111,6 +116,13 @@ namespace skeleton
 			 *  \return Matching vector
 			 */
 			const std::vector<Eigen::Matrix<double,Eigen::Dynamic,1> >& getMatch() const;
+			
+			/**
+			 *  \brief Tells if the branches have been matched or not
+			 *
+			 *  \return true if the matching is done
+			 */
+			bool isMatched() const;
 
 		public://modifying functions
 			/**
