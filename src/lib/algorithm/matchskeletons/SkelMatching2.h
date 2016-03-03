@@ -43,7 +43,7 @@ namespace algorithm
 	namespace matchskeletons
 	{
 		/**
-		 *  \brief Options structure
+		 *  \brief Match options structure
 		 */
 		struct OptionsMatch
 		{
