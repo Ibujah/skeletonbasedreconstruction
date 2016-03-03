@@ -10,7 +10,8 @@ set(SOURCE_FILES    extractboundary/MarchingSquares.cpp
 					skeletonization/VoronoiSkeleton2D.cpp
 					pruning/ScaleAxisTransform.cpp
 					fitbspline/ComputeNodeVector.cpp
-					fitbspline/Graph2Bspline.cpp)
+					fitbspline/Graph2Bspline.cpp
+					matchskeletons/SkelMatching2.cpp)
 # make the library
 add_library(
     ${LIBRARY_NAME}
