@@ -107,8 +107,8 @@ namespace mathtools
 				
 				for(unsigned int i = 0; i<line.size();i++)
 				{
-					Eigen::Matrix<double,Dim,1> vec = line.getVecDir();
-					Eigen::Matrix<double,Dim,1> ori = line.getOrigin();
+					Eigen::Matrix<double,Dim,1> vec = line[i].getVecDir();
+					Eigen::Matrix<double,Dim,1> ori = line[i].getOrigin().getCoords();
 					
 					Eigen::Matrix<double,Dim,Dim> Idmodif = Eigen::Matrix<double,Dim,Dim>::Identity() - vec*vec.transpose();
 					
