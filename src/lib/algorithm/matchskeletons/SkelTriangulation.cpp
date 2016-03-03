@@ -35,6 +35,7 @@ SOFTWARE.
 skeleton::BranchContSkel3d::Ptr algorithm::matchskeletons::BranchTriangulation(
 		skeleton::ReconstructionBranch::Ptr recbranch,
 		const std::vector<skeleton::BranchContProjSkel::Ptr> projbr,
+		const skeleton::model::Classic<3>::Ptr model,
 		const OptionsTriang &options)
 {
 	std::vector<Eigen::Vector4d> pt_approx(recbranch->getMatch().size());
@@ -50,7 +51,7 @@ skeleton::BranchContSkel3d::Ptr algorithm::matchskeletons::BranchTriangulation(
 		pt_approx[i] = mathtools::geometry::euclidian::Triangulate<4>(line).getCoords();
 	}
 	
-	skeleton::BranchGraphSkel3d::Ptr grbr(new skeleton::BranchGraphSkel3d(skeleton::model::Classic<3>(),pt_approx));
+	skeleton::BranchGraphSkel3d::Ptr grbr(new skeleton::BranchGraphSkel3d(model,pt_approx));
 
 	return algorithm::fitbspline::Graph2Bspline(grbr,options.degree);
 }
@@ -58,6 +59,7 @@ skeleton::BranchContSkel3d::Ptr algorithm::matchskeletons::BranchTriangulation(
 skeleton::CompContSkel3d::Ptr algorithm::matchskeletons::ComposedTriangulation(
 		skeleton::ReconstructionSkeleton::Ptr recskel,
 		const std::vector<skeleton::CompContProjSkel::Ptr> projskel,
+		const skeleton::model::Classic<3>::Ptr model,
 		const algorithm::matchskeletons::OptionsTriang &options)
 {
 	skeleton::CompContSkel3d::Ptr compskel(new skeleton::CompContSkel3d());
@@ -82,7 +84,7 @@ skeleton::CompContSkel3d::Ptr algorithm::matchskeletons::ComposedTriangulation(
 			branches[i] = projskel[i]->getBranch(recbr->getFirstExt()[i],recbr->getLastExt()[i]);
 		}
 		
-		skeleton::BranchContSkel3d::Ptr br = BranchTriangulation(recbr,branches,options);
+		skeleton::BranchContSkel3d::Ptr br = BranchTriangulation(recbr,branches,model,options);
 		
 		std::pair<unsigned int, unsigned int> ext = recskel->getExtremities(*it);
 

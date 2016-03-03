@@ -72,6 +72,7 @@ namespace algorithm
 		skeleton::BranchContSkel3d::Ptr BranchTriangulation(
 				skeleton::ReconstructionBranch::Ptr recbranch,
 				const std::vector<skeleton::BranchContProjSkel::Ptr> projbr,
+				const skeleton::model::Classic<3>::Ptr model = skeleton::model::Classic<3>::Ptr(new skeleton::model::Classic<3>()),
 				const OptionsTriang &options = OptionsTriang());
 		
 		/**
@@ -87,6 +88,7 @@ namespace algorithm
 		skeleton::CompContSkel3d::Ptr ComposedTriangulation(
 				skeleton::ReconstructionSkeleton::Ptr recskel,
 				const std::vector<skeleton::CompContProjSkel::Ptr> projskel,
+				const skeleton::model::Classic<3>::Ptr model = skeleton::model::Classic<3>::Ptr(new skeleton::model::Classic<3>()),
 				const OptionsTriang &options = OptionsTriang());
 	}
 }
