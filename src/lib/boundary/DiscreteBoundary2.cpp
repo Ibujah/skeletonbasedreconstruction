@@ -27,7 +27,7 @@ SOFTWARE.
  *  \author Bastien Durix
  */
 
-#include "DiscreteBoundary.h"
+#include "DiscreteBoundary2.h"
 
 using namespace boundary;
 
