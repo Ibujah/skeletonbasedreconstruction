@@ -91,6 +91,35 @@ namespace mathtools
 				
 				return std::pair<affine::Point<Dim>,double>(coordsP,dist);
 			}
+
+			/**
+			 *  \brief Compute the triangulation of a set of lines
+			 *
+			 *  \param line lines to triangulate
+			 *
+			 *  \return triangulated point
+			 */
+			template<unsigned int Dim>
+			affine::Point<Dim> Triangulate(const std::vector<Line<Dim> > &line)
+			{
+				Eigen::Matrix<double,Dim,Dim> A = Eigen::Matrix<double,Dim,Dim>::Zero();
+				Eigen::Matrix<double,Dim,1>   b = Eigen::Matrix<double,Dim,1>::Zero();
+				
+				for(unsigned int i = 0; i<line.size();i++)
+				{
+					Eigen::Matrix<double,Dim,1> vec = line.getVecDir();
+					Eigen::Matrix<double,Dim,1> ori = line.getOrigin();
+					
+					Eigen::Matrix<double,Dim,Dim> Idmodif = Eigen::Matrix<double,Dim,Dim>::Identity() - vec*vec.transpose();
+					
+					A = A + Idmodif;
+					b = b + Idmodif*ori;
+				}
+				
+				Eigen::Matrix<double,Dim,1> Pcoo = A.householderQr().solve(b);
+				
+				return affine::Point<Dim>(Pcoo);
+			}
 		}
 	}
 }
