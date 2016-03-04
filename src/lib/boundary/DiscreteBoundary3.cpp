@@ -53,3 +53,23 @@ const mathtools::affine::Frame<3>::Ptr boundary::DiscreteBoundary<3>::getFrame()
 {
 	return m_frame;
 }
+
+const std::map<unsigned int, Eigen::Vector3d> boundary::DiscreteBoundary<3>::getPoints() const
+{
+	return m_node;
+}
+
+const std::map<unsigned int, Eigen::Vector3d> boundary::DiscreteBoundary<3>::getNormals() const
+{
+	return m_normal;
+}
+
+const std::list<std::pair<unsigned int, unsigned int> > boundary::DiscreteBoundary<3>::getEdges() const
+{
+	return m_edge;
+}
+
+const std::list<std::tuple<unsigned int, unsigned int, unsigned int> > boundary::DiscreteBoundary<3>::getFaces() const
+{
+	return m_face;
+}

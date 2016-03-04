@@ -123,6 +123,34 @@ namespace boundary
 			 *  \return frame of the boundary
 			 */
 			const mathtools::affine::Frame<3>::Ptr getFrame() const;
+
+			/**
+			 *  \brief Points getter
+			 *
+			 *  \return Map containing the points
+			 */
+			const std::map<unsigned int, Eigen::Vector3d> getPoints() const;
+
+			/**
+			 *  \brief Normals getter
+			 *
+			 *  \return Map containing the normals
+			 */
+			const std::map<unsigned int, Eigen::Vector3d> getNormals() const;
+
+			/**
+			 *  \brief Edges getter
+			 *
+			 *  \return List containing the edges
+			 */
+			const std::list<std::pair<unsigned int, unsigned int> > getEdges() const;
+
+			/**
+			 *  \brief Faces getter
+			 *
+			 *  \return List containing the faces
+			 */
+			const std::list<std::tuple<unsigned int, unsigned int, unsigned int> > getFaces() const;
 	};
 }
 
