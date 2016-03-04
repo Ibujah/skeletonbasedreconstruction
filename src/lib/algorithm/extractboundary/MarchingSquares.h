@@ -27,11 +27,11 @@ SOFTWARE.
  *  \author Bastien Durix
  */
 
-#ifndef _EXTRACTBOUNDARY_H_
-#define _EXTRACTBOUNDARY_H_
+#ifndef _MARCHINGSQUARES_H_
+#define _MARCHINGSQUARES_H_
 
 #include <shape/DiscreteShape.h>
-#include <boundary/DiscreteBoundary.h>
+#include <boundary/DiscreteBoundary2.h>
 
 /**
  *  \brief Lots of algorithms
@@ -55,4 +55,4 @@ namespace algorithm
 	}
 }
 
-#endif //_EXTRACTBOUNDARY_H_
+#endif //_MARCHINGSQUARES_H_

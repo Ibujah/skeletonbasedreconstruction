@@ -32,7 +32,7 @@ SOFTWARE.
 
 #include <opencv2/core/core.hpp>
 
-#include <boundary/DiscreteBoundary.h>
+#include <boundary/DiscreteBoundary2.h>
 #include <mathtools/affine/Frame.h>
 
 /**

@@ -31,7 +31,7 @@ SOFTWARE.
 #define _VORONOISKELETON2D_H_
 
 #include <skeleton/Skeletons.h>
-#include <boundary/DiscreteBoundary.h>
+#include <boundary/DiscreteBoundary2.h>
 #include <camera/Camera.h>
 
 /**
