@@ -73,6 +73,11 @@ namespace skeleton
 			 */
 			using RevFun = mathtools::application::AffineFun;
 			
+			/**
+			 *  \brief Composition between NodeFun and RevFun
+			 */
+			using CompFun = mathtools::application::Compositor<NodeFun,RevFun>;
+			
 		protected:
 			/**
 			 *  \brief Model used to give a meaning to the skeleton
@@ -85,7 +90,7 @@ namespace skeleton
 			/**
  			 *  \brief Function giving nodes in the branch
  			 */
-			typename mathtools::application::Compositor<NodeFun,RevFun>::Ptr m_nodefun;
+			typename CompFun::Ptr m_nodefun;
 			
 			/**
 			 *  \brief Constructor
@@ -105,7 +110,7 @@ namespace skeleton
 			 *  \param nodefun node function
 			 */
 			ContinuousBranch(const typename Model::Ptr model, const typename NodeFun::Ptr nodefun) :
-				m_model(model), m_nodefun(new mathtools::application::Compositor<NodeFun,RevFun>(nodefun,typename RevFun::Ptr(new RevFun(1,0)))) {}
+				m_model(model), m_nodefun(new CompFun(nodefun,typename RevFun::Ptr(new RevFun(1,0)))) {}
 			
 			/**
 			 *  \brief Constructor
@@ -159,6 +164,16 @@ namespace skeleton
 			const TypeNode getNode(double t) const
 			{
 				return m_model->template toObj<TypeNode>(getNode(t));
+			}
+			
+			/**
+			 *  \brief Composed function getter
+			 *
+			 *  \return composed node function 
+			 */
+			const typename CompFun::Ptr getCompFun()
+			{
+				return m_nodefun;
 			}
 
 			/**
