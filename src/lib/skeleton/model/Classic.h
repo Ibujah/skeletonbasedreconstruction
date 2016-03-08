@@ -179,7 +179,7 @@ namespace skeleton
 				 */
 				Eigen::Matrix<double,meta<Classic>::stordim,1> toVec(const mathtools::geometry::euclidian::HyperSphere<Dim> &sph) const
 				{
-					if(!sph.getFrame()->getBasis()->getMatrix().isApprox(m_frame->getBasis()->getMatrix(),std::numeric_limits<double>::epsilon()))
+					if(!sph.getBasis()->getMatrix().isApprox(m_frame->getBasis()->getMatrix(),std::numeric_limits<double>::epsilon()))
 						throw std::logic_error("skeleton::model::Classic::toVec: hypersphere coordinates cannot be expressed in this model");
 					Eigen::Matrix<double,meta<Classic>::stordim,1> vec;
 					vec.template block<Dim,1>(0,0) = sph.getCenter().getCoords(m_frame);
@@ -213,7 +213,7 @@ namespace skeleton
 					return mathtools::geometry::euclidian::HyperSphere<Dim>(
 								mathtools::affine::Point<Dim>(vec.template block<Dim,1>(0,0),m_frame),
 								vec(Dim,0),
-								m_frame);
+								m_frame->getBasis());
 				}
 		};
 		

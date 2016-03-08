@@ -31,7 +31,7 @@ SOFTWARE.
 #define _HYPERSPHERE_H_
 
 #include <Eigen/Dense>
-#include <mathtools/affine/Frame.h>
+#include <mathtools/vectorial/Basis.h>
 #include <mathtools/affine/Point.h>
 
 /**
@@ -59,9 +59,9 @@ namespace mathtools
 			{
 				private:
 					/**
-					 *  \brief Frame of the hypersphere (to now the scalar product)
+					 *  \brief Basis of the hypersphere (to now the scalar product)
 					 */
-					typename affine::Frame<Dim>::Ptr m_frame;
+					typename vectorial::Basis<Dim>::Ptr m_basis;
 					
 					/**
 					 *  \brief Center of the hypersphere
@@ -79,10 +79,10 @@ namespace mathtools
 					 *
 					 *  \param center center of the hypersphere
 					 *  \param radius radius of the hypersphere, in the frame
-					 *  \param frame  frame of the hypersphere
+					 *  \param basis  basis of the hypersphere
 					 */
-					HyperSphere(const affine::Point<Dim> &center = affine::Point<Dim>(), double radius = 0.0, const typename affine::Frame<Dim>::Ptr frame = affine::Frame<Dim>::CanonicFrame()) :
-						m_frame(frame), m_center(center), m_radius(radius)
+					HyperSphere(const affine::Point<Dim> &center = affine::Point<Dim>(), double radius = 0.0, const typename vectorial::Basis<Dim>::Ptr basis = vectorial::Basis<Dim>::CanonicBasis()) :
+						m_basis(basis), m_center(center), m_radius(radius)
 					{}
 
 					/**
@@ -106,13 +106,13 @@ namespace mathtools
 					}
 
 					/**
-					 *  \brief Frame getter
+					 *  \brief Basis getter
 					 *
-					 *  \return frame of the sphere
+					 *  \return basis of the sphere
 					 */
-					inline const typename affine::Frame<Dim>::Ptr getFrame() const
+					inline const typename vectorial::Basis<Dim>::Ptr getBasis() const
 					{
-						return m_frame;
+						return m_basis;
 					}
 			};
 		}

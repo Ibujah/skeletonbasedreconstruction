@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( AddingNode )
 BOOST_AUTO_TEST_CASE( AddingSphere )
 {
 	// hypersphere creation
-	HyperSphere<2> sph(Point<2>(1.0,0.0),5.0,frame);
+	HyperSphere<2> sph(Point<2>(1.0,0.0),5.0,frame->getBasis());
 
 	// adding a node
 	ind2 = skel->addNode<HyperSphere<2> >(sph);
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE( AddingSphere )
 	
 	BOOST_REQUIRE( sphcpy.getCenter().getCoords().isApprox(sph.getCenter().getCoords(),std::numeric_limits<double>::epsilon()) );
 	BOOST_REQUIRE( sphcpy.getRadius() == sph.getRadius() );
-	BOOST_REQUIRE( sphcpy.getFrame()->getBasis()->getMatrix().isApprox(sph.getFrame()->getBasis()->getMatrix(),std::numeric_limits<double>::epsilon()) );
+	BOOST_REQUIRE( sphcpy.getBasis()->getMatrix().isApprox(sph.getBasis()->getMatrix(),std::numeric_limits<double>::epsilon()) );
 	BOOST_REQUIRE( ind1 != ind2);
 }
 
