@@ -63,28 +63,20 @@ namespace mathtools
 			 */
 			static constexpr unsigned int value = Dim;
 		};
-
+		
 		template<> struct dimension<Eigen::Matrix<double,2,1> >
 		{
-			/**
-			 *  \brief Dimension value
-			 */
 			static constexpr unsigned int value = 2;
 		};
 
 		template<> struct dimension<Eigen::Matrix<double,3,1> >
 		{
-			/**
-			 *  \brief Dimension value
-			 */
 			static constexpr unsigned int value = 3;
 		};
 
 		template<> struct dimension<Eigen::Matrix<double,4,1> >
 		{
-			/**
-			 *  \brief Dimension value
-			 */
+
 			static constexpr unsigned int value = 4;
 		};
 
