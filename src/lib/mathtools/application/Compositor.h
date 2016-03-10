@@ -99,7 +99,8 @@ namespace mathtools
 				 *  \brief Function call
 				 *
 				 *  \param t input variable
-				 *  \return Function evaluation at t
+				 *
+				 *  \return function evaluation at t
 				 */
 				outType operator()(const inType &t) const
 				{
@@ -107,15 +108,42 @@ namespace mathtools
 				};
 
 				/**
-				 *  \brief Jacobian call
+				 *  \brief Function first derivative
 				 *
 				 *  \param t input variable
-				 *  \return Jacobian evaluation at t
+				 *
+				 *  \returns first derivative associated to input t
 				 */
-				template<typename Out = outType, typename In = inType>
-				Eigen::Matrix<double,dimension<Out>::value,dimension<In>::value> jac(const inType &t) const
+				typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
+					der(const inType &t) const
 				{
-					return m_fct->jac(t);
+					return m_fct->der(t);
+				}
+
+				/**
+				 *  \brief Function second derivative
+				 *
+				 *  \param t input of the application
+				 *
+				 *  \returns second derivative associated to input t
+				 */
+				typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
+					der2(const inType &t) const
+				{
+					return m_fct->der2(t);
+				}
+				
+				/**
+				 *  \brief Function third derivative
+				 *
+				 *  \param t input of the application
+				 *
+				 *  \returns third derivative associated to input t
+				 */
+				typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type
+					der3(const inType &t) const
+				{
+					return m_fct->der3(t);
 				}
 				
 				/**
@@ -194,7 +222,8 @@ namespace mathtools
 				 *  \brief Function call
 				 *
 				 *  \param t input variable
-				 *  \return Function evaluation at t
+				 *
+				 *  \return function evaluation at t
 				 */
 				outType operator()(const inType &t) const
 				{
@@ -202,15 +231,59 @@ namespace mathtools
 				};
 
 				/**
-				 *  \brief Jacobian call
+				 *  \brief Function first derivative
 				 *
 				 *  \param t input variable
-				 *  \return Jacobian evaluation at t
+				 *
+				 *  \returns first derivative associated to input t
 				 */
-				template<typename Out = outType, typename In = inType>
-				Eigen::Matrix<double,dimension<Out>::value,dimension<In>::value> jac(const inType &t) const
+				typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
+					der(const inType &t) const
 				{
-					return m_fct->jac( m_next(t) ) * m_next.jac(t);
+					return m_fct->der( m_next(t) ) * m_next.der(t);
+				}
+
+				/**
+				 *  \brief Function second derivative
+				 *
+				 *  \param t input of the application
+				 *
+				 *  \returns second derivative associated to input t
+				 */
+				typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
+					der2(const inType &t) const
+				{
+					//(fog)'' = ( (f'og) . g')' = (f''og) . g' . g' + (f'og) . g'' ?????
+					typename derivativematrix<2,dimension<typename Fct::outType>::value,dimension<typename Fct::inType>::value>::type 
+						f_sec = m_fct->der2( m_next(t) );
+					
+					typename derivativematrix<1,dimension<typename Fct::outType>::value,dimension<typename Fct::inType>::value>::type 
+						f_prim = m_fct->der( m_next(t) );
+					
+					typename derivativematrix<2,dimension<typename Compositor<Fct_,Args...>::outType>::value,dimension<typename Compositor<Fct_,Args...>::inType>::value>::type 
+						g_sec = m_next.der2(t);
+					
+					typename derivativematrix<1,dimension<typename Compositor<Fct_,Args...>::outType>::value,dimension<typename Compositor<Fct_,Args...>::inType>::value>::type 
+						g_prim = m_next.der(t);
+					
+					typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type mat_der2;
+					
+					
+					
+					return mat_der2;
+				}
+				
+				/**
+				 *  \brief Function third derivative
+				 *
+				 *  \param t input of the application
+				 *
+				 *  \returns third derivative associated to input t
+				 */
+				typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type
+					der3(const inType &t) const
+				{
+					return m_fct->der3(t);
 				}
 
 				/**

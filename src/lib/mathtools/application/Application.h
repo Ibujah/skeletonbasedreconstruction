@@ -32,6 +32,7 @@ SOFTWARE.
 
 #include <Eigen/Dense>
 #include <memory>
+#include <type_traits>
 
 /**
  *  \brief Mathematical tools
@@ -43,6 +44,86 @@ namespace mathtools
 	 */
 	namespace application
 	{
+		/**
+		 *  \brief Type dimension getter
+		 *
+		 *  \tparam Type: out or in type of an application
+		 */
+		template<typename Type> struct dimension;
+
+		/**
+		 *  \brief Eigen vector dimension getter
+		 *
+		 *  \tparam Dim Eigen vector dimension
+		 */
+		template<unsigned int Dim> struct dimension<Eigen::Matrix<double,Dim,1> >
+		{
+			/**
+			 *  \brief Dimension value
+			 */
+			static constexpr unsigned int value = Dim;
+		};
+		
+		/**
+		 *  \brief Double dimension getter
+		 */
+		template<>
+		struct dimension<double>
+		{
+			/**
+			 *  \brief Dimension value
+			 */
+			static constexpr unsigned int value = 1;
+		};
+
+		/**
+		 *  \brief Recursively defined derivative matrix
+		 *
+		 *  \tparam Der    derivative level (greater or equal to 1)
+		 *  \tparam OutDim application out dimension
+		 *  \tparam InDim  application in dimension
+		 */
+		template<unsigned int Der, unsigned int OutDim, unsigned int InDim>
+		struct derivativematrix
+		{
+			/**
+			 *  \brief Derivative matrix type
+			 */
+			using type = typename std::conditional<(Der%2)==1,
+								Eigen::Matrix<typename derivativematrix<Der-2,InDim,InDim>::type,OutDim,InDim>,
+								Eigen::Matrix<typename derivativematrix<Der-1,InDim,InDim>::type,1,OutDim> >::type;
+		};
+		
+		/**
+		 *  \brief Recursively defined derivative matrix
+		 *
+		 *  \tparam OutDim application out dimension
+		 *  \tparam InDim  application in dimension
+		 */
+		template<unsigned int OutDim, unsigned int InDim>
+		struct derivativematrix<0,OutDim,InDim>
+		{
+			/**
+			 *  \brief Derivative matrix type
+			 */
+			using type = double;
+		};
+		
+		/**
+		 *  \brief Recursively defined derivative matrix
+		 *
+		 *  \tparam OutDim application out dimension
+		 *  \tparam InDim  application in dimension
+		 */
+		template<unsigned int OutDim, unsigned int InDim>
+		struct derivativematrix<1,OutDim,InDim>
+		{
+			/**
+			 *  \brief Derivative matrix type
+			 */
+			using type = Eigen::Matrix<double,OutDim,InDim>;
+		};
+		
 		/**
 		 *  \brief Main application class
 		 *
@@ -74,46 +155,128 @@ namespace mathtools
 				 *
 				 *  \param t Input of the application
 				 *
-				 *  \returns Out put associated by the application
+				 *  \returns Output associated by the application
 				 */
 				virtual outType operator()(const inType &t) const = 0;
-
+				
+				/**
+				 *  \brief Function derivative
+				 *
+				 *  \tparam Der derivative level
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns Derivative at level Der, associated to input t
+				 */
+				template<unsigned int Der>
+				inline typename derivativematrix<Der,dimension<outType>::value,dimension<inType>::value>::type&
+					der(const inType &t) const
+				{
+					return der(t,Eigen::Matrix<double,Der,1>());
+				}
+				
+				/**
+				 *  \brief Jacobian matrix
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns Jacobian matrix associated to input t
+				 */
+				inline typename Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value>&
+					jac(const inType &t) const
+				{
+					return der(t);
+				}
+				
+				/**
+				 *  \brief Hessian matrix
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns Hessian matrix associated to input t
+				 */
+				inline typename Eigen::Matrix<double,dimension<inType>::value,dimension<inType>::value>&
+					hess(const inType &t) const
+				{
+					static_assert(dimension<outType>::value == 1,"Hessian matrices are only defined for function of which out dimension is 1");
+					return der2(t)(0,0);
+				}
+				
+			private:
+				/**
+				 *  \brief Function first derivative
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns First derivative associated to input t
+				 */
+				inline typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type& 
+					der(const inType &t, const Eigen::Matrix<double,1,1>&) const
+				{
+					return der(t);
+				}
+				
+				/**
+				 *  \brief Function second derivative
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns Second derivative associated to input t
+				 */
+				inline typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type& 
+					der(const inType &t, const Eigen::Matrix<double,2,1>&) const
+				{
+					return der2(t);
+				}
+				
+				/**
+				 *  \brief Function third derivative
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns Third derivative associated to input t
+				 */
+				inline typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type& 
+					der(const inType &t, const Eigen::Matrix<double,3,1>&) const
+				{
+					return der3(t);
+				}
+				
+			public:
+				/**
+				 *  \brief Function first derivative
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns First derivative associated to input t
+				 */
+				virtual typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
+					der(const inType &t) const;
+				
+				/**
+				 *  \brief Function second derivative
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns Second derivative associated to input t
+				 */
+				virtual typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
+					der2(const inType &t) const;
+				
+				/**
+				 *  \brief Function third derivative
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns Third derivative associated to input t
+				 */
+				virtual typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type
+					der3(const inType &t) const;
+				
 				/**
 				 *  \brief Pure virtual destructor
 				 */
 				virtual ~Application<OutType,InType>() {};
-		};
-
-		/**
-		 *  \brief Type dimension getter
-		 *
-		 *  \tparam Type: out or in type of an application
-		 */
-		template<typename Type> struct dimension;
-
-		/**
-		 *  \brief Eigen vector dimension getter
-		 *
-		 *  \tparam Dim Eigen vector dimension
-		 */
-		template<unsigned int Dim> struct dimension<Eigen::Matrix<double,Dim,1> >
-		{
-			/**
-			 *  \brief Dimension value
-			 */
-			static constexpr unsigned int value = Dim;
-		};
-
-		/**
-		 *  \brief Double dimension getter
-		 */
-		template<>
-		struct dimension<double>
-		{
-			/**
-			 *  \brief Dimension value
-			 */
-			static constexpr unsigned int value = 1;
 		};
 	}
 }

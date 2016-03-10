@@ -105,13 +105,16 @@ namespace mathtools
 				}
 
 				/**
-				 *  \brief Jacobian call
+				 *  \brief Function first derivative
 				 *
-				 *  \return Jacobian evaluation at vec
+				 *  \param t Input of the application
+				 *
+				 *  \returns First derivative associated to input t
 				 */
-				virtual double jac(const double &) const
+				virtual typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
+					der(const double &t) const
 				{
-					return m_a;
+					return (Eigen::Matrix<double,1,1>::Ones()*m_a);
 				}
 
 				/**
