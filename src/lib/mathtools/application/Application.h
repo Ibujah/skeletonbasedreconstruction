@@ -63,7 +63,31 @@ namespace mathtools
 			 */
 			static constexpr unsigned int value = Dim;
 		};
-		
+
+		template<> struct dimension<Eigen::Matrix<double,2,1> >
+		{
+			/**
+			 *  \brief Dimension value
+			 */
+			static constexpr unsigned int value = 2;
+		};
+
+		template<> struct dimension<Eigen::Matrix<double,3,1> >
+		{
+			/**
+			 *  \brief Dimension value
+			 */
+			static constexpr unsigned int value = 3;
+		};
+
+		template<> struct dimension<Eigen::Matrix<double,4,1> >
+		{
+			/**
+			 *  \brief Dimension value
+			 */
+			static constexpr unsigned int value = 4;
+		};
+
 		/**
 		 *  \brief Double dimension getter
 		 */
@@ -251,7 +275,10 @@ namespace mathtools
 				 *  \returns First derivative associated to input t
 				 */
 				virtual typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
-					der(const inType &t) const;
+					der(const inType &t) const
+					{
+						throw std::logic_error("Not implemented");
+					}
 				
 				/**
 				 *  \brief Function second derivative
@@ -261,7 +288,10 @@ namespace mathtools
 				 *  \returns Second derivative associated to input t
 				 */
 				virtual typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
-					der2(const inType &t) const;
+					der2(const inType &t) const
+					{
+						throw std::logic_error("Not implemented");
+					}
 				
 				/**
 				 *  \brief Function third derivative
@@ -271,7 +301,10 @@ namespace mathtools
 				 *  \returns Third derivative associated to input t
 				 */
 				virtual typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type
-					der3(const inType &t) const;
+					der3(const inType &t) const
+					{
+						throw std::logic_error("Not implemented");
+					}
 				
 				/**
 				 *  \brief Pure virtual destructor

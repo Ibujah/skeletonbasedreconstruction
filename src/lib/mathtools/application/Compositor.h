@@ -283,7 +283,11 @@ namespace mathtools
 				typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type
 					der3(const inType &t) const
 				{
-					return m_fct->der3(t);
+					typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type mat_der3;
+					
+					
+					
+					return mat_der3;
 				}
 
 				/**
