@@ -56,7 +56,7 @@ namespace mathtools
 		 *
 		 *  \tparam Dim Eigen vector dimension
 		 */
-		template<unsigned int Dim> struct dimension<Eigen::Matrix<double,Dim,1> >
+		template<int Dim> struct dimension<Eigen::Matrix<double,Dim,1> >
 		{
 			/**
 			 *  \brief Dimension value
@@ -64,22 +64,6 @@ namespace mathtools
 			static constexpr unsigned int value = Dim;
 		};
 		
-		template<> struct dimension<Eigen::Matrix<double,2,1> >
-		{
-			static constexpr unsigned int value = 2;
-		};
-
-		template<> struct dimension<Eigen::Matrix<double,3,1> >
-		{
-			static constexpr unsigned int value = 3;
-		};
-
-		template<> struct dimension<Eigen::Matrix<double,4,1> >
-		{
-
-			static constexpr unsigned int value = 4;
-		};
-
 		/**
 		 *  \brief Double dimension getter
 		 */
