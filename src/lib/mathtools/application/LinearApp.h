@@ -98,7 +98,6 @@ namespace mathtools
 					return m_matrix * vec;
 				}
 
-
 				/**
 				 *  \brief Function first derivative
 				 *
@@ -110,16 +109,26 @@ namespace mathtools
 					der(const Eigen::Matrix<double,DimIn,1> &vec) const
 				{
 					typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type arr;
+					
+					Eigen::Map<Eigen::Matrix<double,DimOut,DimIn> >((double*)arr.data()) = m_matrix;
 
-					double *ptr = (double*)arr.data();
-					for(unsigned int c = 0; c < m_matrix.cols(); c++)
-						for(unsigned int r = 0; r < m_matrix.rows(); r++)
-						{
-							*ptr = m_matrix(r,c);
-							ptr++;
-						}
+					return arr;
+				}
 
-
+				/**
+				 *  \brief Function first derivative
+				 *
+				 *  \param vec Input of the application
+				 *
+				 *  \returns First derivative associated to input vec
+				 */
+				virtual inline typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
+					der2(const Eigen::Matrix<double,DimIn,1> &vec) const
+				{
+					typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type arr;
+					
+					Eigen::Map<Eigen::Matrix<double,DimOut,DimIn*DimIn> >((double*)arr.data()) = Eigen::Matrix<double,DimOut,DimIn*DimIn>::Zero();
+					
 					return arr;
 				}
 				
