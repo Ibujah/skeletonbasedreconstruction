@@ -273,12 +273,26 @@ namespace mathtools
 					
 					typename derivativematrix<1,dimension<typename Compositor<Fct_,Args...>::outType>::value,dimension<typename Compositor<Fct_,Args...>::inType>::value>::type 
 						g_prim = m_next.der(t);
+					Eigen::Map<Eigen::Matrix<double,dimension<typename Compositor<Fct_,Args...>::outType>::value,dimension<typename Compositor<Fct_,Args...>::inType>::value> > Jg((double*)g_prim.data());
 					
-					typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type mat_der2;
+					typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type fog_der2;
 					
+					for(unsigned int i = 0; i < dimension<outType>::value; i++)
+					{
+						Eigen::Map<Eigen::Matrix<double,dimension<inType>::value,dimension<inType>::value>,0,Eigen::InnerStride<dimension<outType>::value> > fog_der2_i((double*)fog_der2.data() + i);
+						
+						Eigen::Map<Eigen::Matrix<double,dimension<typename Fct::inType>::value,dimension<typename Fct::inType>::value>,0,Eigen::InnerStride<dimension<typename Fct::outType>::value> > Hf_i((double*)f_sec.data() + i);
+						
+						fog_der2_i = Jg.transpose() * Hf_i * Jg;
+						
+						for(unsigned int j = 0; j < dimension<typename Compositor<Fct_,Args...>::outType>::value; j++)
+						{
+							Eigen::Map<Eigen::Matrix<double,dimension<typename Compositor<Fct_,Args...>::inType >::value,dimension<typename Compositor<Fct_,Args...>::inType >::value>,0,Eigen::InnerStride<dimension<typename Compositor<Fct_,Args...>::outType>::value> > Hg_j((double*)g_sec.data() + j);
+							fog_der2_i += f_prim[j][i] * Hg_j;
+						}
+					}
 					
-					
-					return mat_der2;
+					return fog_der2;
 				}
 				
 				/**
