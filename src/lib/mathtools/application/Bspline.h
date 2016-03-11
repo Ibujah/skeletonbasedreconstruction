@@ -150,28 +150,29 @@ namespace mathtools
 					double tbeg, tend;
 
 					unsigned int interval = m_degree-1;
-
-					while(m_nodevec(0,interval+1) <= t && interval != m_nodevec.cols()-m_degree-1) {interval++;}
-
+					
+					if(t >= m_nodevec(0,m_nodevec.cols()-m_degree)) interval = m_nodevec.cols()-m_degree-1;
+					else
+						while(m_nodevec(0,interval+1) <= t && interval != m_nodevec.cols()-m_degree-1) {interval++;}
+					
 					tbeg = m_nodevec(0,interval);
 					tend = m_nodevec(0,interval+1);
 
 					Blossom(tbeg,m_nodevec,ctrl_vec_der1);
 					Blossom(tend,m_nodevec,ctrl_vec_der2);
-
-					ctrl_vec_der = (ctrl_vec_der2 - ctrl_vec_der1).block(0,0,Dim,ctrl_vec_der.cols())*(1/(tend-tbeg));
+					
+					if(tend != tbeg)
+						ctrl_vec_der = (ctrl_vec_der2 - ctrl_vec_der1).block(0,0,Dim,ctrl_vec_der.cols())*(1/(tend-tbeg));
 					
 					typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type arr;
 					
 					Eigen::Map<Eigen::Matrix<double,Dim,1> > res((double*)arr.data());
 					
-					double treel = t<tbeg?tbeg:(t>tend?tend:t);
-					
 					res.setZero();
 
 					for(unsigned int ind = 0; ind<ctrl_vec_der.cols(); ind++)
 					{
-						double basis_ind = BsplineBasis(treel,m_degree-1,ind,m_nodevec.block(0,1,1,m_nodevec.cols()-2));
+						double basis_ind = BsplineBasis(t,m_degree-1,ind,m_nodevec.block(0,1,1,m_nodevec.cols()-2));
 						res+=ctrl_vec_der.block(0,ind,Dim,1)*basis_ind;
 					}
 
@@ -197,7 +198,9 @@ namespace mathtools
 
 					unsigned int interval = m_degree-2;
 
-					while(m_nodevec(0,interval+1) <= t && interval != m_nodevec.cols()-m_degree-1) {interval++;}
+					if(t >= m_nodevec(0,m_nodevec.cols()-m_degree)) interval = m_nodevec.cols()-m_degree-1;
+					else
+						while(m_nodevec(0,interval+1) <= t && interval != m_nodevec.cols()-m_degree-1) {interval++;}
 
 					tbeg = m_nodevec(0,interval);
 					tmid = m_nodevec(0,interval+1);
@@ -217,18 +220,16 @@ namespace mathtools
 
 					if(tend != tbeg)
 						ctrl_vec_der22 = (ctrl_vec_der12 - ctrl_vec_der11).block(0,0,Dim,ctrl_vec_der22.cols())*(1/(tend-tbeg));
-
+					
 					typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type arr;
 					
 					Eigen::Map<Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value> > res((double*)arr.data());
 
-					double treel = t<tbeg?tbeg:(t>tend?tend:t);
-					
 					res.setZero();
-
+					
 					for(unsigned int ind = 0; ind<ctrl_vec_der22.cols(); ind++)
 					{
-						double basis_ind = BsplineBasis(treel,m_degree-2,ind,m_nodevec.block(0,2,1,m_nodevec.cols()-3));
+						double basis_ind = BsplineBasis(t,m_degree-2,ind,m_nodevec.block(0,2,1,m_nodevec.cols()-3));
 						res+=ctrl_vec_der22.block(0,ind,Dim,1)*basis_ind;
 					}
 
