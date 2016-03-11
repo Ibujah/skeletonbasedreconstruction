@@ -44,6 +44,8 @@ using namespace mathtools::affine;
 #define BOOST_TEST_MODULE TestMathtools
 #include <boost/test/unit_test.hpp>
 
+#include <iostream>
+
 BOOST_AUTO_TEST_CASE( BsplineTest )
 {
 	unsigned int fraction = 100;
@@ -103,10 +105,16 @@ BOOST_AUTO_TEST_CASE( CompositorTest )
 		double t = (double)i*0.01;
 
 		Eigen::Vector3d vecres = comp(t);
+		Eigen::Vector3d dvecres = Eigen::Map<Eigen::Vector3d>((double*)comp.der(t).data());
+		Eigen::Vector3d ddvecres = Eigen::Map<Eigen::Vector3d>((double*)comp.der2(t).data());
 
 		Eigen::Vector3d vecref = mat_lin * bsp(t);
+		Eigen::Vector3d dvecref = mat_lin * Eigen::Map<Eigen::Vector3d>((double*)bsp.der(t).data());
+		Eigen::Vector3d ddvecref = mat_lin * Eigen::Map<Eigen::Vector3d>((double*)bsp.der2(t).data());
 		
 		BOOST_CHECK( (vecres-vecref).norm() < std::numeric_limits<double>::epsilon() );
+		BOOST_CHECK( (dvecres-dvecref).norm() < std::numeric_limits<double>::epsilon() );
+		BOOST_CHECK( (ddvecres-ddvecref).norm() < std::numeric_limits<double>::epsilon() );
 	}
 }
 
