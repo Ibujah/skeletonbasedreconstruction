@@ -126,6 +126,30 @@ double mathtools::application::BsplineBasis(double t, unsigned int degree, unsig
 }
 
 
+void mathtools::application::Blossom(double t, const Eigen::Matrix<double,1,Eigen::Dynamic> &node, Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> &ctrl)
+{
+	if(node.cols() + 1 < ctrl.cols() || ctrl.cols() == 0)
+		throw std::logic_error("Blossom : wrong number of nodes or control points");
+
+	unsigned int degree = node.cols() - ctrl.cols() + 1;
+
+	if(degree == 0)
+	{
+		ctrl *= 0;
+	}
+	else
+	{
+		for(unsigned int i = 0; i < ctrl.cols()-1; i++)
+		{
+			double tdeb = node(0,i), tfin = node(0,i+degree);
+			if(t >= tdeb && t <= tfin ) //supposed to be different
+			{
+				ctrl.block(0,i,ctrl.rows(),1) = ctrl.block(0,i,ctrl.rows(),1)*(tfin - t)/(tfin - tdeb) + ctrl.block(0,i+1,ctrl.rows(),1)*(t - tdeb)/(tfin - tdeb); 
+			}
+		}
+	}
+}
+
 
 
 

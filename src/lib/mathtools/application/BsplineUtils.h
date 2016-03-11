@@ -56,6 +56,17 @@ namespace mathtools
 		 *  \throws std::logic_error if basis indice is out of node vector
 		 */
 		double BsplineBasis(double t, unsigned int degree, unsigned int indice, const Eigen::Matrix<double,1,Eigen::Dynamic> &node);
+
+		/**
+		 *  \brief Blossom function
+		 *
+		 *  \param t    Blossom parameter
+		 *  \param node Node vector
+		 *  \param ctrl In control Vectors, Out control Vectors
+		 *
+		 *  \throws std::logic_error if wrong number of nodes or control points
+		 */
+		void Blossom(double t, const Eigen::Matrix<double,1,Eigen::Dynamic> &node, Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> &ctrl);
 	}
 }
 
