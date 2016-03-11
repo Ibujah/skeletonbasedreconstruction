@@ -118,6 +118,19 @@ namespace mathtools
 				}
 
 				/**
+				 *  \brief Function first derivative
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns First derivative associated to input t
+				 */
+				virtual inline typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
+					der2(const double &t) const
+				{
+					return {0};
+				}
+
+				/**
 				 *  \brief Slope getter
 				 *
 				 *  \return slope
