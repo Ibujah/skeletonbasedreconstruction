@@ -241,9 +241,9 @@ namespace mathtools
 				 */
 				virtual inline typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
 					der(const inType &t) const
-					{
-						throw std::logic_error("Not implemented");
-					}
+				{
+					throw std::logic_error("Not implemented");
+				}
 				
 				/**
 				 *  \brief Function second derivative
@@ -254,9 +254,9 @@ namespace mathtools
 				 */
 				virtual inline typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
 					der2(const inType &t) const
-					{
-						throw std::logic_error("Not implemented");
-					}
+				{
+					throw std::logic_error("Not implemented");
+				}
 				
 				/**
 				 *  \brief Function third derivative
@@ -267,9 +267,9 @@ namespace mathtools
 				 */
 				virtual inline typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type
 					der3(const inType &t) const
-					{
-						throw std::logic_error("Not implemented");
-					}
+				{
+					throw std::logic_error("Not implemented");
+				}
 				
 				/**
 				 *  \brief Pure virtual destructor
