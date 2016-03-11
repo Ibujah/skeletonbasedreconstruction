@@ -227,10 +227,15 @@ namespace mathtools
 
 					res.setZero();
 					
-					for(unsigned int ind = 0; ind<ctrl_vec_der22.cols(); ind++)
+					if(t >= m_nodevec(0,m_nodevec.cols()-m_degree))
+						res = ctrl_vec_der22.block(0,ctrl_vec_der22.cols()-1,Dim,1);
+					else
 					{
-						double basis_ind = BsplineBasis(t,m_degree-2,ind,m_nodevec.block(0,2,1,m_nodevec.cols()-3));
-						res+=ctrl_vec_der22.block(0,ind,Dim,1)*basis_ind;
+						for(unsigned int ind = 0; ind<ctrl_vec_der22.cols(); ind++)
+						{
+							double basis_ind = BsplineBasis(t,m_degree-2,ind,m_nodevec.block(0,2,1,m_nodevec.cols()-3));
+							res+=ctrl_vec_der22.block(0,ind,Dim,1)*basis_ind;
+						}
 					}
 
 					return arr;
