@@ -99,7 +99,7 @@ namespace mathtools
 				 * 
 				 *  \return application output 
 				 */
-				virtual double operator()(const double &t) const
+				virtual inline double operator()(const double &t) const
 				{
 					return m_a * t + m_b;
 				}
@@ -111,10 +111,10 @@ namespace mathtools
 				 *
 				 *  \returns First derivative associated to input t
 				 */
-				virtual typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
+				virtual inline typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
 					der(const double &t) const
 				{
-					return (Eigen::Matrix<double,1,1>::Ones()*m_a);
+					return {m_a};
 				}
 
 				/**
@@ -122,7 +122,7 @@ namespace mathtools
 				 *
 				 *  \return slope
 				 */
-				double getSlope() const
+				inline const double& getSlope() const
 				{
 					return m_a;
 				}
@@ -132,7 +132,7 @@ namespace mathtools
 				 *
 				 *  \return y-intercept
 				 */
-				double getYIntercept() const
+				inline const double& getYIntercept() const
 				{
 					return m_b;
 				}

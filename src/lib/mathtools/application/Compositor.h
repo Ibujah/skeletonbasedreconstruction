@@ -102,7 +102,7 @@ namespace mathtools
 				 *
 				 *  \return function evaluation at t
 				 */
-				outType operator()(const inType &t) const
+				inline outType operator()(const inType &t) const
 				{
 					return (*m_fct)(t);
 				};
@@ -114,7 +114,7 @@ namespace mathtools
 				 *
 				 *  \returns first derivative associated to input t
 				 */
-				typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
+				inline typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
 					der(const inType &t) const
 				{
 					return m_fct->der(t);
@@ -127,7 +127,7 @@ namespace mathtools
 				 *
 				 *  \returns second derivative associated to input t
 				 */
-				typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
+				inline typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
 					der2(const inType &t) const
 				{
 					return m_fct->der2(t);
@@ -140,7 +140,7 @@ namespace mathtools
 				 *
 				 *  \returns third derivative associated to input t
 				 */
-				typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type
+				inline typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type
 					der3(const inType &t) const
 				{
 					return m_fct->der3(t);
@@ -151,7 +151,7 @@ namespace mathtools
 				 *
 				 *  \return current function associated to compositor
 				 */
-				const typename Fct::Ptr getFun() const
+				inline const typename Fct::Ptr getFun() const
 				{
 					return m_fct;
 				}
@@ -225,7 +225,7 @@ namespace mathtools
 				 *
 				 *  \return function evaluation at t
 				 */
-				outType operator()(const inType &t) const
+				inline outType operator()(const inType &t) const
 				{
 					return (*m_fct)(  m_next(t) );
 				};
@@ -237,10 +237,18 @@ namespace mathtools
 				 *
 				 *  \returns first derivative associated to input t
 				 */
-				typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
+				inline typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
 					der(const inType &t) const
 				{
-					return m_fct->der( m_next(t) ) * m_next.der(t);
+					typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type arr;
+					
+					Eigen::Map<Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value> >((double*)arr.data()) = 
+						Eigen::Map<Eigen::Matrix<double,dimension<typename Fct::outType>::value,dimension<typename Fct::inType>::value > >(
+							(double*)m_fct->der( m_next(t) ).data())*
+						Eigen::Map<Eigen::Matrix<double,dimension<typename Compositor<Fct_,Args...>::outType>::value,dimension<typename Compositor<Fct_,Args...>::inType>::value> >(
+							(double*)m_next.der(t).data());
+					
+					return arr;
 				}
 
 				/**
@@ -250,10 +258,10 @@ namespace mathtools
 				 *
 				 *  \returns second derivative associated to input t
 				 */
-				typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
+				inline typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
 					der2(const inType &t) const
 				{
-					//(fog)'' = ( (f'og) . g')' = (f''og) . g' . g' + (f'og) . g'' ?????
+					//(f_i o g)'' = Jg^t . Hf_i . Jg + sum( df_i/dyj . Hgj ) 
 					typename derivativematrix<2,dimension<typename Fct::outType>::value,dimension<typename Fct::inType>::value>::type 
 						f_sec = m_fct->der2( m_next(t) );
 					
@@ -280,7 +288,7 @@ namespace mathtools
 				 *
 				 *  \returns third derivative associated to input t
 				 */
-				typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type
+				inline typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type
 					der3(const inType &t) const
 				{
 					typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type mat_der3;
@@ -305,7 +313,7 @@ namespace mathtools
 				 *
 				 *  \return current function associated to compositor
 				 */
-				const typename Fct::Ptr getFun() const
+				inline const typename Fct::Ptr getFun() const
 				{
 					return m_fct;
 				}

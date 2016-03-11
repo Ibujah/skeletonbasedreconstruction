@@ -93,19 +93,45 @@ namespace mathtools
 				 * 
 				 *  \return application output 
 				 */
-				virtual Eigen::Matrix<double,DimOut,1> operator()(const Eigen::Matrix<double,DimIn,1> &vec) const
+				virtual inline Eigen::Matrix<double,DimOut,1> operator()(const Eigen::Matrix<double,DimIn,1> &vec) const
 				{
 					return m_matrix * vec;
 				}
 
+
 				/**
-				 *  \brief Jacobian call
+				 *  \brief Function first derivative
 				 *
-				 *  \param : input parameter
+				 *  \param vec Input of the application
 				 *
-				 *  \return Jacobian evaluation at vec
+				 *  \returns First derivative associated to input vec
 				 */
-				virtual Eigen::Matrix<double,DimOut,DimIn> jac(const Eigen::Matrix<double,DimIn,1> &) const
+				virtual inline typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
+					der(const Eigen::Matrix<double,DimIn,1> &vec) const
+				{
+					typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type arr;
+
+					double *ptr = (double*)arr.data();
+					for(unsigned int c = 0; c < m_matrix.cols(); c++)
+						for(unsigned int r = 0; r < m_matrix.rows(); r++)
+						{
+							*ptr = m_matrix(r,c);
+							ptr++;
+						}
+
+
+					return arr;
+				}
+				
+				/**
+				 *  \brief Jacobian matrix
+				 *
+				 *  \param vec Input of the application
+				 *
+				 *  \returns Jacobian matrix associated to input vec
+				 */
+				virtual inline typename Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value>
+					jac(const inType &vec) const
 				{
 					return m_matrix;
 				}
@@ -115,7 +141,7 @@ namespace mathtools
 				 *
 				 *  \return Linera applicatino matrix
 				 */
-				Eigen::Matrix<double,DimOut,DimIn>& getMatrix() const
+				inline Eigen::Matrix<double,DimOut,DimIn>& getMatrix() const
 				{
 					return m_matrix;
 				}
