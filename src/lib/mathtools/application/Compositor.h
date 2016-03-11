@@ -284,7 +284,7 @@ namespace mathtools
 						Eigen::Map<Eigen::Matrix<double,dimension<typename Fct::inType>::value,dimension<typename Fct::inType>::value>,0,Eigen::InnerStride<dimension<typename Fct::outType>::value> > Hf_i((double*)f_sec.data() + i);
 						
 						fog_der2_i = Jg.transpose() * Hf_i * Jg;
-						
+
 						for(unsigned int j = 0; j < dimension<typename Compositor<Fct_,Args...>::outType>::value; j++)
 						{
 							Eigen::Map<Eigen::Matrix<double,dimension<typename Compositor<Fct_,Args...>::inType >::value,dimension<typename Compositor<Fct_,Args...>::inType >::value>,0,Eigen::InnerStride<dimension<typename Compositor<Fct_,Args...>::outType>::value> > Hg_j((double*)g_sec.data() + j);
@@ -293,23 +293,6 @@ namespace mathtools
 					}
 					
 					return fog_der2;
-				}
-				
-				/**
-				 *  \brief Function third derivative
-				 *
-				 *  \param t input of the application
-				 *
-				 *  \returns third derivative associated to input t
-				 */
-				inline typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type
-					der3(const inType &t) const
-				{
-					typename derivativematrix<3,dimension<outType>::value,dimension<inType>::value>::type mat_der3;
-					
-					
-					
-					return mat_der3;
 				}
 
 				/**
