@@ -133,7 +133,108 @@ namespace mathtools
 
 					return res;
 				}
-				
+
+				/**
+				 *  \brief Function first derivative
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns First derivative associated to input t
+				 */
+				virtual typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type
+					der(const double &t) const
+				{
+					Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> ctrl_vec_der1 = m_ctrlpt,
+						ctrl_vec_der2 = m_ctrlpt,
+						ctrl_vec_der(Dim,m_ctrlpt.cols()-1);
+					double tbeg, tend;
+
+					unsigned int interval = m_degree-1;
+
+					while(m_nodevec(0,interval+1) <= t && interval != m_nodevec.cols()-m_degree-1) {interval++;}
+
+					tbeg = m_nodevec(0,interval);
+					tend = m_nodevec(0,interval+1);
+
+					Blossom(tbeg,m_nodevec,ctrl_vec_der1);
+					Blossom(tend,m_nodevec,ctrl_vec_der2);
+
+					ctrl_vec_der = (ctrl_vec_der2 - ctrl_vec_der1).block(0,0,Dim,ctrl_vec_der.cols())*(1/(tend-tbeg));
+					
+					typename derivativematrix<1,dimension<outType>::value,dimension<inType>::value>::type arr;
+					
+					Eigen::Map<Eigen::Matrix<double,Dim,1> > res((double*)arr.data());
+					
+					double treel = t<tbeg?tbeg:(t>tend?tend:t);
+					
+					res.setZero();
+
+					for(unsigned int ind = 0; ind<ctrl_vec_der.cols(); ind++)
+					{
+						double basis_ind = BsplineBasis(treel,m_degree-1,ind,m_nodevec.block(0,1,1,m_nodevec.cols()-2));
+						res+=ctrl_vec_der.block(0,ind,Dim,1)*basis_ind;
+					}
+
+					return arr;
+				}
+
+				/**
+				 *  \brief Function second derivative
+				 *
+				 *  \param t Input of the application
+				 *
+				 *  \returns Second derivative associated to input t
+				 */
+				virtual typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type
+					der2(const double &t) const
+				{
+					Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> ctrl_vec_der1 = m_ctrlpt,
+						ctrl_vec_der2 = m_ctrlpt,
+						ctrl_vec_der11(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Zero(Dim,m_ctrlpt.cols()-1)),
+						ctrl_vec_der12(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Zero(Dim,m_ctrlpt.cols()-1)),
+						ctrl_vec_der22(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Zero(Dim,m_ctrlpt.cols()-2));
+					double tbeg, tmid, tend;
+
+					unsigned int interval = m_degree-2;
+
+					while(m_nodevec(0,interval+1) <= t && interval != m_nodevec.cols()-m_degree-1) {interval++;}
+
+					tbeg = m_nodevec(0,interval);
+					tmid = m_nodevec(0,interval+1);
+					tend = m_nodevec(0,interval+2);
+
+					Blossom(tbeg,m_nodevec,ctrl_vec_der1);
+					Blossom(tend,m_nodevec,ctrl_vec_der2);
+					
+					if(tmid != tbeg)
+						ctrl_vec_der11 = (ctrl_vec_der2 - ctrl_vec_der1).block(0,0,Dim,ctrl_vec_der11.cols())*(1/(tmid-tbeg));
+
+					Blossom(tbeg,m_nodevec,ctrl_vec_der1);
+					Blossom(tend,m_nodevec,ctrl_vec_der2);
+					
+					if(tend != tmid)
+						ctrl_vec_der12 = (ctrl_vec_der2 - ctrl_vec_der1).block(0,0,Dim,ctrl_vec_der12.cols())*(1/(tend-tmid));
+
+					if(tend != tbeg)
+						ctrl_vec_der22 = (ctrl_vec_der12 - ctrl_vec_der11).block(0,0,Dim,ctrl_vec_der22.cols())*(1/(tend-tbeg));
+
+					typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type arr;
+					
+					Eigen::Map<Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value> > res((double*)arr.data());
+
+					double treel = t<tbeg?tbeg:(t>tend?tend:t);
+					
+					res.setZero();
+
+					for(unsigned int ind = 0; ind<ctrl_vec_der22.cols(); ind++)
+					{
+						double basis_ind = BsplineBasis(treel,m_degree-2,ind,m_nodevec.block(0,2,1,m_nodevec.cols()-3));
+						res+=ctrl_vec_der22.block(0,ind,Dim,1)*basis_ind;
+					}
+
+					return arr;
+				}
+
 				/**
 				 *  \brief Inferior boundary accessor
 				 *
