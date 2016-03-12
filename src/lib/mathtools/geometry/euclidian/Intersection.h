@@ -31,6 +31,7 @@ SOFTWARE.
 #define _INTERSECTION_H_
 
 #include <mathtools/affine/Point.h>
+#include "Projection.h"
 #include "HyperSphere.h"
 #include "HyperPlane.h"
 #include "HyperCircle.h"
@@ -76,9 +77,9 @@ namespace mathtools
 
 				if(intersect)
 				{
-					double radius = sqrt(rad_sq_in_basis-dist_sq);
+					double radius = sqrt(rad_sq_in_basis-dist_sq_in_basis);
 
-					hcircle = HyperCircle<Dim>(circle_center, hplane.getNormal(), radius, hsphere.getBasis());
+					hcircle = HyperCircle<Dim>(circle_center, radius, hplane.getNormal());
 				}
 
 				return intersect;
