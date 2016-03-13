@@ -11,6 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wno-enum-compare")
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 find_package(EIGEN REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(SFML 2 COMPONENTS window)
 
 find_package(VoroPlusPlus)
 
@@ -42,6 +43,7 @@ set(SKELETON_LIB   "Skeleton")
 set(USERINPUT_LIB  "UserInput")
 
 set(DISPLAYOCV_LIB "DisplayOCV")
+set(DISPLAY3D_LIB "Display3D")
 
 include_directories(${EIGEN_INCLUDE_DIRS})
 
