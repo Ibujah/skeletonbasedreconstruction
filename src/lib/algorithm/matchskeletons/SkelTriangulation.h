@@ -63,8 +63,8 @@ namespace algorithm
 		 *  \brief Two branches matching algorithm
 		 *
 		 *  \param recbranch branch containing reconstruction data
-		 *  \param projbr1   first projective branch
-		 *  \param projbr2   second projective branch
+		 *  \param projbr    projective branch
+		 *  \param model     future branch model
 		 *  \param options   algorithm options
 		 *
 		 *  \return triangulated branch
@@ -79,8 +79,8 @@ namespace algorithm
 		 *  \brief Two skeletons matching algorithm
 		 *
 		 *  \param recskel   skeleton containing reconstruction data
-		 *  \param projskel1 first projective skeleton
-		 *  \param projskel2 second projective skeleton
+		 *  \param projskel  projective skeleton
+		 *  \param model     future skeleton model
 		 *  \param options   algorithm options
 		 *
 		 *  \return triangulated skeleton

@@ -82,9 +82,9 @@ namespace skeleton
 			/**
 			 *  \brief Constructor
 			 *
-			 *  \param indskel    skeleton used in reconstruction
-			 *  \param firstskel  first extremities of projective skeletons
-			 *  \param lastskel   last extremities of projective skeletons
+			 *  \param indskel   skeleton used in reconstruction
+			 *  \param firstext  first extremities of projective skeletons
+			 *  \param lastext   last extremities of projective skeletons
 			 */
 			ReconstructionBranch(const std::vector<unsigned int> &indskel, const std::vector<unsigned int> &firstext, const std::vector<unsigned int> &lastext);
 		
