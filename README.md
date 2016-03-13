@@ -17,4 +17,5 @@ Towards Skeleton Based Reconstruction: From Projective Skeletonization to Canal 
  * [Boost](http://www.boost.org/)
  * [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) (header only)
  * [OpenCV](http://opencv.org/)
+ * [SFML](http://www.sfml-dev.org/)
  * [Voro++](http://math.lbl.gov/voro++/) (already in 3rdparty)
