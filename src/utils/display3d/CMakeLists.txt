@@ -10,10 +10,12 @@ add_library(
 	)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/lib/
+					${SFML_INCLUDE_DIR}
 					${Boost_INCLUDE_DIR})
 
 target_link_libraries(${LIBRARY_NAME} ${MATHTOOLS_LIB}
-									  ${CAMERA_LIB})
+									  ${CAMERA_LIB}
+									  ${SFML_LIBRARIES})
 
 
 SET_TARGET_PROPERTIES(${LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE CXX)
