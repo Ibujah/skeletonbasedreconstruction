@@ -3,7 +3,8 @@ set(LIBRARY_NAME ${DISPLAY3D_LIB})
 set(SOURCE_FILES DisplayClass.cpp
 				 DisplayFrame.cpp
 				 DisplayBoundary.cpp
-				 DisplayCamera.cpp)
+				 DisplayCamera.cpp
+				 DisplaySkeleton.cpp)
 
 # make the library
 add_library(
