@@ -7,7 +7,10 @@ before_install:
   # g++4.9.1
   - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
 
-  -sudo apt-get update -qq
+  - sudo apt-get update -qq
+
+  # libraries install
+  - sudo apt-get install cmake libboost-all-dev libeigen3-dev libopencv-dev libcv-dev
 
   # sfml install
   - wget http://sfml-dev.org/download/sfml/2.1/SFML-2.1-linux-gcc-64bits.tar.bz2 -O /tmp/sfml.tar.bz2
@@ -15,13 +18,6 @@ before_install:
   - sudo cp -r SFML-2.1/* /usr/
   - sudo apt-get install -y libjpeg62-dev libsndfile1-dev libglew1.5 libglew1.5-dev libfreetype6 libjpeg-turbo8 libjpeg8 libopenal-data libopenal1  libxrandr2 libxrender1 libsoil1 
   
-  # libraries install
-  - sudo apt-get install cmake libboost-all-dev libeigen3-dev libopencv-dev libcv-dev
-
-script: make
-
- 
-
 install:
   # g++4.9.1
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.9; fi
