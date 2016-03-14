@@ -92,12 +92,12 @@ namespace display3d
  			 *
  			 *  \return list indice
  			 */
-			unsigned int StartList();
+			unsigned int startList();
 			
 			/**
  			 *  \brief Ends a list
  			 */
-			void EndList();
+			void endList();
 			
 			/**
  			 *  \brief Set camera parameters to view
@@ -137,7 +137,7 @@ namespace display3d
 			/**
  			 *  \brief Displays all registered lists
  			 */
-			void Display() const;
+			void display() const;
 			
 			/**
  			 *  \brief Displays lists in container
@@ -147,7 +147,7 @@ namespace display3d
  			 *  \param cont  container in which the lists are
  			 */
 			template<typename Container>
-			void Display(const Container &cont) const;
+			void display(const Container &cont) const;
 	};
 }
 

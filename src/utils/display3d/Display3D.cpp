@@ -35,14 +35,14 @@ display3d::DisplayClass::DisplayClass(const std::string &title, unsigned int wid
 	m_window(sf::VideoMode(width,height),title), m_nblists(0), m_znear(0.01), m_zfar(1000.)
 {}
 
-unsigned int display3d::DisplayClass::StartList()
+unsigned int display3d::DisplayClass::startList()
 {
 	m_window.setActive(true);
 	glNewList(m_nblists,GL_COMPILE);
 	return m_nblists;
 }
 
-void display3d::DisplayClass::EndList()
+void display3d::DisplayClass::endList()
 {
 	m_window.setActive(true);
 	glEndList();
@@ -61,22 +61,25 @@ void display3d::DisplayClass::setIntrinsics(const camera::Intrinsics::Ptr intrin
 	unsigned int width = intrinsics->getWidth();
 	unsigned int height = intrinsics->getHeight();
 	m_window.setSize(sf::Vector2u(width,height));
+	Eigen::Vector2d origin = intrinsics->getFrame()->getOrigin();
+	Eigen::Matrix2d basis = intrinsics->getFrame()->getBasis()->getMatrix();
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity();
 	switch(intrinsics->getType())
 	{
 		case camera::Intrinsics::Type::pinhole:
-			glMatrixMode( GL_PROJECTION );
-			glLoadIdentity();
 			glFrustum(
-			  		intrinsics->getFrame()->getOrigin()[0]*m_znear,
-			  		(width*intrinsics->getFrame()->getBasis()->getMatrix()(0,0)+intrinsics->getFrame()->getOrigin()[0])*m_znear,
-			  		(height*intrinsics->getFrame()->getBasis()->getMatrix()(1,1)+intrinsics->getFrame()->getOrigin()[1])*m_znear,
-			  		intrinsics->getFrame()->getOrigin()[1]*m_znear,
+			  		origin[0]*m_znear,
+			  		(width*basis(0,0)+origin[0])*m_znear,
+			  		(height*basis(1,1)+origin[1])*m_znear,
+			  		origin[1]*m_znear,
 			  		m_znear,m_zfar);
 			glScalef(1,1,-1);
 			glViewport( 0, 0, width, height );
 			break;
 		case camera::Intrinsics::Type::ortho:
-			//TODO
+			glOrtho(-origin[0]/basis(0,0),(width-origin[0])/basis(0,0),(height-origin[1])/basis(1,1),-origin[1]/basis(1,1),m_znear,m_zfar);
+			glViewport( 0, 0, width, height );
 			break;
 	}
 }
@@ -112,7 +115,7 @@ unsigned int display3d::DisplayClass::getNblists()
 	return m_nblists;
 }
 			
-void display3d::DisplayClass::Display() const
+void display3d::DisplayClass::display() const
 {
 	m_window.setActive(true);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -123,7 +126,7 @@ void display3d::DisplayClass::Display() const
 }
 			
 template<typename Container>
-void display3d::DisplayClass::Display(const Container &cont) const
+void display3d::DisplayClass::display(const Container &cont) const
 {
 	m_window.setActive(true);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -131,4 +134,14 @@ void display3d::DisplayClass::Display(const Container &cont) const
 
 	for(typename Container::const_iterator it = cont.begin(); it != cont.end(); it++)
 		glCallList(*it);
+}
+
+
+namespace display3d
+{
+	template<>
+	void display3d::DisplayClass::display<std::vector<unsigned int> >(const std::vector<unsigned int> &cont) const;
+
+	template<>
+	void display3d::DisplayClass::display<std::list<unsigned int> >(const std::list<unsigned int> &cont) const;
 }
