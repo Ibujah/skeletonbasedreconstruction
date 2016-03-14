@@ -22,12 +22,12 @@ SOFTWARE.
 
 
 /**
- *  \file Display3D.cpp
+ *  \file DisplayClass.cpp
  *  \brief Provides display methods with SFML
  *  \author Bastien Durix
  */
 
-#include "Display3D.h"
+#include "DisplayClass.h"
 #include <camera/OrthoCam.h>
 #include <camera/PinHole.h>
 

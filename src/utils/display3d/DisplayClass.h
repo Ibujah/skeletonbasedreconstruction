@@ -22,13 +22,13 @@ SOFTWARE.
 
 
 /**
- *  \file Display3D.h
+ *  \file DisplayClass.h
  *  \brief Provides display methods with SFML
  *  \author Bastien Durix
  */
 
-#ifndef _DISPLAY3D_H_
-#define _DISPLAY3D_H_
+#ifndef _DISPLAYCLASS_H_
+#define _DISPLAYCLASS_H_
 
 #include <string>
 #include <list>
@@ -151,4 +151,4 @@ namespace display3d
 	};
 }
 
-#endif // _DISPLAY3D_H_
+#endif // _DISPLAYCLASS_H_

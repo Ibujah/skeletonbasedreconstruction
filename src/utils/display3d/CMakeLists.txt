@@ -1,7 +1,7 @@
 set(LIBRARY_NAME ${DISPLAY3D_LIB})
 
-set(SOURCE_FILES Display3D.cpp)
-
+set(SOURCE_FILES DisplayClass.cpp
+				 DisplayFrame.cpp)
 # make the library
 add_library(
     ${LIBRARY_NAME}
