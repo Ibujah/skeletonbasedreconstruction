@@ -38,7 +38,11 @@ SOFTWARE.
 
 #include <iostream>
 
+#ifdef _WIN32
+#define BOOST_TEST_STATIC_LINK
+#else
 #define BOOST_TEST_DYN_LINK
+#endif
 #define BOOST_TEST_MODULE TestAlgos
 #include <boost/test/unit_test.hpp>
 

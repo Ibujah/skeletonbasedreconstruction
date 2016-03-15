@@ -33,7 +33,11 @@ SOFTWARE.
 using namespace mathtools::affine;
 using namespace mathtools::geometry::euclidian;
 
+#ifdef _WIN32
+#define BOOST_TEST_STATIC_LINK
+#else
 #define BOOST_TEST_DYN_LINK
+#endif
 #define BOOST_TEST_MODULE TestMathtools
 #include <boost/test/unit_test.hpp>
 
