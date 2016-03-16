@@ -26,14 +26,42 @@ SOFTWARE.
  *  \author Bastien Durix
  */
 
+#include <mathtools/application/Bspline.h>
+#include <skeleton/Skeletons.h>
+#include <boundary/DiscreteBoundary3.h>
+
+#include <algorithm/skinning/ContinuousSkinning.h>
+
 #include <display3d/DisplayClass.h>
 #include <display3d/DisplayFrame.h>
+#include <display3d/DisplaySkeleton.h>
+#include <display3d/DisplayBoundary.h>
 
 int main()
 {
+	unsigned int degree = 3;
+	unsigned int nbctrlpt = 4;
+	Eigen::Matrix<double,1,Eigen::Dynamic> nodevec(1,nbctrlpt + degree - 1);
+	nodevec << 0.0, 0.0, 0.0, 1.0, 1.0, 1.0;
+	Eigen::Matrix<double,4,Eigen::Dynamic> ctrlpt(4,nbctrlpt);
+	ctrlpt << 0.0, 1.0, 1.0, 0.0,
+			  0.0, 4.0, 1.0, 1.0,
+			  0.0, 2.0, 2.0, 1.0,
+			  0.1, 0.2, 0.2, 0.1;
+	mathtools::application::Application<Eigen::Vector4d,double>::Ptr bspline(new mathtools::application::Bspline<4>(ctrlpt,nodevec,degree));
+	skeleton::BranchContSkel3d::Ptr contbr(
+			new skeleton::BranchContSkel3d(
+					skeleton::model::Classic<3>::Ptr(new skeleton::model::Classic<3>()),
+					bspline));
+
+	//boundary::DiscreteBoundary<3>::Ptr bnd = algorithm::skinning::ContinuousSkinning(contbr);
+	
 	display3d::DisplayClass disclass("Test SFML");
 	
 	display3d::DisplayFrame(disclass,mathtools::affine::Frame<3>::CanonicFrame());
+	display3d::DisplayBranch(disclass,contbr);
+	//display3d::DisplayBoundary_Wired(disclass,bnd);
+	
 	
 	disclass.enableCtrl();
 	
