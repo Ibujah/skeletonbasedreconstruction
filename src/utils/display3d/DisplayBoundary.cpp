@@ -46,11 +46,11 @@ unsigned int display3d::DisplayBoundary_Wired(display3d::DisplayClass &disclass,
 		Eigen::Vector3d nor1 = disbnd->getNormals().find(ind1)->second;
 		Eigen::Vector3d nor2 = disbnd->getNormals().find(ind2)->second;
 
-		glNormal3f(pt1.x(),pt1.y(),pt1.z());
-		glVertex3f(nor1.x(),nor1.y(),nor1.z());
+		glNormal3f(nor1.x(),nor1.y(),nor1.z());
+		glVertex3f(pt1.x(),pt1.y(),pt1.z());
 
-		glNormal3f(pt2.x(),pt2.y(),pt2.z());
-		glVertex3f(nor2.x(),nor2.y(),nor2.z());
+		glNormal3f(nor2.x(),nor2.y(),nor2.z());
+		glVertex3f(pt2.x(),pt2.y(),pt2.z());
 	}
 	glEnd();
 	
@@ -79,14 +79,14 @@ unsigned int display3d::DisplayBoundary_Filled(display3d::DisplayClass &disclass
 		Eigen::Vector3d nor2 = disbnd->getNormals().find(ind2)->second;
 		Eigen::Vector3d nor3 = disbnd->getNormals().find(ind3)->second;
 
-		glNormal3f(pt1.x(),pt1.y(),pt1.z());
-		glVertex3f(nor1.x(),nor1.y(),nor1.z());
+		glNormal3f(nor1.x(),nor1.y(),nor1.z());
+		glVertex3f(pt1.x(),pt1.y(),pt1.z());
 
-		glNormal3f(pt2.x(),pt2.y(),pt2.z());
-		glVertex3f(nor2.x(),nor2.y(),nor2.z());
+		glNormal3f(nor2.x(),nor2.y(),nor2.z());
+		glVertex3f(pt2.x(),pt2.y(),pt2.z());
 
-		glNormal3f(pt3.x(),pt3.y(),pt3.z());
-		glVertex3f(nor3.x(),nor3.y(),nor3.z());
+		glNormal3f(nor3.x(),nor3.y(),nor3.z());
+		glVertex3f(pt3.x(),pt3.y(),pt3.z());
 	}
 	glEnd();
 	
