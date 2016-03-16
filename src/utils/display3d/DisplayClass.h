@@ -68,14 +68,14 @@ namespace display3d
 			unsigned int m_nblists;
 			
 			/**
- 			 *  \brief z-near value
- 			 */
-			double m_znear;
-			
+			 *  \param Time measure
+			 */
+			sf::Clock m_clock;
+
 			/**
- 			 *  \brief z-far value
- 			 */
-			double m_zfar;
+			 *  \brief Tells if the mouse is grabbed by the window or not
+			 */
+			bool m_mousegrabbed;
 
 		public:
 			/**
@@ -148,6 +148,23 @@ namespace display3d
  			 */
 			template<typename Container>
 			void display(const Container &cont) const;
+			
+			/**
+			 *  \brief Enable control for the window 
+			 */
+			void EnableCtrl();
+			
+			/**
+			 *  \brief Disable control for the window
+			 */
+			void DisableCtrl();
+			
+			/**
+			 *  \brief Moves the camera based on wasd (or zqsd on azerty keyboards) keys
+			 *
+			 *  \param camvit  camera speed
+			 */
+			void MoveCamera(float camvit = 0.1);
 	};
 }
 

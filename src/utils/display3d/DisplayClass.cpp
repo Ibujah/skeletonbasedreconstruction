@@ -27,12 +27,15 @@ SOFTWARE.
  *  \author Bastien Durix
  */
 
+#define ZNEAR 0.01
+#define ZFAR 1000.
+
 #include "DisplayClass.h"
 #include <camera/OrthoCam.h>
 #include <camera/PinHole.h>
 
 display3d::DisplayClass::DisplayClass(const std::string &title, unsigned int width, unsigned int height) :
-	m_window(sf::VideoMode(width,height),title), m_nblists(0), m_znear(0.01), m_zfar(1000.)
+	m_window(sf::VideoMode(width,height),title), m_nblists(0), m_clock(), m_mousegrabbed(false)
 {}
 
 unsigned int display3d::DisplayClass::startList()
@@ -69,16 +72,16 @@ void display3d::DisplayClass::setIntrinsics(const camera::Intrinsics::Ptr intrin
 	{
 		case camera::Intrinsics::Type::pinhole:
 			glFrustum(
-			  		origin[0]*m_znear,
-			  		(width*basis(0,0)+origin[0])*m_znear,
-			  		(height*basis(1,1)+origin[1])*m_znear,
-			  		origin[1]*m_znear,
-			  		m_znear,m_zfar);
+			  		origin[0]*ZNEAR,
+			  		(width*basis(0,0)+origin[0])*ZNEAR,
+			  		(height*basis(1,1)+origin[1])*ZNEAR,
+			  		origin[1]*ZNEAR,
+			  		ZNEAR,ZFAR);
 			glScalef(1,1,-1);
 			glViewport( 0, 0, width, height );
 			break;
 		case camera::Intrinsics::Type::ortho:
-			glOrtho(-origin[0]/basis(0,0),(width-origin[0])/basis(0,0),(height-origin[1])/basis(1,1),-origin[1]/basis(1,1),m_znear,m_zfar);
+			glOrtho(-origin[0]/basis(0,0),(width-origin[0])/basis(0,0),(height-origin[1])/basis(1,1),-origin[1]/basis(1,1),ZNEAR,ZFAR);
 			glViewport( 0, 0, width, height );
 			break;
 	}
@@ -144,4 +147,66 @@ namespace display3d
 
 	template<>
 	void display3d::DisplayClass::display<std::list<unsigned int> >(const std::list<unsigned int> &cont) const;
+}
+
+void display3d::DisplayClass::EnableCtrl()
+{
+	m_window.setMouseCursorVisible(false);
+	m_clock.restart();
+	sf::Mouse::setPosition(sf::Vector2i(0,0),m_window);
+	m_mousegrabbed = true;
+}
+
+void display3d::DisplayClass::DisableCtrl()
+{
+	m_window.setMouseCursorVisible(true);
+	m_mousegrabbed = false;
+}
+
+void display3d::DisplayClass::MoveCamera(float camvit)
+{
+	if(m_mousegrabbed)
+	{
+		m_window.setActive(true);
+
+		glMatrixMode( GL_MODELVIEW );
+
+		sf::Vector2i coords = sf::Mouse::getPosition(m_window);
+		sf::Mouse::setPosition(sf::Vector2i(0,0),m_window);
+
+		float sec = m_clock.getElapsedTime().asSeconds();
+		m_clock.restart();
+
+		float dx = 0, dz = 0;
+		float dist = camvit*sec;
+
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		{
+			dz += 1;
+		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		{
+			dz -= 1;
+		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			dx -= 1;
+		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		{
+			dx += 1;
+		}
+
+		float nor = sqrt(dx*dx+dz*dz);
+		if(nor != 0)
+		{
+			dx *= dist/nor;
+			dz *= dist/nor;
+		}
+
+		glTranslatef(dx,0.0,dz);
+
+		glRotatef(coords.x,1.0,0.0,0.0);
+		glRotatef(coords.y,0.0,1.0,0.0);
+	}
 }
