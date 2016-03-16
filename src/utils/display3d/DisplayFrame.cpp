@@ -37,8 +37,6 @@ unsigned int display3d::DisplayFrame(display3d::DisplayClass &disclass, const ma
 	
 	glPushMatrix( );
 	
-	glLoadIdentity( );
-	
 	Eigen::Matrix4d trmat = Eigen::Matrix4d::Identity();
  	trmat.block<3,3>(0,0) = frame->getBasis()->getMatrix();
  	trmat.block<3,1>(0,3) = frame->getOrigin();
@@ -91,11 +89,8 @@ unsigned int display3d::DisplayFrame(display3d::DisplayClass &disclass, const ma
 	glVertex3f( 0.0, 0.25f, 0.8 ); // upper horizontal leg
 	glVertex3f( 0.0, 0.25f, 1.0 );
 	
-	glPopMatrix();
-	
 	glEnd( );
 	
-	glColor3f( 1.0, 1.0, 1.0 );
 	glPopMatrix( );
 	
 	disclass.endList();
