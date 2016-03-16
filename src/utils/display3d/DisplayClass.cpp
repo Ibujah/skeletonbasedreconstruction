@@ -149,7 +149,7 @@ namespace display3d
 	void display3d::DisplayClass::display<std::list<unsigned int> >(const std::list<unsigned int> &cont) const;
 }
 
-void display3d::DisplayClass::EnableCtrl()
+void display3d::DisplayClass::enableCtrl()
 {
 	m_window.setMouseCursorVisible(false);
 	m_clock.restart();
@@ -157,13 +157,13 @@ void display3d::DisplayClass::EnableCtrl()
 	m_mousegrabbed = true;
 }
 
-void display3d::DisplayClass::DisableCtrl()
+void display3d::DisplayClass::disableCtrl()
 {
 	m_window.setMouseCursorVisible(true);
 	m_mousegrabbed = false;
 }
 
-void display3d::DisplayClass::MoveCamera(float camvit)
+void display3d::DisplayClass::moveCamera(float camvit)
 {
 	if(m_mousegrabbed)
 	{

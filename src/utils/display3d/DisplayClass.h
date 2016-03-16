@@ -152,19 +152,19 @@ namespace display3d
 			/**
 			 *  \brief Enable control for the window 
 			 */
-			void EnableCtrl();
+			void enableCtrl();
 			
 			/**
 			 *  \brief Disable control for the window
 			 */
-			void DisableCtrl();
+			void disableCtrl();
 			
 			/**
 			 *  \brief Moves the camera based on wasd (or zqsd on azerty keyboards) keys
 			 *
 			 *  \param camvit  camera speed
 			 */
-			void MoveCamera(float camvit = 0.1);
+			void moveCamera(float camvit = 0.1);
 	};
 }
 
