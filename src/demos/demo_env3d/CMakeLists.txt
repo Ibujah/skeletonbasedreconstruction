@@ -1,6 +1,7 @@
 include_directories(${CMAKE_SOURCE_DIR}/src/lib
 					${CMAKE_SOURCE_DIR}/src/utils
-					${Boost_INCLUDE_DIR})
+					${Boost_INCLUDE_DIR}
+					${SFML_INCLUDE_DIR})
 
 set(source_files main.cpp)
 
