@@ -45,7 +45,7 @@ int main()
 	nodevec << 0.0, 0.0, 0.0, 1.0, 1.0, 1.0;
 	Eigen::Matrix<double,4,Eigen::Dynamic> ctrlpt(4,nbctrlpt);
 	ctrlpt << 0.0, 1.0, 1.0, 0.0,
-			  0.0, 4.0, 1.0, 1.0,
+			  0.0, 2.0, 1.0, 0.0,
 			  0.0, 2.0, 2.0, 1.0,
 			  0.1, 0.2, 0.2, 0.1;
 	mathtools::application::Application<Eigen::Vector4d,double>::Ptr bspline(new mathtools::application::Bspline<4>(ctrlpt,nodevec,degree));
@@ -54,13 +54,13 @@ int main()
 					skeleton::model::Classic<3>::Ptr(new skeleton::model::Classic<3>()),
 					bspline));
 
-	//boundary::DiscreteBoundary<3>::Ptr bnd = algorithm::skinning::ContinuousSkinning(contbr);
+	boundary::DiscreteBoundary<3>::Ptr bnd = algorithm::skinning::ContinuousSkinning(contbr);
 	
 	display3d::DisplayClass disclass("Test SFML");
 	
 	display3d::DisplayFrame(disclass,mathtools::affine::Frame<3>::CanonicFrame());
 	display3d::DisplayBranch(disclass,contbr);
-	//display3d::DisplayBoundary_Wired(disclass,bnd);
+	display3d::DisplayBoundary_Wired(disclass,bnd);
 	
 	
 	disclass.enableCtrl();
