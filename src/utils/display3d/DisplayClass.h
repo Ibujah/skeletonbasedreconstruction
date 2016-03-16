@@ -73,9 +73,24 @@ namespace display3d
 			sf::Clock m_clock;
 
 			/**
-			 *  \brief Tells if the mouse is grabbed by the window or not
+			 *  \brief Control enablement
 			 */
-			bool m_mousegrabbed;
+			bool m_ctrlenabled;
+			
+			/**
+			 *  \brief Key to press to release the control of the window
+			 */
+			sf::Keyboard::Key m_quitkey;
+			
+			/**
+			 *  \brief Camera position
+			 */
+			sf::Vector3f m_campos;
+			
+			/**
+			 *  \brief Camera rotation
+			 */
+			sf::Vector3f m_camrot;
 
 		public:
 			/**
@@ -107,6 +122,11 @@ namespace display3d
 			void setView(const camera::Camera::Ptr camera);
 			
 			/**
+ 			 *  \brief Set default view
+ 			 */
+			void setView();
+
+			/**
  			 *  \brief Set intrinsics parameters to current view
  			 *
  			 *  \param intrinsics  intrinsics parameters to set
@@ -114,11 +134,21 @@ namespace display3d
 			void setIntrinsics(const camera::Intrinsics::Ptr intrinsics);
 			
 			/**
+ 			 *  \brief Set default intrinsics
+ 			 */
+			void setIntrinsics();
+			
+			/**
  			 *  \brief Set extrinsics parameters to current view
  			 *
  			 *  \param extrinsics  extrinsics parameters to set
  			 */
 			void setExtrinsics(const camera::Extrinsics::Ptr extrinsics);
+
+			/**
+ 			 *  \brief Set default extrinsics
+ 			 */
+			void setExtrinsics();
 
 			/**
  			 *  \brief SFML window getter
@@ -132,12 +162,12 @@ namespace display3d
  			 *
  			 *  \return number of lists
  			 */
-			unsigned int getNblists();
+			unsigned int getNblists() const;
 			
 			/**
  			 *  \brief Displays all registered lists
  			 */
-			void display() const;
+			void display();
 			
 			/**
  			 *  \brief Displays lists in container
@@ -147,12 +177,14 @@ namespace display3d
  			 *  \param cont  container in which the lists are
  			 */
 			template<typename Container>
-			void display(const Container &cont) const;
+			void display(const Container &cont);
 			
 			/**
-			 *  \brief Enable control for the window 
+			 *  \brief Enable control for the window, until a key is pressed
+			 *
+			 *  \param key  key to press to release control
 			 */
-			void enableCtrl();
+			void enableCtrl(const sf::Keyboard::Key &key = sf::Keyboard::Escape);
 			
 			/**
 			 *  \brief Disable control for the window
@@ -160,11 +192,18 @@ namespace display3d
 			void disableCtrl();
 			
 			/**
-			 *  \brief Moves the camera based on wasd (or zqsd on azerty keyboards) keys
+			 *  \brief Tells if controls are enabled or not
+			 *
+			 *  \return true if controls are enabled
+			 */
+			bool isCtrlEnabled() const;
+
+			/**
+			 *  \brief Manages the keyboard (moves the camera, check escape key ...)
 			 *
 			 *  \param camvit  camera speed
 			 */
-			void moveCamera(float camvit = 0.1);
+			void manageKeyboard(float camvit = 4.0);
 	};
 }
 

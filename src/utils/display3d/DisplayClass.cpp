@@ -35,13 +35,16 @@ SOFTWARE.
 #include <camera/PinHole.h>
 
 display3d::DisplayClass::DisplayClass(const std::string &title, unsigned int width, unsigned int height) :
-	m_window(sf::VideoMode(width,height),title), m_nblists(0), m_clock(), m_mousegrabbed(false)
-{}
+	m_window(sf::VideoMode(width,height),title), m_nblists(0), m_clock(), m_ctrlenabled(false), m_campos(0,0,0), m_camrot(0,0,0)
+{
+	setView();
+	m_window.setVerticalSyncEnabled(true);
+}
 
 unsigned int display3d::DisplayClass::startList()
 {
 	m_window.setActive(true);
-	glNewList(m_nblists,GL_COMPILE);
+	glNewList(m_nblists+1,GL_COMPILE);
 	return m_nblists;
 }
 
@@ -51,13 +54,19 @@ void display3d::DisplayClass::endList()
 	glEndList();
 	m_nblists++;
 }
-			
+
 void display3d::DisplayClass::setView(const camera::Camera::Ptr camera)
 {
 	setIntrinsics(camera->getIntrinsics());
 	setExtrinsics(camera->getExtrinsics());
 }
-			
+
+void display3d::DisplayClass::setView()
+{
+	setIntrinsics();
+	setExtrinsics();
+}
+
 void display3d::DisplayClass::setIntrinsics(const camera::Intrinsics::Ptr intrinsics)
 {
 	m_window.setActive(true);
@@ -72,21 +81,41 @@ void display3d::DisplayClass::setIntrinsics(const camera::Intrinsics::Ptr intrin
 	{
 		case camera::Intrinsics::Type::pinhole:
 			glFrustum(
-			  		origin[0]*ZNEAR,
-			  		(width*basis(0,0)+origin[0])*ZNEAR,
-			  		(height*basis(1,1)+origin[1])*ZNEAR,
-			  		origin[1]*ZNEAR,
-			  		ZNEAR,ZFAR);
-			glScalef(1,1,-1);
-			glViewport( 0, 0, width, height );
+					origin.x()*ZNEAR,
+					(width*basis(0,0)+origin.x())*ZNEAR,
+					(height*basis(1,1)+origin.y())*ZNEAR,
+					origin.y()*ZNEAR,
+					ZNEAR,
+					ZFAR);
 			break;
 		case camera::Intrinsics::Type::ortho:
-			glOrtho(-origin[0]/basis(0,0),(width-origin[0])/basis(0,0),(height-origin[1])/basis(1,1),-origin[1]/basis(1,1),ZNEAR,ZFAR);
-			glViewport( 0, 0, width, height );
+			glOrtho(origin[0],origin[0]+width*basis(0,0),origin[1]+height*basis(1,1),origin[1],ZNEAR,ZFAR);
 			break;
 	}
+	glScalef(1,1,-1);
+	glViewport( 0, 0, width, height );
 }
-			
+
+void display3d::DisplayClass::setIntrinsics()
+{
+	m_window.setActive(true);
+	unsigned int width = m_window.getSize().x;
+	unsigned int height = m_window.getSize().y;
+	Eigen::Vector2d origin(-((double)width/(double)width)/2.0,-((double)height/(double)width)/2.0);
+	Eigen::Matrix2d basis = Eigen::Matrix2d::Identity()/(double)width;
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity();
+	glFrustum(
+			origin.x()*ZNEAR,
+			(width*basis(0,0)+origin.x())*ZNEAR,
+			(height*basis(1,1)+origin.y())*ZNEAR,
+			origin.y()*ZNEAR,
+			ZNEAR,
+			ZFAR);
+	glScalef(1,-1,1);
+	glViewport( 0, 0, width, height );
+}
+
 void display3d::DisplayClass::setExtrinsics(const camera::Extrinsics::Ptr extrinsics)
 {
 	m_window.setActive(true);
@@ -106,6 +135,19 @@ void display3d::DisplayClass::setExtrinsics(const camera::Extrinsics::Ptr extrin
 		}
 	}
 	glMultMatrixf(modelMatrix);
+
+	m_campos = sf::Vector3f(0,0,0);
+	m_camrot = sf::Vector3f(0,0,0);
+}
+
+void display3d::DisplayClass::setExtrinsics()
+{
+	m_window.setActive(true);
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity( );
+
+	m_campos = sf::Vector3f(0,0,0);
+	m_camrot = sf::Vector3f(0,0,0);
 }
 
 sf::Window& display3d::DisplayClass::getWindow()
@@ -113,100 +155,158 @@ sf::Window& display3d::DisplayClass::getWindow()
 	return m_window;
 }
 			
-unsigned int display3d::DisplayClass::getNblists()
+unsigned int display3d::DisplayClass::getNblists() const
 {
 	return m_nblists;
 }
 			
-void display3d::DisplayClass::display() const
+void display3d::DisplayClass::display()
 {
 	m_window.setActive(true);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glClearColor(1.0,1.0,1.0,0);
+	
+	glMatrixMode(GL_MODELVIEW);
+
+	glPushMatrix( );
+	glRotatef( -m_camrot.x, 1, 0, 0 );
+	glRotatef( -m_camrot.y, 0, 1, 0 );
+	glRotatef( -m_camrot.z, 0, 0, 1 );
+	glTranslatef( m_campos.x, m_campos.y, m_campos.z );
 
 	for(unsigned int i = 0; i < m_nblists; i++)
-		glCallList(i);
+		glCallList(i+1);
+	
+	glPopMatrix();
+
+	m_window.display();
 }
 			
 template<typename Container>
-void display3d::DisplayClass::display(const Container &cont) const
+void display3d::DisplayClass::display(const Container &cont)
 {
 	m_window.setActive(true);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glClearColor(1.0,1.0,1.0,0);
 
+	glMatrixMode(GL_MODELVIEW);
+
+	glPushMatrix( );
+	glRotatef( -m_camrot.x, 1, 0, 0 );
+	glRotatef( -m_camrot.y, 0, 1, 0 );
+	glRotatef( -m_camrot.z, 0, 0, 1 );
+	glTranslatef( m_campos.x, m_campos.y, m_campos.z );
+
 	for(typename Container::const_iterator it = cont.begin(); it != cont.end(); it++)
-		glCallList(*it);
+		glCallList(*it+1);
+
+	glPopMatrix();
+	m_window.display();
 }
 
 
 namespace display3d
 {
 	template<>
-	void display3d::DisplayClass::display<std::vector<unsigned int> >(const std::vector<unsigned int> &cont) const;
+	void display3d::DisplayClass::display<std::vector<unsigned int> >(const std::vector<unsigned int> &cont);
 
 	template<>
-	void display3d::DisplayClass::display<std::list<unsigned int> >(const std::list<unsigned int> &cont) const;
+	void display3d::DisplayClass::display<std::list<unsigned int> >(const std::list<unsigned int> &cont);
 }
 
-void display3d::DisplayClass::enableCtrl()
+void display3d::DisplayClass::enableCtrl(const sf::Keyboard::Key &key)
 {
 	m_window.setMouseCursorVisible(false);
 	m_clock.restart();
-	sf::Mouse::setPosition(sf::Vector2i(0,0),m_window);
-	m_mousegrabbed = true;
+	sf::Mouse::setPosition(sf::Vector2i(m_window.getSize().x/2,m_window.getSize().y/2),m_window);
+	m_ctrlenabled = true;
+	m_quitkey = key;
 }
 
 void display3d::DisplayClass::disableCtrl()
 {
 	m_window.setMouseCursorVisible(true);
-	m_mousegrabbed = false;
+	m_ctrlenabled = false;
 }
 
-void display3d::DisplayClass::moveCamera(float camvit)
+bool display3d::DisplayClass::isCtrlEnabled() const
 {
-	if(m_mousegrabbed)
+	return m_ctrlenabled;
+}
+
+void display3d::DisplayClass::manageKeyboard(float camvit)
+{
+	if(m_ctrlenabled)
 	{
-		m_window.setActive(true);
-
-		glMatrixMode( GL_MODELVIEW );
-
-		sf::Vector2i coords = sf::Mouse::getPosition(m_window);
-		sf::Mouse::setPosition(sf::Vector2i(0,0),m_window);
-
 		float sec = m_clock.getElapsedTime().asSeconds();
 		m_clock.restart();
+		
 
-		float dx = 0, dz = 0;
-		float dist = camvit*sec;
 
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		// Position
+		float dx = 0, dy = 0, dz = 0;
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
 		{
-			dz += 1;
+			dx =  sin(m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
+			dy =  sin(-m_camrot.x/180.0*3.14159);
+			dz =  cos(m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
 		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		{
-			dz -= 1;
-		}
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		{
-			dx -= 1;
+			dx =  -sin( m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
+			dy =  -sin(-m_camrot.x/180.0*3.14159);
+			dz =  -cos( m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
 		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 		{
-			dx += 1;
+			dx =  -cos(-m_camrot.y/180.0*3.14159);
+			dy =  -0.0;
+			dz =  -sin(-m_camrot.y/180.0*3.14159);
+		}
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+		{
+			dx =  cos(-m_camrot.y/180.0*3.14159);
+			dy =  0.0;
+			dz =  sin(-m_camrot.y/180.0*3.14159);
 		}
 
-		float nor = sqrt(dx*dx+dz*dz);
+		float dist = camvit*sec;
+		
+		float nor = sqrt(dx*dx+dy*dy+dz*dz);
 		if(nor != 0)
 		{
 			dx *= dist/nor;
+			dy *= dist/nor;
 			dz *= dist/nor;
 		}
+		
+		m_campos.x +=dx;
+		m_campos.y +=dy;
+		m_campos.z +=dz;
 
-		glTranslatef(dx,0.0,dz);
 
-		glRotatef(coords.x,1.0,0.0,0.0);
-		glRotatef(coords.y,0.0,1.0,0.0);
+		// Rotation
+		sf::Vector2i coords = sf::Mouse::getPosition(m_window);
+		coords.x -= m_window.getSize().x/2;
+		coords.y -= m_window.getSize().y/2;
+		sf::Mouse::setPosition(sf::Vector2i(m_window.getSize().x/2,m_window.getSize().y/2),m_window);
+		
+		m_camrot.x -= (float)coords.y/2.0;
+		if(m_camrot.x<-90.0) m_camrot.x=-90.0;
+		if(m_camrot.x>90.0) m_camrot.x=90.0;
+		m_camrot.y -= (float)coords.x/2.0;
+		if(m_camrot.y<0.0) m_camrot.y+=360.0;
+		if(m_camrot.y>360.0) m_camrot.y-=360.0;
+
+		// Quit Event
+		sf::Event event;
+		while(m_window.pollEvent(event))
+		{
+			if(event.type == sf::Event::KeyPressed)
+			{
+				if(event.key.code == m_quitkey)
+					disableCtrl();
+			}
+		}
 	}
 }
