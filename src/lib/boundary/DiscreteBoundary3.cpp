@@ -33,7 +33,8 @@ boundary::DiscreteBoundary<3>::DiscreteBoundary(const mathtools::affine::Frame<3
 
 unsigned int boundary::DiscreteBoundary<3>::addPoint(const mathtools::affine::Point<3> &point, const Eigen::Vector3d &normal)
 {
-	unsigned int key = m_node.rbegin()->first+1;
+	unsigned int key = 0;
+    if(m_node.size()) key = m_node.rbegin()->first+1;
 	m_node.insert(std::pair<unsigned int,Eigen::Vector3d>(key,point.getCoords(m_frame)));
 	m_normal.insert(std::pair<unsigned int,Eigen::Vector3d>(key,normal));
 	return key;
@@ -41,11 +42,15 @@ unsigned int boundary::DiscreteBoundary<3>::addPoint(const mathtools::affine::Po
 
 void boundary::DiscreteBoundary<3>::addEdge(unsigned int ind1, unsigned int ind2)
 {
+	if(!isPointIn(ind1) || !isPointIn(ind2))
+		throw std::logic_error("boundary::DiscreteBoundary<3>::addEdge : Index is not in the boundary");
 	m_edge.push_back(std::pair<unsigned int, unsigned int>(ind1,ind2));
 }
  
 void boundary::DiscreteBoundary<3>::addFace(unsigned int ind1, unsigned int ind2, unsigned int ind3)
 {
+	if(!isPointIn(ind1) || !isPointIn(ind2) || !isPointIn(ind3))
+		throw std::logic_error("boundary::DiscreteBoundary<3>::addFace : Index is not in the boundary");
 	m_face.push_back(std::make_tuple(ind1,ind2,ind3));
 }
 
@@ -54,22 +59,27 @@ const mathtools::affine::Frame<3>::Ptr boundary::DiscreteBoundary<3>::getFrame()
 	return m_frame;
 }
 
-const std::map<unsigned int, Eigen::Vector3d> boundary::DiscreteBoundary<3>::getPoints() const
+const std::map<unsigned int, Eigen::Vector3d>& boundary::DiscreteBoundary<3>::getPoints() const
 {
 	return m_node;
 }
 
-const std::map<unsigned int, Eigen::Vector3d> boundary::DiscreteBoundary<3>::getNormals() const
+const std::map<unsigned int, Eigen::Vector3d>& boundary::DiscreteBoundary<3>::getNormals() const
 {
 	return m_normal;
 }
 
-const std::list<std::pair<unsigned int, unsigned int> > boundary::DiscreteBoundary<3>::getEdges() const
+const std::list<std::pair<unsigned int, unsigned int> >& boundary::DiscreteBoundary<3>::getEdges() const
 {
 	return m_edge;
 }
 
-const std::list<std::tuple<unsigned int, unsigned int, unsigned int> > boundary::DiscreteBoundary<3>::getFaces() const
+const std::list<std::tuple<unsigned int, unsigned int, unsigned int> >& boundary::DiscreteBoundary<3>::getFaces() const
 {
 	return m_face;
+}
+
+bool boundary::DiscreteBoundary<3>::isPointIn(unsigned int index) const
+{
+	return (m_node.find(index) != m_node.end());
 }

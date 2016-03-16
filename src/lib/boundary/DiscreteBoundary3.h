@@ -129,28 +129,37 @@ namespace boundary
 			 *
 			 *  \return Map containing the points
 			 */
-			const std::map<unsigned int, Eigen::Vector3d> getPoints() const;
+			const std::map<unsigned int, Eigen::Vector3d>& getPoints() const;
 
 			/**
 			 *  \brief Normals getter
 			 *
 			 *  \return Map containing the normals
 			 */
-			const std::map<unsigned int, Eigen::Vector3d> getNormals() const;
+			const std::map<unsigned int, Eigen::Vector3d>& getNormals() const;
 
 			/**
 			 *  \brief Edges getter
 			 *
 			 *  \return List containing the edges
 			 */
-			const std::list<std::pair<unsigned int, unsigned int> > getEdges() const;
+			const std::list<std::pair<unsigned int, unsigned int> >& getEdges() const;
 
 			/**
 			 *  \brief Faces getter
 			 *
 			 *  \return List containing the faces
 			 */
-			const std::list<std::tuple<unsigned int, unsigned int, unsigned int> > getFaces() const;
+			const std::list<std::tuple<unsigned int, unsigned int, unsigned int> >& getFaces() const;
+
+			/**
+ 			 *  \brief Verifies if a point is in the boundary
+ 			 *
+ 			 *  \param index  index to verify
+ 			 *
+ 			 *  \return true if the point is in the boundary
+ 			 */
+			bool isPointIn(unsigned int index) const;
 	};
 }
 
