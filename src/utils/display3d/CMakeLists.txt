@@ -19,6 +19,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/lib/
 
 target_link_libraries(${LIBRARY_NAME} ${MATHTOOLS_LIB}
 									  ${CAMERA_LIB}
+									  ${OPENGL_LIBRARIES}
 									  ${SFML_LIBRARIES})
 
 
