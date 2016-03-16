@@ -59,7 +59,7 @@ inline Eigen::Matrix3d ComputeFrenetBasis(const Eigen::Vector4d &der, const Eige
 {
 	Eigen::Matrix3d frenet_basis;
 	frenet_basis.block<3,1>(0,0) = der.block<3,1>(0,0).normalized();
-	frenet_basis.block<3,1>(0,1) = der2.block<3,1>(0,0)*(1 - der2.block<3,1>(0,0).dot(frenet_basis.block<3,1>(0,0)));
+	frenet_basis.block<3,1>(0,1) = (der2.block<3,1>(0,0) - der2.block<3,1>(0,0).dot(frenet_basis.block<3,1>(0,0))*frenet_basis.block<3,1>(0,0)).normalized();
 	frenet_basis.block<3,1>(0,2) = frenet_basis.block<3,1>(0,0).cross(frenet_basis.block<3,1>(0,1));
 	return basis->getMatrix()*frenet_basis;
 }
@@ -111,12 +111,12 @@ void ComputeCircles(const skeleton::BranchContSkel3d::Ptr contbr,
 		Eigen::Matrix3d frenet_basis = ComputeFrenetBasis(der,der2,contbr->getModel()->getFrame()->getBasis());
 		HyperCircle<3> circle;
 		
-		if(i != 0)
+		if(list_sph.size())
 		{
 			AdjustFrenetBasis(frenet_basis_prev,frenet_basis);
 		}
 		frenet_basis_prev = frenet_basis;
-
+		
 		if(mathtools::geometry::euclidian::Intersection(plane,sphere,circle))
 		{
 			list_sph.push_back(sphere);
@@ -146,8 +146,8 @@ void ComputeExt(const algorithm::skinning::OptionsContSkinning &options,
 
 	for(unsigned int i = 0; i < nbcer; i++)
 	{
-		Point<3> ctr = ptext + (double)(i+1)*(cir.getCenter() - ptext)/(double)(nbcer+1);
-		double radius = sqrt(pow(sph.getRadius(),2) + (sph.getCenter()-ctr).squaredNorm());
+		Point<3> ctr = cir.getCenter() + (double)(i+1)*(ptext - cir.getCenter())/(double)(nbcer+1);
+		double radius = sqrt(pow(sph.getRadius(),2) - (sph.getCenter()-ctr).squaredNorm());
 		if(first)
 		{
 			list_sph.push_front(sph);
@@ -230,7 +230,7 @@ void ContinuousSkinning_helper(boundary::DiscreteBoundary<3>::Ptr disbnd,
 		{
 			LinkCircles(vec_indprev,vec_ind,disbnd);
 		}
-		vec_indprev = vec_ind;
+		vec_indprev.assign(vec_ind.begin(),vec_ind.end());
 	}
 	for(unsigned int i = 0; i < options.nbpt; i++)
 	{
