@@ -150,10 +150,14 @@ namespace mathtools
 
 					res.setZero();
 
-					for(unsigned int ind = 0; ind<m_ctrlpt.cols(); ind++)
+					Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> ctrlpt = m_ctrlpt;
+					Eigen::Matrix<double,1,Eigen::Dynamic> nodevec = m_nodevec;
+					ComputeDerivative(nodevec,ctrlpt,m_degree,1);
+
+					for(unsigned int ind = 0; ind<ctrlpt.cols(); ind++)
 					{
-						double basis_ind = BsplineBasisDerivative(t,m_degree,ind,m_nodevec,1);
-						res+=m_ctrlpt.block(0,ind,Dim,1)*basis_ind;
+						double basis_ind = BsplineBasis(t,m_degree-1,ind,nodevec);
+						res+=ctrlpt.block(0,ind,Dim,1)*basis_ind;
 					}
 
 					return arr;
@@ -175,10 +179,14 @@ namespace mathtools
 
 					res.setZero();
 
-					for(unsigned int ind = 0; ind<m_ctrlpt.cols(); ind++)
+					Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> ctrlpt = m_ctrlpt;
+					Eigen::Matrix<double,1,Eigen::Dynamic> nodevec = m_nodevec;
+					ComputeDerivative(nodevec,ctrlpt,m_degree,2);
+
+					for(unsigned int ind = 0; ind<ctrlpt.cols(); ind++)
 					{
-						double basis_ind = BsplineBasisDerivative(t,m_degree,ind,m_nodevec,2);
-						res+=m_ctrlpt.block(0,ind,Dim,1)*basis_ind;
+						double basis_ind = BsplineBasis(t,m_degree-2,ind,nodevec);
+						res+=ctrlpt.block(0,ind,Dim,1)*basis_ind;
 					}
 
 					return arr;

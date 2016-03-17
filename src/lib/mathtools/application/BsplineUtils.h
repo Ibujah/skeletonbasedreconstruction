@@ -58,30 +58,15 @@ namespace mathtools
 		double BsplineBasis(double t, unsigned int degree, unsigned int indice, const Eigen::Matrix<double,1,Eigen::Dynamic> &node);
 
 		/**
-		 *  \brief Evaluate the derivative of the bspline basis function
-		 *
-		 *	\param t      Parameter for which evaluate the basis
-		 *	\param degree Bspline degree
-		 *	\param indice Indice of bspline basis
-		 *	\param node   Node vector of the basis
-		 *	\param der    Derivative level
-		 *
-		 *  \return evaluation of the basis derivative for parameter t
-		 *
-		 *  \throws std::logic_error if basis indice is out of node vector
-		 */
-		double BsplineBasisDerivative(double t, unsigned int degree, unsigned int indice, const Eigen::Matrix<double,1,Eigen::Dynamic> &node, unsigned int der);
-
-		/**
-		 *  \brief Blossom function
-		 *
-		 *  \param t    Blossom parameter
-		 *  \param node Node vector
-		 *  \param ctrl In control Vectors, Out control Vectors
-		 *
-		 *  \throws std::logic_error if wrong number of nodes or control points
-		 */
-		void Blossom(double t, const Eigen::Matrix<double,1,Eigen::Dynamic> &node, Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> &ctrl);
+ 		 *  \brief Computes derivative base of nodes and control points for a bspline
+ 		 *
+ 		 *  \param node    In and out node vector
+ 		 *  \param ctrl    In and out control vector
+ 		 *  \param degree  Current degree of the bspline
+ 		 *  \param der     Derivation level
+ 		 */
+		void ComputeDerivative(Eigen::Matrix<double,1,Eigen::Dynamic> &node, Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> &ctrl,
+							   unsigned int degree, unsigned int der);
 	}
 }
 

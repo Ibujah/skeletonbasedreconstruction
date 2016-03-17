@@ -125,82 +125,18 @@ double mathtools::application::BsplineBasis(double t, unsigned int degree, unsig
 	return res;
 }
 
-double mathtools::application::BsplineBasisDerivative(double t, unsigned int degree, unsigned int indice, const Eigen::Matrix<double,1,Eigen::Dynamic> &node, unsigned int der)
+void mathtools::application::ComputeDerivative(Eigen::Matrix<double,1,Eigen::Dynamic> &node, Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> &ctrl,
+		unsigned int degree, unsigned int der)
 {
-	if(indice + der > node.cols() && degree > der)
-		throw std::logic_error("BsplineBasisDerivative : Basis indice is out of node vector");
-	double res = 0.0;
-	/*
-	 *  if degree = 0 && der > 0
-	 *		=> return 0
-	 *
-	 *  if degree = 0 && der == 0
-	 *		=> return B(t)
-	 */
-	if(der == 0)
+	if(der != 0)
 	{
-		res = BsplineBasis(t,degree,indice,node);
-	}
-	/*
-	 *  if degree != 0
-	 *  recursive definition of bspline basis derivative
-	 *  
-	 *  B^{der}_{d,i}(t) = d( B^{der-1}_{d-1,i}(t) * a_1(t) - B^{der-1}_{d-1,i+1}(t) * a_2(t) )
-	 *
-	 *  with a_1(t) = 0                             if i == 0
-	 *	              1/(node[i+d-1] - node[i-1])   if i >  0
-	 *                
-	 *
-	 *  with a_2(t) = 1/(node[i+d] - node[i])       if i + d <  node.cols()
-	 *                0                             if i + d == node.cols()
-	 */
-	else if(degree != 0)
-	{
-		if(indice > 0)
-		{
-			double den1 = node(0, indice + degree - 1) - node(0, indice - 1);
+		ctrl = degree * (ctrl.block(0,1,ctrl.rows(),ctrl.cols()-1) - ctrl.block(0,0,ctrl.rows(),ctrl.cols()-1));
 
-			if(den1 != 0)
-				res += (double)degree * (1.0/den1) * BsplineBasisDerivative(t, degree-1, indice, node, der-1);
-		}
+		for(unsigned int i = 0; i < ctrl.rows(); i++)
+			ctrl.block(i,0,1,ctrl.cols()) =
+				ctrl.block(i,0,1,ctrl.cols()).cwiseQuotient(node.block(0, degree, 1,ctrl.cols())-node.block(0, 0, 1, ctrl.cols()));
 
-		if(indice + degree < node.cols())
-		{
-			double den2 = node(0, indice + degree) - node(0, indice);
-
-			if(den2 != 0)
-				res -= (double)degree * (1.0/den2) * BsplineBasisDerivative(t, degree-1, indice+1, node, der-1);
-		}
-	}	
-	return res;
-}
-
-
-void mathtools::application::Blossom(double t, const Eigen::Matrix<double,1,Eigen::Dynamic> &node, Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> &ctrl)
-{
-	if(node.cols() + 1 < ctrl.cols() || ctrl.cols() == 0)
-		throw std::logic_error("Blossom : wrong number of nodes or control points");
-
-	unsigned int degree = node.cols() - ctrl.cols() + 1;
-
-	if(degree == 0)
-	{
-		ctrl *= 0;
-	}
-	else
-	{
-		for(unsigned int i = 0; i < ctrl.cols()-1; i++)
-		{
-			double tdeb = node(0,i), tfin = node(0,i+degree);
-			if(t >= tdeb && t <= tfin ) //supposed to be different
-			{
-				ctrl.block(0,i,ctrl.rows(),1) = ctrl.block(0,i,ctrl.rows(),1)*(tfin - t)/(tfin - tdeb) + ctrl.block(0,i+1,ctrl.rows(),1)*(t - tdeb)/(tfin - tdeb); 
-			}
-		}
+		node = node.block(0,1,1,node.cols()-2);
+		ComputeDerivative(node,ctrl,degree-1,der-1);
 	}
 }
-
-
-
-
-
