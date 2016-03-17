@@ -50,9 +50,9 @@ inline HyperPlane<3> ComputeCaractPlane(const Eigen::Vector4d &val, const Eigen:
 	Eigen::Matrix4d coeff = Eigen::Matrix4d::Identity();
 	coeff(3,3)=-1;
 
-	double factor = der.transpose()*coeff*val;
+	double factor = der.transpose()*(1.0/normal.norm())*coeff*val;
 
-	return HyperPlane<3>(factor,basis->getMatrix()*normal);
+	return HyperPlane<3>(factor,normal.normalized());
 }
 
 inline Eigen::Matrix3d ComputeFrenetBasis(const Eigen::Vector4d &der, const Eigen::Vector4d &der2, const Basis<3>::Ptr basis)
@@ -116,7 +116,7 @@ void ComputeCircles(const skeleton::BranchContSkel3d::Ptr contbr,
 			AdjustFrenetBasis(frenet_basis_prev,frenet_basis);
 		}
 		frenet_basis_prev = frenet_basis;
-		
+
 		if(mathtools::geometry::euclidian::Intersection(plane,sphere,circle))
 		{
 			list_sph.push_back(sphere);
