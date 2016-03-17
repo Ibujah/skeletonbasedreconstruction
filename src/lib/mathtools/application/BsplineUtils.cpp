@@ -127,7 +127,7 @@ double mathtools::application::BsplineBasis(double t, unsigned int degree, unsig
 
 double mathtools::application::BsplineBasisDerivative(double t, unsigned int degree, unsigned int indice, const Eigen::Matrix<double,1,Eigen::Dynamic> &node, unsigned int der)
 {
-	if(indice + der > node.cols())
+	if(indice + der > node.cols() && degree > der)
 		throw std::logic_error("BsplineBasisDerivative : Basis indice is out of node vector");
 	double res = 0.0;
 	/*
@@ -137,7 +137,7 @@ double mathtools::application::BsplineBasisDerivative(double t, unsigned int deg
 	 *  if degree = 0 && der == 0
 	 *		=> return B(t)
 	 */
-	if(der==0)
+	if(der == 0)
 	{
 		res = BsplineBasis(t,degree,indice,node);
 	}
@@ -158,24 +158,18 @@ double mathtools::application::BsplineBasisDerivative(double t, unsigned int deg
 	{
 		if(indice > 0)
 		{
-			if(node(0, indice-1) <= t && t < node(0, indice + degree - 1))
-			{
-				double den1 = node(0, indice + degree - 1) - node(0, indice - 1);
+			double den1 = node(0, indice + degree - 1) - node(0, indice - 1);
 
-				if(den1 != 0)
-					res += (double)degree * (1.0/den1) * BsplineBasisDerivative(t, degree-1, indice, node, der-1);
-			}
+			if(den1 != 0)
+				res += (double)degree * (1.0/den1) * BsplineBasisDerivative(t, degree-1, indice, node, der-1);
 		}
 
 		if(indice + degree < node.cols())
 		{
-			if(node(0, indice) <= t && t < node(0, indice + degree))
-			{
-				double den2 = node(0, indice + degree) - node(0, indice);
+			double den2 = node(0, indice + degree) - node(0, indice);
 
-				if(den2 != 0)
-					res -= (double)degree * (1.0/den2) * BsplineBasisDerivative(t, degree-1, indice+1, node, der-1);
-			}
+			if(den2 != 0)
+				res -= (double)degree * (1.0/den2) * BsplineBasisDerivative(t, degree-1, indice+1, node, der-1);
 		}
 	}	
 	return res;
