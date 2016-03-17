@@ -35,7 +35,7 @@ SOFTWARE.
 #include <camera/PinHole.h>
 
 display3d::DisplayClass::DisplayClass(const std::string &title, unsigned int width, unsigned int height) :
-	m_window(sf::VideoMode(width,height),title), m_nblists(0), m_clock(), m_ctrlenabled(false), m_campos(0,0,0), m_camrot(0,0,0)
+	m_window(sf::VideoMode(width,height),title,sf::Style::Titlebar), m_nblists(0), m_clock(), m_ctrlenabled(false), m_campos(0,0,0), m_camrot(0,0,0)
 {
 	setView();
 	m_window.setVerticalSyncEnabled(true);
