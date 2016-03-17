@@ -32,7 +32,7 @@ SOFTWARE.
 double mathtools::application::BsplineBasis(double t, unsigned int degree, unsigned int indice, const Eigen::Matrix<double,1,Eigen::Dynamic> &node)
 {
 	if(indice + degree > node.cols())
-		throw std::logic_error("Basis indice is out of node vector");
+		throw std::logic_error("BsplineBasis : Basis indice is out of node vector");
 	double res = 0.0;
 	/*
 	 *  if degree = 0
@@ -119,6 +119,62 @@ double mathtools::application::BsplineBasis(double t, unsigned int degree, unsig
 			if(node(0, indice) <= t)
 			{
 				res += BsplineBasis(t, degree-1, indice+1, node);
+			}
+		}
+	}	
+	return res;
+}
+
+double mathtools::application::BsplineBasisDerivative(double t, unsigned int degree, unsigned int indice, const Eigen::Matrix<double,1,Eigen::Dynamic> &node, unsigned int der)
+{
+	if(indice + der > node.cols())
+		throw std::logic_error("BsplineBasisDerivative : Basis indice is out of node vector");
+	double res = 0.0;
+	/*
+	 *  if degree = 0 && der > 0
+	 *		=> return 0
+	 *
+	 *  if degree = 0 && der == 0
+	 *		=> return B(t)
+	 */
+	if(der==0)
+	{
+		res = BsplineBasis(t,degree,indice,node);
+	}
+	/*
+	 *  if degree != 0
+	 *  recursive definition of bspline basis derivative
+	 *  
+	 *  B^{der}_{d,i}(t) = d( B^{der-1}_{d-1,i}(t) * a_1(t) - B^{der-1}_{d-1,i+1}(t) * a_2(t) )
+	 *
+	 *  with a_1(t) = 0                             if i == 0
+	 *	              1/(node[i+d-1] - node[i-1])   if i >  0
+	 *                
+	 *
+	 *  with a_2(t) = 1/(node[i+d] - node[i])       if i + d <  node.cols()
+	 *                0                             if i + d == node.cols()
+	 */
+	else if(degree != 0)
+	{
+		if(indice > 0)
+		{
+			if(node(0, indice-1) <= t && t < node(0, indice + degree - 1))
+			{
+				double den1 = node(0, indice + degree - 1) - node(0, indice - 1);
+
+				if(den1 != 0)
+					res += (double)degree * (1.0/den1) * BsplineBasisDerivative(t, degree-1, indice, node, der-1);
+			}
+		}
+
+		if(indice + degree < node.cols())
+		{
+			if(node(0, indice) <= t && t < node(0, indice + degree))
+			{
+				double den2 = node(0, indice + degree) - node(0, indice);
+
+				if(den2 != 0)
+					res -= (double)degree * (1.0/den2) * BsplineBasisDerivative(t, degree-1, indice+1, node, der-1);
 			}
 		}
 	}	
