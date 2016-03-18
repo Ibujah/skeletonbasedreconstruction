@@ -59,10 +59,15 @@ namespace algorithm
 			unsigned int nbpt;
 
 			/**
+ 			 *  \brief Fraction of circles that are on the extremities
+ 			 */
+			unsigned int fracnbcer;
+
+			/**
 			 *  \brief Default constructor
 			 */
-			OptionsContSkinning(unsigned int nbcer_ = 20, unsigned int nbpt_ = 16) :
-				nbcer(nbcer_), nbpt(nbpt_) {}
+			OptionsContSkinning(unsigned int nbcer_ = 20, unsigned int nbpt_ = 16, unsigned int fracnbcer_ = 8) :
+				nbcer(nbcer_), nbpt(nbpt_), fracnbcer(fracnbcer_) {}
 		};
 		
 		/**

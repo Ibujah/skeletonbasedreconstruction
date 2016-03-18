@@ -142,7 +142,7 @@ void ComputeExt(const algorithm::skinning::OptionsContSkinning &options,
 	norext = dir * basis->getMatrix().block<3,1>(0,0);
 	ptext = sph.getCenter() + sph.getRadius() * norext;
 	
-	unsigned int nbcer = options.nbcer/4;
+	unsigned int nbcer = options.nbcer/options.fracnbcer;
 
 	for(unsigned int i = 0; i < nbcer; i++)
 	{
