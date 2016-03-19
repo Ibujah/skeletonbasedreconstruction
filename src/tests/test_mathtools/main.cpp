@@ -48,8 +48,6 @@ using namespace mathtools::affine;
 #define BOOST_TEST_MODULE TestMathtools
 #include <boost/test/unit_test.hpp>
 
-#include <iostream>
-
 BOOST_AUTO_TEST_CASE( BsplineTest )
 {
 	unsigned int fraction = 100;
