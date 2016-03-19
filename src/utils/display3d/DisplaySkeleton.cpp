@@ -32,8 +32,9 @@ SOFTWARE.
 
 using namespace mathtools::affine;
 
-void DisplayBranch_helper(const skeleton::BranchContSkel3d::Ptr contbr, unsigned int nb_pts)
+void DisplayBranch_helper(const skeleton::BranchContSkel3d::Ptr contbr, unsigned int nb_pts, float red, float green, float blue)
 {
+	glColor3f(red,green,blue);
 	Point<3> pt_prev = contbr->getNode<Point<3> >(0.0);
 	glDisable(GL_DEPTH_TEST);
     glLineWidth(4.0);
@@ -56,16 +57,16 @@ void DisplayBranch_helper(const skeleton::BranchContSkel3d::Ptr contbr, unsigned
     glLineWidth(1.0);
 }
 
-unsigned int display3d::DisplayBranch(DisplayClass &disclass, const skeleton::BranchContSkel3d::Ptr contbr)
+unsigned int display3d::DisplayBranch(DisplayClass &disclass, const skeleton::BranchContSkel3d::Ptr contbr, float red, float green, float blue)
 {
 	unsigned int indexlist = disclass.startList();
-	DisplayBranch_helper(contbr,100);
+	DisplayBranch_helper(contbr,100,red,green,blue);
 	disclass.endList();
 	return indexlist;
 }
 
 
-unsigned int display3d::DisplaySkeleton(DisplayClass &disclass, const skeleton::CompContSkel3d::Ptr contskl)
+unsigned int display3d::DisplaySkeleton(DisplayClass &disclass, const skeleton::CompContSkel3d::Ptr contskl, float red, float green, float blue)
 {
 	unsigned int indexlist = disclass.startList();
 	std::vector<unsigned int> edge(0);
@@ -73,7 +74,7 @@ unsigned int display3d::DisplaySkeleton(DisplayClass &disclass, const skeleton::
 
 	for(unsigned int i=0;i<edge.size();i++)
 	{
-		DisplayBranch_helper(contskl->getBranch(edge[i]),100);
+		DisplayBranch_helper(contskl->getBranch(edge[i]),100,red,green,blue);
 	}
 
 	disclass.endList();

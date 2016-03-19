@@ -46,7 +46,7 @@ namespace display3d
 	 *
 	 *  \return index of the list containing the branch
 	 */
-	unsigned int DisplayBranch(DisplayClass &disclass, const skeleton::BranchContSkel3d::Ptr contbr);
+	unsigned int DisplayBranch(DisplayClass &disclass, const skeleton::BranchContSkel3d::Ptr contbr, float red = 0.0, float green = 0.0, float blue = 1.0);
 
 	/**
 	 *  \brief Displays a continuous skeleton
@@ -56,7 +56,7 @@ namespace display3d
 	 *
 	 *  \return index of the list containing the skeleton
 	 */
-	unsigned int DisplaySkeleton(DisplayClass &disclass, const skeleton::CompContSkel3d::Ptr contskel);
+	unsigned int DisplaySkeleton(DisplayClass &disclass, const skeleton::CompContSkel3d::Ptr contskel, float red = 0.0, float green = 0.0, float blue = 1.0);
 }
 
 
