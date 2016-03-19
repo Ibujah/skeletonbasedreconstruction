@@ -142,8 +142,11 @@ namespace mathtools
 				 *  \param bspline Bspline to copy
 				 */
 				Bspline(const Bspline<Dim> &bspline) : 
-					Application<Eigen::Matrix<double,Dim,1>,double>(), m_ctrlpt(bspline.m_ctrlpt), 
-					m_nodevec(bspline.m_nodevec), m_degree(bspline.m_degree) {};
+					Application<Eigen::Matrix<double,Dim,1>,double>(),
+					m_ctrlpt(bspline.m_ctrlpt), m_nodevec(bspline.m_nodevec),
+					m_ctrlptder(bspline.m_ctrlptder), m_nodevecder(bspline.m_nodevecder),
+					m_ctrlptder2(bspline.m_ctrlptder2), m_nodevecder2(bspline.m_nodevecder2),
+					m_degree(bspline.m_degree) {};
 				
 				/**
 				 *  \brief Bspline call
