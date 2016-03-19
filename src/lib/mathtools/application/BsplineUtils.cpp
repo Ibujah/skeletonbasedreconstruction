@@ -124,19 +124,3 @@ double mathtools::application::BsplineBasis(double t, unsigned int degree, unsig
 	}	
 	return res;
 }
-
-void mathtools::application::ComputeDerivative(Eigen::Matrix<double,1,Eigen::Dynamic> &node, Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> &ctrl,
-		unsigned int degree, unsigned int der)
-{
-	if(der != 0)
-	{
-		ctrl = degree * (ctrl.block(0,1,ctrl.rows(),ctrl.cols()-1) - ctrl.block(0,0,ctrl.rows(),ctrl.cols()-1));
-
-		for(unsigned int i = 0; i < ctrl.rows(); i++)
-			ctrl.block(i,0,1,ctrl.cols()) =
-				ctrl.block(i,0,1,ctrl.cols()).cwiseQuotient(node.block(0, degree, 1,ctrl.cols())-node.block(0, 0, 1, ctrl.cols()));
-
-		node = node.block(0,1,1,node.cols()-2);
-		ComputeDerivative(node,ctrl,degree-1,der-1);
-	}
-}

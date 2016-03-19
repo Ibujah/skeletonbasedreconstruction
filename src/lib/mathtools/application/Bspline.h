@@ -81,6 +81,26 @@ namespace mathtools
 				Eigen::Matrix<double,1,Eigen::Dynamic> m_nodevec;
 
 				/**
+				 *  \brief Control points for first derivative
+				 */
+				Eigen::Matrix<double,Dim,Eigen::Dynamic> m_ctrlptder;
+
+				/**
+				 *  \brief Node vector for first derivative
+				 */
+				Eigen::Matrix<double,1,Eigen::Dynamic> m_nodevecder;
+
+				/**
+				 *  \brief Control points for second derivative
+				 */
+				Eigen::Matrix<double,Dim,Eigen::Dynamic> m_ctrlptder2;
+
+				/**
+				 *  \brief Node vector for second derivative
+				 */
+				Eigen::Matrix<double,1,Eigen::Dynamic> m_nodevecder2;
+
+				/**
 				 *  \brief Bspline degree
 				 */
 				unsigned int m_degree;
@@ -98,11 +118,22 @@ namespace mathtools
 				Bspline(const Eigen::Matrix<double,Dim,Eigen::Dynamic> &ctrlpt,
 						const Eigen::Matrix<double,1,Eigen::Dynamic>   &nodevec,
 						const unsigned int &degree) : 
-					Application<Eigen::Matrix<double,Dim,1>,double>(), m_ctrlpt(ctrlpt), 
-					m_nodevec(nodevec), m_degree(degree)
+					Application<Eigen::Matrix<double,Dim,1>,double>(),
+					m_ctrlpt(ctrlpt), m_nodevec(nodevec),
+					m_ctrlptder(Dim,1), m_nodevecder(1,1),
+					m_ctrlptder2(Dim,1), m_nodevecder2(1,1),
+					m_degree(degree)
 				{
 					if( ctrlpt.cols() + degree != nodevec.cols()+1  )
 						throw std::logic_error("Bspline : not verified #CtrlPt + degree = #NodeVec + 1");
+					if(m_degree>0)
+					{
+						ComputeDerivative<Dim>(m_degree, m_nodevec, m_ctrlpt, m_nodevecder, m_ctrlptder);
+					}
+					if(m_degree>1)
+					{
+						ComputeDerivative<Dim>(m_degree-1, m_nodevecder, m_ctrlptder, m_nodevecder2, m_ctrlptder2);
+					}
 				}
 
 				/**
@@ -149,15 +180,14 @@ namespace mathtools
 					Eigen::Map<Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value> > res((double*)arr.data());
 
 					res.setZero();
-
-					Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> ctrlpt = m_ctrlpt;
-					Eigen::Matrix<double,1,Eigen::Dynamic> nodevec = m_nodevec;
-					ComputeDerivative(nodevec,ctrlpt,m_degree,1);
-
-					for(unsigned int ind = 0; ind<ctrlpt.cols(); ind++)
+					
+					if(m_degree > 0)
 					{
-						double basis_ind = BsplineBasis(t,m_degree-1,ind,nodevec);
-						res+=ctrlpt.block(0,ind,Dim,1)*basis_ind;
+						for(unsigned int ind = 0; ind<m_ctrlptder.cols(); ind++)
+						{
+							double basis_ind = BsplineBasis(t,m_degree-1,ind,m_nodevecder);
+							res+=m_ctrlptder.block(0,ind,Dim,1)*basis_ind;
+						}
 					}
 
 					return arr;
@@ -176,17 +206,16 @@ namespace mathtools
 					typename derivativematrix<2,dimension<outType>::value,dimension<inType>::value>::type arr;
 					
 					Eigen::Map<Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value> > res((double*)arr.data());
-
+					
 					res.setZero();
-
-					Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> ctrlpt = m_ctrlpt;
-					Eigen::Matrix<double,1,Eigen::Dynamic> nodevec = m_nodevec;
-					ComputeDerivative(nodevec,ctrlpt,m_degree,2);
-
-					for(unsigned int ind = 0; ind<ctrlpt.cols(); ind++)
+					
+					if(m_degree > 1)
 					{
-						double basis_ind = BsplineBasis(t,m_degree-2,ind,nodevec);
-						res+=ctrlpt.block(0,ind,Dim,1)*basis_ind;
+						for(unsigned int ind = 0; ind<m_ctrlptder2.cols(); ind++)
+						{
+							double basis_ind = BsplineBasis(t,m_degree-2,ind,m_nodevecder2);
+							res+=m_ctrlptder2.block(0,ind,Dim,1)*basis_ind;
+						}
 					}
 
 					return arr;
