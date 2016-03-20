@@ -74,10 +74,14 @@ namespace mathtools
 				 *
 				 *  \param matrix  full rank matrix
 				 *
-				 *  \throws logic_error if matrix parameter not invertible
+				 *  \throws logic_error if matrix parameter not invertible, or if it contains nan
 				 */
 				Basis(const Eigen::Matrix<double,Dim,Dim> &matrix) : m_matrix(matrix)
 				{
+					if(m_matrix != m_matrix)
+					{
+						throw new std::logic_error("mathtools::vectorial::Basis() : basis parameter is not a number");
+					}
 					double det = m_matrix.determinant();
 					if(det*det <= Eigen::NumTraits<double>::dummy_precision())
 					{
@@ -92,11 +96,15 @@ namespace mathtools
 				 *  \param vec1 first basis vector
 				 *  \param vec2 second basis vector
 				 *
-				 *  \throws logic_error if matrix parameter not invertible
+				 *  \throws logic_error if matrix parameter not invertible, or if it contains nan
 				 */
 				Basis(const Eigen::Vector2d &vec1, const Eigen::Vector2d &vec2)
 				{
 					m_matrix << vec1, vec2;
+					if(m_matrix != m_matrix)
+					{
+						throw new std::logic_error("mathtools::vectorial::Basis() : basis parameter is not a number");
+					}
 					double det = m_matrix.determinant();
 					if(det*det <= Eigen::NumTraits<double>::dummy_precision())
 					{
@@ -112,11 +120,15 @@ namespace mathtools
 				 *  \param vec2 second basis vector
 				 *  \param vec3 third basis vector
 				 *
-				 *  \throws logic_error if matrix parameter not invertible
+				 *  \throws logic_error if matrix parameter not invertible, or if it contains nan
 				 */
 				Basis(const Eigen::Vector3d &vec1, const Eigen::Vector3d &vec2, const Eigen::Vector3d &vec3)
 				{
 					m_matrix << vec1, vec2, vec3;
+					if(m_matrix != m_matrix)
+					{
+						throw new std::logic_error("mathtools::vectorial::Basis() : basis parameter is not a number");
+					}
 					double det = m_matrix.determinant();
 					if(det*det <= Eigen::NumTraits<double>::dummy_precision())
 					{
