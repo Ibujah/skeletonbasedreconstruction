@@ -29,6 +29,7 @@ SOFTWARE.
 
 #include "ContinuousSkinning.h"
 #include <vector>
+#include <Eigen/SVD>
 #include <mathtools/vectorial/Basis.h>
 #include <mathtools/geometry/euclidian/HyperPlane.h>
 #include <mathtools/geometry/euclidian/HyperSphere.h>
@@ -90,6 +91,194 @@ inline void LinkCircles(const std::vector<unsigned int> &prev_pts, const std::ve
 	}
 }
 
+void CompleteFrenetBasisBegining(const std::list<HyperCircle<3> > &list_cir, std::list<Basis<3>::Ptr> &list_basis)
+{
+	std::list<HyperCircle<3> >::const_reverse_iterator itcir = list_cir.rend();
+	std::list<Basis<3>::Ptr >::reverse_iterator itbas = list_basis.rend();
+	
+	do
+	{
+		itcir--;
+		itbas--;
+	}while((*itbas) == NULL);
+	
+	Eigen::Vector3d nor = (*itbas)->getMatrix().block<3,1>(0,1);
+	
+	for(; itbas != list_basis.rend(); itbas++, itcir++)
+	{
+		Eigen::Vector3d tgt = itcir->getNormal().normalized();
+		Eigen::Vector3d binor = tgt.cross(nor).normalized();
+		nor = binor.cross(tgt).normalized();
+		
+		Basis<3>::Ptr basis = Basis<3>::CreateBasis(tgt,nor,binor);
+		*itbas = basis;
+	}
+}
+
+void CompleteFrenetBasisEnding(const std::list<HyperCircle<3> > &list_cir, std::list<Basis<3>::Ptr> &list_basis)
+{
+	std::list<HyperCircle<3> >::const_iterator itcir = list_cir.end();
+	std::list<Basis<3>::Ptr >::iterator itbas = list_basis.end();
+	
+	do
+	{
+		itcir--;
+		itbas--;
+	}while((*itbas) == NULL);
+	
+	Eigen::Vector3d nor = (*itbas)->getMatrix().block<3,1>(0,1);
+	
+	for(; itbas != list_basis.end(); itbas++, itcir++)
+	{
+		Eigen::Vector3d tgt = itcir->getNormal().normalized();
+		Eigen::Vector3d binor = tgt.cross(nor).normalized();
+		nor = binor.cross(tgt).normalized();
+		
+		Basis<3>::Ptr basis = Basis<3>::CreateBasis(tgt,nor,binor);
+		*itbas = basis;
+	}
+}
+
+void CompleteFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<Basis<3>::Ptr> &list_basis)
+{
+	std::list<HyperCircle<3> >::const_iterator itcirbeg = list_cir.begin();
+	std::list<Basis<3>::Ptr >::iterator itbasbeg = list_basis.begin();
+	
+	bool finished = false;
+	
+	while(itbasbeg != list_basis.end() && finished)
+	{
+		itbasbeg++;
+		itcirbeg++;
+
+		if((*std::next(itbasbeg)) == NULL)
+			finished = false;
+	}
+	
+	while(!finished)
+	{
+		std::list<HyperCircle<3> >::const_iterator itcirend = itcirbeg;
+		std::list<Basis<3>::Ptr >::iterator itbasend = itbasbeg;
+		
+		do
+		{
+			itcirend++;
+			itbasend++;
+		}while((*itbasend) == NULL);
+		
+		Eigen::Vector3d norbeg = (*itbasbeg)->getMatrix().block<3,1>(0,1);
+		Eigen::Vector3d norend = (*itbasend)->getMatrix().block<3,1>(0,1);
+		
+		Eigen::Vector3d ptbeg = itcirbeg->getCenter().getCoords();
+		Eigen::Vector3d ptend = itcirend->getCenter().getCoords();
+		
+		itcirbeg++;
+		itbasbeg++;
+		
+		for(;itbasbeg != itbasend; itbasbeg++, itcirbeg++)
+		{
+			Eigen::Vector3d ptcur = itcirbeg->getCenter().getCoords();
+			double prop = (ptcur - ptbeg).norm() / ((ptcur - ptbeg).norm() + (ptend - ptcur).norm());
+			
+			Eigen::Vector3d norcur = norbeg * (1.0 - prop) + norend * prop;
+			
+			Eigen::Vector3d tgt = itcirbeg->getNormal().normalized();
+			Eigen::Vector3d binor = tgt.cross(norcur).normalized();
+			norcur = binor.cross(tgt).normalized();
+			
+			Basis<3>::Ptr basis = Basis<3>::CreateBasis(tgt,norcur,binor);
+			*itbasbeg = basis;
+		}
+		
+		finished = true;
+		
+		while(itbasbeg != list_basis.end() && finished)
+		{
+			itbasbeg++;
+			itcirbeg++;
+
+			if((*std::next(itbasbeg)) == NULL)
+				finished = false;
+		}
+	}
+}
+
+void FillFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<Basis<3>::Ptr> &list_basis)
+{
+	Eigen::Matrix<double,3,Eigen::Dynamic> matpt(3,list_cir.size());
+	Eigen::Vector3d mean = Eigen::Vector3d::Zero();
+	
+	unsigned int numpt = 0;
+	for(std::list<HyperCircle<3> >::const_iterator it = list_cir.begin(); it != list_cir.end(); it++)
+	{
+		matpt.block<3,1>(0,numpt) = it->getCenter().getCoords();
+		mean += it->getCenter().getCoords();
+		numpt++;
+	}
+	
+	mean *= (1.0/(double)numpt);
+	matpt -= mean * Eigen::Matrix<double,1,Eigen::Dynamic>::Ones(1,list_cir.size());
+	
+	Eigen::JacobiSVD<Eigen::Matrix<double,3,Eigen::Dynamic> > svd(matpt,Eigen::ComputeThinU);
+	svd.computeU();
+	Eigen::Matrix3d U = svd.matrixU();
+	
+	Eigen::Vector3d nor = U.block<3,1>(0,2);
+	
+	std::list<HyperCircle<3> >::const_iterator itcir = list_cir.begin();
+	std::list<Basis<3>::Ptr >::iterator itbas = list_basis.begin();
+	
+	for(; itbas != list_basis.end(); itbas++, itcir++)
+	{
+		Eigen::Vector3d tgt = itcir->getNormal().normalized();
+		Eigen::Vector3d binor = tgt.cross(nor).normalized();
+		nor = binor.cross(tgt).normalized();
+		
+		Basis<3>::Ptr basis = Basis<3>::CreateBasis(tgt,nor,binor);
+		*itbas = basis;
+	}
+}
+
+void CheckFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<Basis<3>::Ptr> &list_basis)
+{
+	// cases
+	// 1 - list_basis is empty
+	// 2 - list_basis misses some elements (not extremities)
+	// 3 - list_basis misses 1 or 2 extremities
+	// 4 - list_basis is full
+	
+	bool full = true;
+	bool empty = true;
+	
+	for(std::list<Basis<3>::Ptr>::iterator it = list_basis.begin(); it != list_basis.end(); it++)
+	{
+		if((*it) == NULL)
+		{
+			full = false;
+		}
+		else
+		{
+			empty = false;
+		}
+	}
+
+	bool miss_beg = (*(list_basis.begin()) == NULL);
+	bool miss_end = (*(list_basis.rbegin()) == NULL);
+
+	if(empty)
+	{
+		FillFrenetBasis(list_cir,list_basis);
+	}
+	else if(!full)
+	{
+		if(miss_beg)
+			CompleteFrenetBasisBegining(list_cir,list_basis);
+		if(miss_end)
+			CompleteFrenetBasisEnding(list_cir,list_basis);
+		CompleteFrenetBasis(list_cir,list_basis);
+	}
+}
+
 void ComputeCircles(const skeleton::BranchContSkel3d::Ptr contbr,
 					const algorithm::skinning::OptionsContSkinning &options,
 					std::list<HyperSphere<3> > &list_sph,
@@ -121,9 +310,20 @@ void ComputeCircles(const skeleton::BranchContSkel3d::Ptr contbr,
 		{
 			list_sph.push_back(sphere);
 			list_cir.push_back(circle);
-			list_basis.push_back(Basis<3>::CreateBasis(frenet_basis));
+			Basis<3>::Ptr basis(NULL);
+			if(der2.block<3,1>(0,0).norm() != 0.0)
+			{
+				try
+				{
+					basis = Basis<3>::CreateBasis(frenet_basis);
+				}
+				catch(...)
+				{}
+			}
+			list_basis.push_back(basis);
 		}
 	}
+	CheckFrenetBasis(list_cir,list_basis);
 }
 
 void ComputeExt(const algorithm::skinning::OptionsContSkinning &options,
