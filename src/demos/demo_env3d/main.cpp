@@ -63,6 +63,17 @@ int main()
 			   0.1, 0.2, 0.2, 0.1;
 	mathtools::application::Application<Eigen::Vector4d,double>::Ptr bspline2(new mathtools::application::Bspline<4>(ctrlpt2,nodevec2,degree));
 	
+	// Partial straight skeleton
+	unsigned int nbctrlpt3 = 6;
+	Eigen::Matrix<double,1,Eigen::Dynamic> nodevec3(1,nbctrlpt3 + degree - 1);
+	nodevec3 << 0.0, 0.0, 0.0, 0.3, 0.6, 1.0, 1.0, 1.0;
+	Eigen::Matrix<double,4,Eigen::Dynamic> ctrlpt3(4,nbctrlpt3);
+	ctrlpt3 << 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,
+			   0.0, 1.5, 1.5, 1.5, 1.5, 3.0,
+			   0.0, 1.0, 1.5, 2.0, 2.5, 3.0,
+			   0.1, 0.2, 0.2, 0.1, 0.1, 0.2;
+	mathtools::application::Application<Eigen::Vector4d,double>::Ptr bspline3(new mathtools::application::Bspline<4>(ctrlpt3,nodevec3,degree));
+	
 	skeleton::BranchContSkel3d::Ptr contbr1(
 			new skeleton::BranchContSkel3d(
 					skeleton::model::Classic<3>::Ptr(new skeleton::model::Classic<3>()),
@@ -75,6 +86,12 @@ int main()
 					bspline2));
 	boundary::DiscreteBoundary<3>::Ptr bnd2 = algorithm::skinning::ContinuousSkinning(contbr2->reverted()->reverted());
 	
+	skeleton::BranchContSkel3d::Ptr contbr3(
+			new skeleton::BranchContSkel3d(
+					skeleton::model::Classic<3>::Ptr(new skeleton::model::Classic<3>()),
+					bspline3));
+	boundary::DiscreteBoundary<3>::Ptr bnd3 = algorithm::skinning::ContinuousSkinning(contbr3->reverted()->reverted());
+	
 	display3d::DisplayClass disclass("Test SFML");
 	
 	display3d::DisplayFrame(disclass,mathtools::affine::Frame<3>::CanonicFrame());
@@ -82,6 +99,8 @@ int main()
 	display3d::DisplayBoundary_Wired(disclass,bnd1);
 	display3d::DisplayBranch(disclass,contbr2);
 	display3d::DisplayBoundary_Wired(disclass,bnd2);
+	display3d::DisplayBranch(disclass,contbr3);
+	display3d::DisplayBoundary_Wired(disclass,bnd3);
 	
 	
 	disclass.enableCtrl();
