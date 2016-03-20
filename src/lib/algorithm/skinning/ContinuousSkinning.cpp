@@ -144,15 +144,19 @@ void CompleteFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<B
 	std::list<HyperCircle<3> >::const_iterator itcirbeg = list_cir.begin();
 	std::list<Basis<3>::Ptr >::iterator itbasbeg = list_basis.begin();
 	
-	bool finished = false;
+	bool finished = true;
 	
 	while(itbasbeg != list_basis.end() && finished)
 	{
-		itbasbeg++;
-		itcirbeg++;
-
 		if((*std::next(itbasbeg)) == NULL)
+		{
 			finished = false;
+		}
+		else
+		{
+			itbasbeg++;
+			itcirbeg++;
+		}
 	}
 	
 	while(!finished)
@@ -166,8 +170,15 @@ void CompleteFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<B
 			itbasend++;
 		}while((*itbasend) == NULL);
 		
-		Eigen::Vector3d norbeg = (*itbasbeg)->getMatrix().block<3,1>(0,1);
 		Eigen::Vector3d norend = (*itbasend)->getMatrix().block<3,1>(0,1);
+		
+		Eigen::Vector3d coordsend = (*itbasbeg)->getMatrixInverse() * norend;
+		Basis<3>::Ptr basbeg = (*itbasbeg);
+		
+		coordsend *= (1.0/coordsend.block<2,1>(1,0).norm());
+
+		double angleend = atan2(coordsend.z(),coordsend.y());
+		if(angleend > M_PI) angleend -= 2*M_PI;
 		
 		Eigen::Vector3d ptbeg = itcirbeg->getCenter().getCoords();
 		Eigen::Vector3d ptend = itcirend->getCenter().getCoords();
@@ -180,7 +191,9 @@ void CompleteFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<B
 			Eigen::Vector3d ptcur = itcirbeg->getCenter().getCoords();
 			double prop = (ptcur - ptbeg).norm() / ((ptcur - ptbeg).norm() + (ptend - ptcur).norm());
 			
-			Eigen::Vector3d norcur = norbeg * (1.0 - prop) + norend * prop;
+			double anglecur = prop * angleend;
+
+			Eigen::Vector3d norcur = basbeg->getMatrix() * Eigen::Vector3d(0.0,cos(anglecur),sin(anglecur));
 			
 			Eigen::Vector3d tgt = itcirbeg->getNormal().normalized();
 			Eigen::Vector3d binor = tgt.cross(norcur).normalized();
@@ -194,11 +207,15 @@ void CompleteFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<B
 		
 		while(itbasbeg != list_basis.end() && finished)
 		{
-			itbasbeg++;
-			itcirbeg++;
-
 			if((*std::next(itbasbeg)) == NULL)
+			{
 				finished = false;
+			}
+			else
+			{
+				itbasbeg++;
+				itcirbeg++;
+			}
 		}
 	}
 }
@@ -252,18 +269,18 @@ void CheckFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<Basi
 	
 	for(std::list<Basis<3>::Ptr>::iterator it = list_basis.begin(); it != list_basis.end(); it++)
 	{
-		if((*it) == NULL)
-		{
-			full = false;
-		}
-		else
+		if((*it).operator bool())
 		{
 			empty = false;
 		}
+		else
+		{
+			full = false;
+		}
 	}
-
-	bool miss_beg = (*(list_basis.begin()) == NULL);
-	bool miss_end = (*(list_basis.rbegin()) == NULL);
+	
+	bool miss_beg = !(*(list_basis.begin()));
+	bool miss_end = !(*(list_basis.rbegin()));
 
 	if(empty)
 	{
@@ -310,7 +327,7 @@ void ComputeCircles(const skeleton::BranchContSkel3d::Ptr contbr,
 		{
 			list_sph.push_back(sphere);
 			list_cir.push_back(circle);
-			Basis<3>::Ptr basis(NULL);
+			Basis<3>::Ptr basis;
 			if(der2.block<3,1>(0,0).norm() != 0.0)
 			{
 				try
