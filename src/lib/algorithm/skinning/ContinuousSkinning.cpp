@@ -148,7 +148,7 @@ void CompleteFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<B
 	
 	while(itbasbeg != list_basis.end() && finished)
 	{
-		if((*std::next(itbasbeg)) == NULL)
+		if(!(*std::next(itbasbeg)))
 		{
 			finished = false;
 		}
@@ -168,7 +168,7 @@ void CompleteFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<B
 		{
 			itcirend++;
 			itbasend++;
-		}while((*itbasend) == NULL);
+		}while(!(*itbasend));
 		
 		Eigen::Vector3d norend = (*itbasend)->getMatrix().block<3,1>(0,1);
 		
@@ -207,7 +207,12 @@ void CompleteFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<B
 		
 		while(itbasbeg != list_basis.end() && finished)
 		{
-			if((*std::next(itbasbeg)) == NULL)
+			if(std::next(itbasbeg) == list_basis.end())
+			{
+				itbasbeg++;
+				itcirbeg++;
+			}
+			else if(!(*std::next(itbasbeg)))
 			{
 				finished = false;
 			}
