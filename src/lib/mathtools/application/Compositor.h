@@ -281,7 +281,7 @@ namespace mathtools
 					{
 						Eigen::Map<Eigen::Matrix<double,dimension<inType>::value,dimension<inType>::value>,0,Eigen::InnerStride<dimension<outType>::value> > fog_der2_i((double*)fog_der2.data() + i);
 						
-						Eigen::Map<Eigen::Matrix<double,dimension<typename Fct::inType>::value,dimension<typename Fct::inType>::value>,0,Eigen::InnerStride<dimension<typename Fct::outType>::value> > Hf_i((double*)f_sec.data() + i);
+						Eigen::Map<Eigen::Matrix<double,dimension<typename Fct::inType>::value,dimension<typename Fct::inType>::value>,0,Eigen::Stride<dimension<typename Fct::outType>::value*dimension<typename Fct::inType>::value,dimension<typename Fct::outType>::value> > Hf_i((double*)f_sec.data() + i);
 						
 						fog_der2_i = Jg.transpose() * Hf_i * Jg;
 
