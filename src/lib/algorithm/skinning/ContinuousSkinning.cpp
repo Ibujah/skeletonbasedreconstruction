@@ -148,7 +148,12 @@ void CompleteFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<B
 	
 	while(itbasbeg != list_basis.end() && finished)
 	{
-		if(!(*std::next(itbasbeg)))
+		if(std::next(itbasbeg) == list_basis.end())
+		{
+			itbasbeg++;
+			itcirbeg++;
+		}
+		else if(!(*std::next(itbasbeg)))
 		{
 			finished = false;
 		}
