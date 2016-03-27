@@ -62,6 +62,13 @@ bool skeleton::model::Orthographic::included(const Eigen::Matrix<double,meta<Ort
 		vec1(meta<Orthographic>::stordim-1,0);
 }
 
+mathtools::affine::Point<2> skeleton::model::Orthographic::toObj(
+		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
+		const mathtools::affine::Point<2> &) const
+{
+	return mathtools::affine::Point<2>(vec(0),vec(1));
+}
+
 mathtools::geometry::euclidian::Line<4> skeleton::model::Orthographic::toObj(
 		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
 		const mathtools::geometry::euclidian::Line<4> &) const

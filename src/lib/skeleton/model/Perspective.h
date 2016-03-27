@@ -125,6 +125,16 @@ namespace skeleton
 
 			protected:
 				/**
+				 *  \brief Associate the center of the ellips to a vector
+				 *
+				 *  \param vec vector to convert
+				 *
+				 *  \return center associated to vec
+				 */
+				virtual mathtools::affine::Point<2> toObj(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec,
+														  const mathtools::affine::Point<2> &) const;
+
+				/**
 				 *  \brief Associate a line to a vector
 				 *
 				 *  \param vec vector to convert

@@ -69,6 +69,13 @@ bool skeleton::model::Perspective::included(const Eigen::Matrix<double,meta<Pers
 	return ((ctr1-ctr2).norm()+rad2 <= rad1);
 }
 
+mathtools::affine::Point<2> skeleton::model::Perspective::toObj(
+		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
+		const mathtools::affine::Point<2> &) const
+{
+	return mathtools::affine::Point<2>(vec(0),vec(1));
+}
+
 mathtools::geometry::euclidian::Line<4> skeleton::model::Perspective::toObj(
 		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
 		const mathtools::geometry::euclidian::Line<4> &) const
