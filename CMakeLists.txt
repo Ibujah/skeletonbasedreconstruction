@@ -54,9 +54,10 @@ set(ALGORITHM_LIB  "Algorithm")
 set(SKELETON_LIB   "Skeleton")
 
 set(USERINPUT_LIB  "UserInput")
+set(FILEIO_LIB     "FileIO")
 
 set(DISPLAYOCV_LIB "DisplayOCV")
-set(DISPLAY3D_LIB "Display3D")
+set(DISPLAY3D_LIB  "Display3D")
 
 include_directories(${EIGEN_INCLUDE_DIRS})
 
