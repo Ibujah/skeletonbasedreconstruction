@@ -30,18 +30,29 @@ SOFTWARE.
 #include <opencv2/imgproc/imgproc.hpp>
 #include "DisplaySkeletonOCV.h"
 
-void displayopencv::DisplayGraphSkeleton(const skeleton::GraphSkel2d::Ptr grskel, cv::Mat &img, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &color)
+template<typename Model>
+void DisplayGraphSkeleton_helper(const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, cv::Mat &img, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &color)
 {
 	std::list<std::pair<unsigned int,unsigned int> > edges;
 	grskel->getAllEdges(edges);
 	for(std::list<std::pair<unsigned int,unsigned int> >::iterator it = edges.begin(); it != edges.end(); it++)
 	{
-		Eigen::Vector2d vec1 = grskel->getNode<mathtools::affine::Point<2> >(it->first).getCoords(frame);
-		Eigen::Vector2d vec2 = grskel->getNode<mathtools::affine::Point<2> >(it->second).getCoords(frame);
+		Eigen::Vector2d vec1 = grskel->template getNode<mathtools::affine::Point<2> >(it->first).getCoords(frame);
+		Eigen::Vector2d vec2 = grskel->template getNode<mathtools::affine::Point<2> >(it->second).getCoords(frame);
 		
 		cv::Point pt1(vec1.x(),vec1.y());
 		cv::Point pt2(vec2.x(),vec2.y());
 
 		cv::line(img,pt1,pt2,color);
 	}
+}
+
+void displayopencv::DisplayGraphSkeleton(const skeleton::GraphSkel2d::Ptr grskel, cv::Mat &img, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &color)
+{
+	DisplayGraphSkeleton_helper<skeleton::model::Classic<2> >(grskel,img,frame,color);
+}
+
+void displayopencv::DisplayGraphSkeleton(const skeleton::GraphProjSkel::Ptr grskel, cv::Mat &img, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &color)
+{
+	DisplayGraphSkeleton_helper<skeleton::model::Projective>(grskel,img,frame,color);
 }

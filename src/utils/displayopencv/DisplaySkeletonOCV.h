@@ -49,6 +49,16 @@ namespace displayopencv
 	 *  \param color  Diplay color of the skeleton
 	 */
 	void DisplayGraphSkeleton(const skeleton::GraphSkel2d::Ptr grskel, cv::Mat &img, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &color);
+
+	/**
+	 *  \brief Displays projective skeleton with opencv
+	 *  
+	 *  \param grskel Skeleton to display
+	 *  \param img    Image where display the skeleton
+	 *  \param frame  Image frame
+	 *  \param color  Diplay color of the skeleton
+	 */
+	void DisplayGraphSkeleton(const skeleton::GraphProjSkel::Ptr grskel, cv::Mat &img, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &color);
 }
 
 #endif //_DISPLAYSKELETONOCV_H_
