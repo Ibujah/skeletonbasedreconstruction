@@ -124,6 +124,13 @@ namespace skeleton
 			 */
 			bool isMatched() const;
 
+			/**
+ 			 *  \brief Reverted branch getter
+ 			 *
+ 			 *  \return Reverted branch
+ 			 */
+			const ReconstructionBranch::Ptr reverted() const;
+
 		public://modifying functions
 			/**
 			 *  \brief Matching vector setter

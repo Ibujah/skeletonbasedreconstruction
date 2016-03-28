@@ -64,3 +64,44 @@ void skeleton::ReconstructionBranch::setMatch(const std::vector<Eigen::Matrix<do
 	m_matched = true;
 	m_match = match;
 }
+
+			std::vector<unsigned int> m_indskel;
+
+			/**
+			 *  \brief First extremity associated in each skeleton
+			 */
+			std::vector<unsigned int> m_firstext;
+			
+			/**
+			 *  \brief Last extremity associated in each skeleton
+			 */
+			std::vector<unsigned int> m_lastext;
+			
+			/**
+			 *  \brief Matching vector
+			 */
+			std::vector<Eigen::Matrix<double,Eigen::Dynamic,1> > m_match;
+			
+			/**
+			 *  \brief Tell if the branches have been matched or not
+			 */
+			bool m_matched;
+const skeleton::ReconstructionBranch::Ptr skeleton::ReconstructionBranch::reverted() const
+{
+	skeleton::ReconstructionBranch::Ptr recrevert(new skeleton::ReconstructionBranch(m_indskel,m_lastext,m_firstext));
+	
+	if(m_matched)
+	{
+		std::vector<Eigen::Matrix<double,Eigen::Dynamic,1> > vecmatch(m_match.size());
+		
+		for(unsigned int i = 0; i < m_match.size(); i++)
+		{
+			Eigen::Matrix<double,Eigen::Dynamic,1> match = Eigen::Matrix<double,Eigen::Dynamic,1>::Ones(m_match[i].rows(),m_match[i].cols()) - m_match[i];
+			vecmatch[i] = match;
+		}
+		
+		recrevert->setMatch(vecmatch);
+	}
+	
+	return recrevert;
+}
