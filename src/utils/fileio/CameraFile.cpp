@@ -80,7 +80,7 @@ camera::Camera::Ptr fileio::ReadCamera(const std::string &filename)
 	
 	mathtools::affine::Frame<3>::Ptr frametr =
 		mathtools::affine::Frame<3>::CreateFrame(
-				tramat.block<3,1>(3,0),
+				tramat.block<3,1>(0,3),
 				mathtools::vectorial::Basis<3>::CreateBasis(tramat.block<3,3>(0,0)));
 	
 	camera::Extrinsics::Ptr extrinsics(new camera::Extrinsics(frametr));
