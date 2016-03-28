@@ -32,6 +32,7 @@ SOFTWARE.
 #define _SEPARATEBRANCHES_H_
 
 #include <skeleton/Skeletons.h>
+#include <list>
 
 /**
  *  \brief Lots of algorithms
@@ -46,7 +47,7 @@ namespace algorithm
 		/**
 		 *  \brief Separates skeleton into several branches
 		 *
-		 *  \param grskel : Skeleton to divide
+		 *  \param grskel  Skeleton to divide
 		 *  
 		 *  \return Composed skeleton corresponding to grskel
 		 */
@@ -55,7 +56,7 @@ namespace algorithm
 		/**
 		 *  \brief Separates skeleton into several branches
 		 *
-		 *  \param grskel : Skeleton to divide
+		 *  \param grskel  Skeleton to divide
 		 *  
 		 *  \return Composed skeleton corresponding to grskel
 		 */
@@ -64,11 +65,44 @@ namespace algorithm
 		/**
 		 *  \brief Separates skeleton into several branches
 		 *
-		 *  \param grskel : Skeleton to divide
+		 *  \param grskel  Skeleton to divide
 		 *  
 		 *  \return Composed skeleton corresponding to grskel
 		 */
 		typename skeleton::CompGraphProjSkel::Ptr SeparateBranches(const typename skeleton::GraphProjSkel::Ptr grskel);
+
+		/**
+		 *  \brief Gets a skeletal branch between two nodes
+		 *
+		 *  \param grskel  Skeleton in which get the branch
+		 *  \param first   Branch first node 
+		 *  \param last    Branch last node 
+		 *
+		 *  \return List of discrete branches between the nodes
+		 */
+		std::list<typename skeleton::BranchContSkel2d::Ptr> SeparateBranch(const typename skeleton::GraphSkel2d::Ptr grskel, unsigned int first, unsigned int last);
+
+		/**
+		 *  \brief Gets a skeletal branch between two nodes
+		 *
+		 *  \param grskel  Skeleton in which get the branch
+		 *  \param first   Branch first node 
+		 *  \param last    Branch last node 
+		 *
+		 *  \return List of discrete branches between the nodes
+		 */
+		std::list<typename skeleton::BranchGraphSkel3d::Ptr> SeparateBranch(const typename skeleton::GraphSkel3d::Ptr grskel, unsigned int first, unsigned int last);
+
+		/**
+		 *  \brief Gets a skeletal branch between two nodes
+		 *
+		 *  \param grskel  Skeleton in which get the branch
+		 *  \param first   Branch first node 
+		 *  \param last    Branch last node 
+		 *
+		 *  \return List of discrete branches between the nodes
+		 */
+		std::list<typename skeleton::BranchGraphProjSkel::Ptr> SeparateBranch(const typename skeleton::GraphProjSkel::Ptr grskel, unsigned int first, unsigned int last);
 	}
 }
 

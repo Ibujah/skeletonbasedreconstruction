@@ -193,4 +193,95 @@ typename skeleton::CompGraphSkel3d::Ptr algorithm::graphoperation::SeparateBranc
 typename skeleton::CompGraphProjSkel::Ptr algorithm::graphoperation::SeparateBranches(const typename skeleton::GraphProjSkel::Ptr grskel)
 {
 	return SeparateBranches_helper<skeleton::model::Projective>(grskel);
-}	
+}
+
+template<typename Model>
+std::list<std::list<unsigned int> > BrowsePath(const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskl, unsigned int first, unsigned int last,
+											   const std::list<unsigned int> &path = std::list<unsigned int>())
+{
+	std::list<std::list<unsigned int> > l_path;
+	std::list<unsigned int> npath = path;
+	npath.push_back(first);
+	
+	/*terminal case : node2 reached*/
+	if(first == last)
+	{
+		l_path.push_back(npath);
+	}
+	else
+	{
+		std::list<unsigned int> neigh;
+		grskl->getNeighbors(first,neigh);
+		/*last node reached is removed from neighbors*/
+		if(npath.size())
+		{
+			for(std::list<unsigned int>::iterator it = neigh.begin(); it != neigh.end(); it++)
+			{
+				if(std::find(npath.begin(),npath.end(),*it)!=npath.end())
+				{
+					it = neigh.erase(it);
+					it--;
+				}
+			}
+		}
+		
+		/* 
+		 * if there is still some neighbors
+		 * implicit terminal case : if there is not any neighbor in neigh
+		 */
+		if(neigh.size()==1)
+		{
+			l_path = BrowsePath<Model>(grskl,*(neigh.begin()),last,npath);
+		}
+		else if(neigh.size()>=2)
+		{
+			for(std::list<unsigned int>::iterator it = neigh.begin(); it != neigh.end(); it++)
+			{
+				std::list<unsigned int> cur_path = npath;
+				std::list<std::list<unsigned int> > sub_list = BrowsePath<Model>(grskl,*it,last,cur_path);
+				l_path.insert(l_path.end(),sub_list.begin(),sub_list.end());
+			}
+		}
+	}
+	
+	return l_path;
+}
+
+template<typename Model>
+std::list<typename skeleton::GraphBranch<Model>::Ptr> SeparateBranch_helper(const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, unsigned int first, unsigned int last)
+{
+	std::list<std::list<unsigned int> > paths = BrowsePath<Model>(grskel,first,last);
+	
+	std::list<typename skeleton::GraphBranch<Model>::Ptr> l_br;
+	
+	for(std::list<std::list<unsigned int> >::iterator it = paths.begin(); it != paths.end(); it++)
+	{
+		std::vector<typename skeleton::GraphBranch<Model>::Stor> vec;
+		vec.reserve(it->size());
+		for(std::list<unsigned int>::iterator itv = it->begin(); itv != it->end(); itv++)
+		{
+			vec.push_back(grskel->getNode(*itv));
+		}
+
+		typename skeleton::GraphBranch<Model>::Ptr br(new skeleton::GraphBranch<Model>(grskel->getModel(),vec));
+
+		l_br.push_back(br);
+	}
+	
+	return l_br;
+}
+
+std::list<typename skeleton::BranchGraphSkel2d::Ptr> SeparateBranch(const typename skeleton::GraphSkel2d::Ptr grskel, unsigned int first, unsigned int last)
+{
+	return SeparateBranch_helper<skeleton::model::Classic<2> >(grskel,first,last);
+}
+
+std::list<typename skeleton::BranchGraphSkel3d::Ptr> SeparateBranch(const typename skeleton::GraphSkel3d::Ptr grskel, unsigned int first, unsigned int last)
+{
+	return SeparateBranch_helper<skeleton::model::Classic<3> >(grskel,first,last);
+}
+
+std::list<typename skeleton::BranchGraphProjSkel::Ptr> SeparateBranch(const typename skeleton::GraphProjSkel::Ptr grskel, unsigned int first, unsigned int last)
+{
+	return SeparateBranch_helper<skeleton::model::Projective>(grskel,first,last);
+}
