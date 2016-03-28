@@ -80,7 +80,7 @@ namespace algorithm
 		 *
 		 *  \return List of discrete branches between the nodes
 		 */
-		std::list<typename skeleton::BranchContSkel2d::Ptr> SeparateBranch(const typename skeleton::GraphSkel2d::Ptr grskel, unsigned int first, unsigned int last);
+		std::list<typename skeleton::BranchGraphSkel2d::Ptr> GetBranch(const typename skeleton::GraphSkel2d::Ptr grskel, unsigned int first, unsigned int last);
 
 		/**
 		 *  \brief Gets a skeletal branch between two nodes
@@ -91,7 +91,7 @@ namespace algorithm
 		 *
 		 *  \return List of discrete branches between the nodes
 		 */
-		std::list<typename skeleton::BranchGraphSkel3d::Ptr> SeparateBranch(const typename skeleton::GraphSkel3d::Ptr grskel, unsigned int first, unsigned int last);
+		std::list<typename skeleton::BranchGraphSkel3d::Ptr> GetBranch(const typename skeleton::GraphSkel3d::Ptr grskel, unsigned int first, unsigned int last);
 
 		/**
 		 *  \brief Gets a skeletal branch between two nodes
@@ -102,7 +102,20 @@ namespace algorithm
 		 *
 		 *  \return List of discrete branches between the nodes
 		 */
-		std::list<typename skeleton::BranchGraphProjSkel::Ptr> SeparateBranch(const typename skeleton::GraphProjSkel::Ptr grskel, unsigned int first, unsigned int last);
+		std::list<typename skeleton::BranchGraphProjSkel::Ptr> GetBranch(const typename skeleton::GraphProjSkel::Ptr grskel, unsigned int first, unsigned int last);
+
+		/**
+		 *  \brief Get composed skeletons from graph skeleton and reconstruction skeleton
+		 *  \details Skeletons have to have no cycles
+		 *
+		 *  \param recskel     Reconstruction skeleton
+		 *  \param vec_prskel  Graph projective skeletons associated to reconstruction skeleton
+		 *
+		 *  \return Computed composed skeletons
+		 *
+		 *  \throws std::logic_error if a skeleton contains a cycle, or if a branch does not exist
+		 */
+		std::vector<typename skeleton::CompGraphProjSkel::Ptr> GetComposed(const typename skeleton::ReconstructionSkeleton::Ptr recskel, const std::vector<skeleton::GraphProjSkel::Ptr> &vec_prskel);
 	}
 }
 
