@@ -61,8 +61,8 @@ camera::Camera::Ptr fileio::ReadCamera(const std::string &filename)
 
 	ku = projmat(0,0);
 	kv = projmat(1,1);
-	u0 = projmat(2,0);
-	v0 = projmat(2,1);
+	u0 = projmat(0,2);
+	v0 = projmat(1,2);
 
 	camera::Intrinsics::Ptr intrinsics(new camera::PinHole(width,height,u0,v0,ku,kv));
 	
