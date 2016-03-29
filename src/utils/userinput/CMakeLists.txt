@@ -1,6 +1,7 @@
 set(LIBRARY_NAME ${USERINPUT_LIB})
 
-include_directories(${CMAKE_SOURCE_DIR}/src/lib)
+include_directories(${CMAKE_SOURCE_DIR}/src/lib
+					${Boost_INCLUDE_DIR})
 set(SOURCE_FILES    DrawShape.cpp
 					ClickWindow.cpp
 					ClickSkelNode.cpp)
