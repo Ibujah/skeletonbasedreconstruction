@@ -42,11 +42,11 @@ skeleton::BranchContSkel3d::Ptr algorithm::matchskeletons::BranchTriangulation(
 
 	for(unsigned int i=0; i<pt_approx.size(); i++)
 	{
-		Eigen::Matrix<double,Eigen::Dynamic,1> match = recbranch->getMatch()[i];;
+		const Eigen::Matrix<double,Eigen::Dynamic,1>& match = recbranch->getMatch()[i];;
 		std::vector<mathtools::geometry::euclidian::Line<4> > line(match.rows());
 		for(unsigned int j = 0; j<match.rows(); j++)
 		{
-			line[j] = projbr[j]->getNode<mathtools::geometry::euclidian::Line<4> >(match[i]);
+			line[j] = projbr[j]->getNode<mathtools::geometry::euclidian::Line<4> >(match(j,0));
 		}
 		pt_approx[i] = mathtools::geometry::euclidian::Triangulate<4>(line).getCoords();
 	}
@@ -78,16 +78,16 @@ skeleton::CompContSkel3d::Ptr algorithm::matchskeletons::ComposedTriangulation(
 	for(std::list<unsigned int>::iterator it = l_edge.begin(); it != l_edge.end(); it++)
 	{
 		skeleton::ReconstructionBranch::Ptr recbr = recskel->getBranch(*it);
+		std::pair<unsigned int,unsigned int> ext = recskel->getExtremities(*it);
+
 		std::vector<skeleton::BranchContProjSkel::Ptr> branches(recbr->getFirstExt().size());
 		for(unsigned int i=0;i<branches.size();i++)
 		{
-			branches[i] = projskel[i]->getBranch(recbr->getFirstExt()[i],recbr->getLastExt()[i]);
+			branches[i] = projskel[i]->getBranch(ext.first,ext.second);
 		}
 		
 		skeleton::BranchContSkel3d::Ptr br = BranchTriangulation(recbr,branches,model,options);
 		
-		std::pair<unsigned int, unsigned int> ext = recskel->getExtremities(*it);
-
 		compskel->addEdge(ext.first,ext.second,br);
 	}
 	return compskel;

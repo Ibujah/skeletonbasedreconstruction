@@ -165,8 +165,9 @@ void algorithm::matchskeletons::ComposedMatching(
 	for(std::list<unsigned int>::iterator it = l_edge.begin(); it != l_edge.end(); it++)
 	{
 		skeleton::ReconstructionBranch::Ptr recbr = recskel->getBranch(*it);
-		typename skeleton::BranchContProjSkel::Ptr projbr1 = projskel1->getBranch(recbr->getFirstExt()[0],recbr->getLastExt()[0]);
-		typename skeleton::BranchContProjSkel::Ptr projbr2 = projskel2->getBranch(recbr->getFirstExt()[1],recbr->getLastExt()[1]);
+		std::pair<unsigned int,unsigned int> ext = recskel->getExtremities(*it);
+		typename skeleton::BranchContProjSkel::Ptr projbr1 = projskel1->getBranch(ext.first,ext.second);
+		typename skeleton::BranchContProjSkel::Ptr projbr2 = projskel2->getBranch(ext.first,ext.second);
 
 		BranchMatching(recbr,projbr1,projbr2,options);
 	}
