@@ -167,6 +167,16 @@ namespace mathtools
 				{
 					return (m_matrix.determinant()>0);
 				}
+
+				/**
+				 *  \brief Inverse basis getter
+				 *
+				 *  \return Pointer to inverse basis
+				 */
+				const Ptr getBasisInverse() const
+				{
+					return CreateBasis(m_matrix_inv);
+				}
 			
 			private:
 				/**
