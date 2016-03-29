@@ -99,6 +99,16 @@ namespace mathtools
 					return m_origin;
 				}
 
+				/**
+				 *  \brief Frame inverse getter
+				 *
+				 *  \return Pointer to inverse frame
+				 */
+				Ptr getFrameInverse() const
+				{
+					return CreateFrame(-1.0*getBasis()->getMatrixInverse()*getOrigin(),getBasis()->getBasisInverse());
+				}
+
 			private:
 				/**
  				 *  \brief Pointer to canonic frame
