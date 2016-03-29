@@ -196,11 +196,11 @@ typename skeleton::CompGraphProjSkel::Ptr algorithm::graphoperation::SeparateBra
 }
 
 template<typename Model>
-std::list<std::list<unsigned int> > BrowsePath(const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskl, unsigned int first, unsigned int last,
-											   const std::list<unsigned int> &path = std::list<unsigned int>())
+void BrowsePath(std::list<std::list<unsigned int> >& l_path,
+				const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskl, unsigned int first, unsigned int last,
+				const std::list<unsigned int> &path = std::list<unsigned int>())
 {
-	std::list<std::list<unsigned int> > l_path;
-	std::list<unsigned int> npath = path;
+	std::list<unsigned int> npath(path.begin(),path.end());
 	npath.push_back(first);
 	
 	/*terminal case : node2 reached*/
@@ -212,7 +212,8 @@ std::list<std::list<unsigned int> > BrowsePath(const typename skeleton::GraphCur
 	{
 		std::list<unsigned int> neigh;
 		grskl->getNeighbors(first,neigh);
-		/*last node reached is removed from neighbors*/
+		
+		/*each reached node is removed from neighbors*/
 		if(npath.size())
 		{
 			for(std::list<unsigned int>::iterator it = neigh.begin(); it != neigh.end(); it++)
@@ -224,36 +225,36 @@ std::list<std::list<unsigned int> > BrowsePath(const typename skeleton::GraphCur
 				}
 			}
 		}
-		
+
 		/* 
 		 * if there is still some neighbors
 		 * implicit terminal case : if there is not any neighbor in neigh
 		 */
 		if(neigh.size()==1)
 		{
-			l_path = BrowsePath<Model>(grskl,*(neigh.begin()),last,npath);
+			BrowsePath<Model>(l_path,grskl,*(neigh.begin()),last,npath);
 		}
 		else if(neigh.size()>=2)
 		{
 			for(std::list<unsigned int>::iterator it = neigh.begin(); it != neigh.end(); it++)
 			{
 				std::list<unsigned int> cur_path = npath;
-				std::list<std::list<unsigned int> > sub_list = BrowsePath<Model>(grskl,*it,last,cur_path);
+				std::list<std::list<unsigned int> > sub_list;
+				BrowsePath<Model>(sub_list,grskl,*it,last,cur_path);
 				l_path.insert(l_path.end(),sub_list.begin(),sub_list.end());
 			}
 		}
 	}
-	
-	return l_path;
 }
 
 template<typename Model>
 std::list<typename skeleton::GraphBranch<Model>::Ptr> GetBranch_helper(const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, unsigned int first, unsigned int last)
 {
-	std::list<std::list<unsigned int> > paths = BrowsePath<Model>(grskel,first,last);
+	std::list<std::list<unsigned int> > paths;
+	BrowsePath<Model>(paths,grskel,first,last);
 	
 	std::list<typename skeleton::GraphBranch<Model>::Ptr> l_br;
-	
+
 	for(std::list<std::list<unsigned int> >::iterator it = paths.begin(); it != paths.end(); it++)
 	{
 		std::vector<typename skeleton::GraphBranch<Model>::Stor> vec;
