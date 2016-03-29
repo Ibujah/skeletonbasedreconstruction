@@ -90,7 +90,7 @@ namespace algorithm
  		 *  \param contbr  continuous branch to skin
  		 *  \param options skinning options
  		 *
- 		 *  \returns boundary corresponding to the branch
+ 		 *  \return boundary corresponding to the branch
  		 */
 		boundary::DiscreteBoundary<3>::Ptr ContinuousSkinning(const skeleton::BranchContSkel3d::Ptr contbr, const OptionsContSkinning &options = OptionsContSkinning());
 
@@ -100,7 +100,7 @@ namespace algorithm
  		 *  \param contskl continuous skeleton to skin
  		 *  \param options skinning options
  		 *
- 		 *  \returns boundary corresponding to the skeleton
+ 		 *  \return boundary corresponding to the skeleton
  		 */
 		boundary::DiscreteBoundary<3>::Ptr ContinuousSkinning(const skeleton::CompContSkel3d::Ptr contskl, const OptionsContSkinning &options = OptionsContSkinning());
 	}
