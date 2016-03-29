@@ -246,17 +246,16 @@ void VoronoiOrtho(typename skeleton::GraphCurveSkeleton<Model>::Ptr skel_int, co
 	}
 }
 
-void VoronoiPersp(skeleton::GraphProjSkel::Ptr skel_int, const boundary::DiscreteBoundary<2>::Ptr disbnd)
+void VoronoiPersp(skeleton::GraphProjSkel::Ptr skel_int, const boundary::DiscreteBoundary<2>::Ptr disbnd, const mathtools::affine::Frame<2>::Ptr frame)
 {
 	skeleton::GraphProjSkel::Ptr grskel(new skeleton::GraphProjSkel(skel_int->getModel()));
 	std::vector<mathtools::affine::Point<2> > bndpts(0);
 	disbnd->getVerticesPoint(bndpts);
-	std::vector<Eigen::Vector2d> bndvec(bndpts.size());
+	std::vector<Eigen::Vector3d> bndvec(bndpts.size());
 
 	/*
 	 *  Build Voronoi container
 	 */
-
 	voro::container vorocont(-10.0,10.0,
 							 -10.0,10.0,
 							 -10.0,10.0,
@@ -269,7 +268,9 @@ void VoronoiPersp(skeleton::GraphProjSkel::Ptr skel_int, const boundary::Discret
 	 */
 	for(unsigned int i=0;i<bndpts.size();i++)
 	{
-		bndvec[i] = bndpts[i].getCoords().normalized();
+		bndvec[i].block<2,1>(0,0) = bndpts[i].getCoords(frame);
+		bndvec[i](2) = 1.0;
+		bndvec[i].normalize();
 		vorocont.put(i,bndvec[i](0),bndvec[i](1),bndvec[i](2));
 	}
 
@@ -344,19 +345,19 @@ void VoronoiPersp(skeleton::GraphProjSkel::Ptr skel_int, const boundary::Discret
 					else if(disbnd->getNext(ind_neigh[0]) == ind_neigh[1] && disbnd->getFrame()->getBasis()->isDirect())
 					{
 						Eigen::Matrix2d mat;
-						mat.block<2,1>(0,0) = bndpts[ind_neigh[1]].getCoords() - bndpts[ind_neigh[0]].getCoords();
-						mat.block<2,1>(0,1) = grskel->getNode(indices[ind_j]).block<2,1>(0,0) - bndpts[ind_neigh[0]].getCoords();
+						mat.block<2,1>(0,0) = bndvec[ind_neigh[1]].block<2,1>(0,0)/bndvec[ind_neigh[1]].z() - bndvec[ind_neigh[0]].block<2,1>(0,0)/bndvec[ind_neigh[0]].z();
+						mat.block<2,1>(0,1) = grskel->getNode(indices[ind_j]).block<2,1>(0,0) - bndvec[ind_neigh[0]].block<2,1>(0,0)/bndvec[ind_neigh[0]].z();
 
-						if(mat.determinant()>0)
+						if(mat.determinant()<0)
 							v_intsph.push_back(indices[i]);
 					}
 					else if(disbnd->getNext(ind_neigh[1]) == ind_neigh[0] && !disbnd->getFrame()->getBasis()->isDirect())
 					{
 						Eigen::Matrix2d mat;
-						mat.block<2,1>(0,0) = bndpts[ind_neigh[1]].getCoords() - bndpts[ind_neigh[0]].getCoords();
-						mat.block<2,1>(0,1) = grskel->getNode(indices[ind_j]).block<2,1>(0,0) - bndpts[ind_neigh[0]].getCoords();
+						mat.block<2,1>(0,0) = bndvec[ind_neigh[1]].block<2,1>(0,0)/bndvec[ind_neigh[1]].z() - bndvec[ind_neigh[0]].block<2,1>(0,0)/bndvec[ind_neigh[0]].z();
+						mat.block<2,1>(0,1) = grskel->getNode(indices[ind_j]).block<2,1>(0,0) - bndvec[ind_neigh[0]].block<2,1>(0,0)/bndvec[ind_neigh[0]].z();
 
-						if(mat.determinant()<0)
+						if(mat.determinant()>0)
 							v_intsph.push_back(indices[i]);
 					}
 				}
@@ -410,14 +411,14 @@ skeleton::GraphProjSkel::Ptr algorithm::skeletonization::ProjectiveVoronoi(const
 	switch(camera->getIntrinsics()->getType())
 	{
 		case camera::Intrinsics::Type::ortho:
-			model  = skeleton::model::Projective::Ptr(new skeleton::model::Orthographic(camera->getExtrinsics()->getFrame()));
+			model  = skeleton::model::Projective::Ptr(new skeleton::model::Orthographic(camera->getIntrinsics()->getFrame(),camera->getExtrinsics()->getFrame()));
 			grskel = skeleton::GraphProjSkel::Ptr(new skeleton::GraphProjSkel(model));
 			VoronoiOrtho<skeleton::model::Projective>(grskel,disbnd,camera->getIntrinsics()->getFrame());
 			break;
 		case camera::Intrinsics::Type::pinhole:
-			model = skeleton::model::Projective::Ptr(new skeleton::model::Orthographic(camera->getExtrinsics()->getFrame()));
+			model = skeleton::model::Projective::Ptr(new skeleton::model::Perspective(camera->getIntrinsics()->getFrame(),camera->getExtrinsics()->getFrame()));
 			grskel = skeleton::GraphProjSkel::Ptr(new skeleton::GraphProjSkel(model));
-			VoronoiPersp(grskel,disbnd);
+			VoronoiPersp(grskel,disbnd,camera->getIntrinsics()->getFrame());
 			break;
 	}
 	

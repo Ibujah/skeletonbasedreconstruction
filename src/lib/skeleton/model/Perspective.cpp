@@ -31,10 +31,10 @@ SOFTWARE.
 
 constexpr unsigned int skeleton::model::meta<skeleton::model::Perspective>::stordim;
 
-skeleton::model::Perspective::Perspective(const mathtools::affine::Frame<3>::Ptr frame) : skeleton::model::Projective(frame)
+skeleton::model::Perspective::Perspective(const mathtools::affine::Frame<2>::Ptr frame2, const mathtools::affine::Frame<3>::Ptr frame3) : skeleton::model::Projective(frame2,frame3)
 {}
 
-skeleton::model::Perspective::Perspective(const Perspective &model) : skeleton::model::Projective(model.m_frame)
+skeleton::model::Perspective::Perspective(const Perspective &model) : skeleton::model::Projective(model.m_frame2,model.m_frame3)
 {}
 
 skeleton::model::Projective::Type skeleton::model::Perspective::getType() const
@@ -73,7 +73,7 @@ mathtools::affine::Point<2> skeleton::model::Perspective::toObj(
 		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
 		const mathtools::affine::Point<2> &) const
 {
-	return mathtools::affine::Point<2>(vec(0),vec(1));
+	return mathtools::affine::Point<2>(vec(0),vec(1),m_frame2);
 }
 
 mathtools::geometry::euclidian::Line<4> skeleton::model::Perspective::toObj(
@@ -81,11 +81,11 @@ mathtools::geometry::euclidian::Line<4> skeleton::model::Perspective::toObj(
 		const mathtools::geometry::euclidian::Line<4> &) const
 {
 	Eigen::Vector4d origin;
-	origin.block<3,1>(0,0) = m_frame->getOrigin();
+	origin.block<3,1>(0,0) = m_frame3->getOrigin();
 	origin(3) = 0;
 
 	Eigen::Vector4d vecdir;
-	origin.block<3,1>(0,0) = m_frame->getBasis()->getMatrix()*Eigen::Vector3d(vec(0),vec(1),1.0);
+	origin.block<3,1>(0,0) = m_frame3->getBasis()->getMatrix()*Eigen::Vector3d(vec(0),vec(1),1.0);
 	origin(3) = vec(2);
 
 	return mathtools::geometry::euclidian::Line<4>(origin,vecdir);

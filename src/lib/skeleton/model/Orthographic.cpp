@@ -31,10 +31,10 @@ SOFTWARE.
 
 constexpr unsigned int skeleton::model::meta<skeleton::model::Orthographic>::stordim;
 
-skeleton::model::Orthographic::Orthographic(const mathtools::affine::Frame<3>::Ptr frame) : skeleton::model::Projective(frame)
+skeleton::model::Orthographic::Orthographic(const mathtools::affine::Frame<2>::Ptr frame2, const mathtools::affine::Frame<3>::Ptr frame3) : skeleton::model::Projective(frame2,frame3)
 {}
 
-skeleton::model::Orthographic::Orthographic(const Orthographic &model) : skeleton::model::Projective(model.m_frame)
+skeleton::model::Orthographic::Orthographic(const Orthographic &model) : skeleton::model::Projective(model.m_frame2,model.m_frame3)
 {}
 
 skeleton::model::Orthographic::Type skeleton::model::Orthographic::getType() const
@@ -66,7 +66,7 @@ mathtools::affine::Point<2> skeleton::model::Orthographic::toObj(
 		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
 		const mathtools::affine::Point<2> &) const
 {
-	return mathtools::affine::Point<2>(vec(0),vec(1));
+	return mathtools::affine::Point<2>(vec(0),vec(1),m_frame2);
 }
 
 mathtools::geometry::euclidian::Line<4> skeleton::model::Orthographic::toObj(
@@ -74,11 +74,11 @@ mathtools::geometry::euclidian::Line<4> skeleton::model::Orthographic::toObj(
 		const mathtools::geometry::euclidian::Line<4> &) const
 {
 	Eigen::Vector4d origin;
-	origin.block<3,1>(0,0) = m_frame->getBasis()->getMatrix()*Eigen::Vector3d(vec(0),vec(1),0.0) + m_frame->getOrigin();
+	origin.block<3,1>(0,0) = m_frame3->getBasis()->getMatrix()*Eigen::Vector3d(vec(0),vec(1),0.0) + m_frame3->getOrigin();
 	origin(3) = vec(2);
 
 	Eigen::Vector4d vecdir;
-	origin.block<3,1>(0,0) = m_frame->getBasis()->getMatrix()*Eigen::Vector3d(0.0,0.0,1.0);
+	origin.block<3,1>(0,0) = m_frame3->getBasis()->getMatrix()*Eigen::Vector3d(0.0,0.0,1.0);
 	origin(3) = 0.0;
 
 	return mathtools::geometry::euclidian::Line<4>(origin,vecdir);

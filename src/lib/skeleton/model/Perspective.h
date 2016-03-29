@@ -76,9 +76,11 @@ namespace skeleton
 				/**
 				 *  \brief Constructor
 				 *
-				 *  \param frame skeleton frame
+				 *  \param frame2 skeleton 2d frame
+				 *  \param frame3 skeleton 3d frame
 				 */
-				Perspective(const mathtools::affine::Frame<3>::Ptr frame = mathtools::affine::Frame<3>::CanonicFrame());
+				Perspective(const mathtools::affine::Frame<2>::Ptr frame2 = mathtools::affine::Frame<2>::CanonicFrame(),
+						    const mathtools::affine::Frame<3>::Ptr frame3 = mathtools::affine::Frame<3>::CanonicFrame());
 
 				/**
 				 *  \brief Copy constructor

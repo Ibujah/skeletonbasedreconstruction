@@ -89,17 +89,24 @@ namespace skeleton
 
 			protected:
 				/**
-				 *  \brief Frame of the skeleton
+				 *  \brief 2D frame of the skeleton
 				 */
-				mathtools::affine::Frame<3>::Ptr m_frame;
+				mathtools::affine::Frame<2>::Ptr m_frame2;
+
+				/**
+				 *  \brief 3D frame of the skeleton
+				 */
+				mathtools::affine::Frame<3>::Ptr m_frame3;
 
 			public:
 				/**
 				 *  \brief Constructor
 				 *
-				 *  \param frame skeleton frame
+				 *  \param frame2 skeleton 2d frame
+				 *  \param frame3 skeleton 3d frame
 				 */
-				Projective(const mathtools::affine::Frame<3>::Ptr frame = mathtools::affine::Frame<3>::CanonicFrame());
+				Projective(const mathtools::affine::Frame<2>::Ptr frame2 = mathtools::affine::Frame<2>::CanonicFrame(),
+						   const mathtools::affine::Frame<3>::Ptr frame3 = mathtools::affine::Frame<3>::CanonicFrame());
 
 				/**
 				 *  \brief Copy constructor
@@ -109,11 +116,18 @@ namespace skeleton
 				Projective(const Projective &model);
 
 				/**
-				 *  \brief Frame getter
+				 *  \brief 2d frame getter
 				 *
-				 *  \return skeleton frame
+				 *  \return skeleton 2d frame
 				 */
-				const mathtools::affine::Frame<3>::Ptr getFrame() const;
+				const mathtools::affine::Frame<2>::Ptr getFrame2() const;
+
+				/**
+				 *  \brief 3d frame getter
+				 *
+				 *  \return skeleton 3d frame
+				 */
+				const mathtools::affine::Frame<3>::Ptr getFrame3() const;
 
 				/**
 				 *  \brief Converts an object into a vector
