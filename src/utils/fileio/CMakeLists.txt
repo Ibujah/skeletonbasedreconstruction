@@ -1,7 +1,8 @@
 set(LIBRARY_NAME ${FILEIO_LIB})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/lib)
-set(SOURCE_FILES   CameraFile.cpp)
+set(SOURCE_FILES   CameraFile.cpp
+				   BoundaryFile.cpp)
 
 # make the library
 add_library(
