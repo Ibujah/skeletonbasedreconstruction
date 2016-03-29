@@ -102,7 +102,8 @@ int main(int argc, char** argv)
 	cv::Mat shpimg1 = cv::imread(imgfilename1.str(),CV_LOAD_IMAGE_GRAYSCALE);
 	
 	shape::DiscreteShape<2>::Ptr shape1(new shape::DiscreteShape<2>(shpimg1.cols,shpimg1.rows));
-	shpimg1.copyTo(cv::Mat(shpimg1.rows,shpimg1.cols,CV_8U,&shape1->getContainer()[0]));
+	cv::Mat cpymat1(shpimg1.rows,shpimg1.cols,CV_8U,&shape1->getContainer()[0]);
+	shpimg1.copyTo(cpymat1);
 	
 	std::cout << "Extract boundary" << std::endl;
 	boundary::DiscreteBoundary<2>::Ptr bnd1 = algorithm::extractboundary::MarchingSquare(shape1,4);
@@ -132,7 +133,8 @@ int main(int argc, char** argv)
 	cv::Mat shpimg2 = cv::imread(imgfilename2.str(),CV_LOAD_IMAGE_GRAYSCALE);
 	
 	shape::DiscreteShape<2>::Ptr shape2(new shape::DiscreteShape<2>(shpimg2.cols,shpimg2.rows));
-	shpimg2.copyTo(cv::Mat(shpimg2.rows,shpimg2.cols,CV_8U,&shape2->getContainer()[0]));
+	cv::Mat cpymat2(shpimg2.rows,shpimg2.cols,CV_8U,&shape2->getContainer()[0]);
+	shpimg2.copyTo(cpymat2);
 	
 	std::cout << "Extract boundary" << std::endl;
 	boundary::DiscreteBoundary<2>::Ptr bnd2 = algorithm::extractboundary::MarchingSquare(shape2,4);
