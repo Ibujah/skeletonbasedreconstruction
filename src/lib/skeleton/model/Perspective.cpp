@@ -82,11 +82,12 @@ mathtools::geometry::euclidian::Line<4> skeleton::model::Perspective::toObj(
 {
 	Eigen::Vector4d origin;
 	origin.block<3,1>(0,0) = m_frame3->getOrigin();
-	origin(3) = 0;
+	origin(3) = 0.0;
 
 	Eigen::Vector4d vecdir;
-	origin.block<3,1>(0,0) = m_frame3->getBasis()->getMatrix()*Eigen::Vector3d(vec(0),vec(1),1.0);
-	origin(3) = vec(2);
+	vecdir.block<3,1>(0,0) = m_frame3->getBasis()->getMatrix()*Eigen::Vector3d(vec(0),vec(1),1.0);
+	vecdir(3) = vec(2);
+	vecdir.normalize();
 
 	return mathtools::geometry::euclidian::Line<4>(origin,vecdir);
 }

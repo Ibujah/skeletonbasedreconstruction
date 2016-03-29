@@ -78,8 +78,9 @@ mathtools::geometry::euclidian::Line<4> skeleton::model::Orthographic::toObj(
 	origin(3) = vec(2);
 
 	Eigen::Vector4d vecdir;
-	origin.block<3,1>(0,0) = m_frame3->getBasis()->getMatrix()*Eigen::Vector3d(0.0,0.0,1.0);
-	origin(3) = 0.0;
+	vecdir.block<3,1>(0,0) = m_frame3->getBasis()->getMatrix()*Eigen::Vector3d(0.0,0.0,1.0);
+	vecdir(3) = 0.0;
+	vecdir.normalize();
 
 	return mathtools::geometry::euclidian::Line<4>(origin,vecdir);
 }
