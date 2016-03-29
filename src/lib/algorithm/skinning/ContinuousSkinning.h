@@ -49,6 +49,20 @@ namespace algorithm
 		struct OptionsContSkinning
 		{
 			/**
+			 *  \brief Several basis computation methods
+			 */
+			enum enum_computebasis
+			{
+				projbasis = 0,
+				frenet
+			};
+			
+			/**
+			 *  \brief Basis computation method
+			 */
+			enum_computebasis computebasis;
+			
+			/**
  			 *  \brief Number of circles on each branch
  			 */
 			unsigned int nbcer;
@@ -66,8 +80,8 @@ namespace algorithm
 			/**
 			 *  \brief Default constructor
 			 */
-			OptionsContSkinning(unsigned int nbcer_ = 20, unsigned int nbpt_ = 16, unsigned int fracnbcer_ = 8) :
-				nbcer(nbcer_), nbpt(nbpt_), fracnbcer(fracnbcer_) {}
+			OptionsContSkinning(unsigned int nbcer_ = 20, unsigned int nbpt_ = 16, unsigned int fracnbcer_ = 8, enum_computebasis computebasis_ = projbasis) :
+				nbcer(nbcer_), nbpt(nbpt_), fracnbcer(fracnbcer_), computebasis(computebasis_) {}
 		};
 		
 		/**

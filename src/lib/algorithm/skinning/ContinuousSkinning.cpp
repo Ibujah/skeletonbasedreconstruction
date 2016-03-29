@@ -306,11 +306,11 @@ void CheckFrenetBasis(const std::list<HyperCircle<3> > &list_cir, std::list<Basi
 	}
 }
 
-void ComputeCircles(const skeleton::BranchContSkel3d::Ptr contbr,
-					const algorithm::skinning::OptionsContSkinning &options,
-					std::list<HyperSphere<3> > &list_sph,
-					std::list<HyperCircle<3> > &list_cir,
-					std::list<Basis<3>::Ptr> &list_basis)
+void ComputeCirclesFrenet(const skeleton::BranchContSkel3d::Ptr contbr,
+						  const algorithm::skinning::OptionsContSkinning &options,
+						  std::list<HyperSphere<3> > &list_sph,
+						  std::list<HyperCircle<3> > &list_cir,
+						  std::list<Basis<3>::Ptr> &list_basis)
 {
 	Eigen::Matrix3d frenet_basis_prev;
 
@@ -351,6 +351,34 @@ void ComputeCircles(const skeleton::BranchContSkel3d::Ptr contbr,
 		}
 	}
 	CheckFrenetBasis(list_cir,list_basis);
+}
+
+void ComputeCirclesProjBasis(const skeleton::BranchContSkel3d::Ptr contbr,
+							 const algorithm::skinning::OptionsContSkinning &options,
+							 std::list<HyperSphere<3> > &list_sph,
+							 std::list<HyperCircle<3> > &list_cir,
+							 std::list<Basis<3>::Ptr> &list_basis)
+{
+	for(unsigned int i = 0; i < options.nbcer; i++)
+	{
+		double t = (double)i/(double)(options.nbcer-1);
+
+		Eigen::Vector4d val = contbr->getCompFun()->operator()(t);
+		Eigen::Vector4d der = Eigen::Map<Eigen::Vector4d>((double*)contbr->getCompFun()->der(t).data());
+		Eigen::Vector4d der2 = Eigen::Map<Eigen::Vector4d>((double*)contbr->getCompFun()->der2(t).data());
+
+		HyperSphere<3> sphere = ComputeSphere(val,contbr->getModel()->getFrame());
+		HyperPlane<3> plane = ComputeCaractPlane(val,der,contbr->getModel()->getFrame()->getBasis());
+		HyperCircle<3> circle;
+		
+		if(mathtools::geometry::euclidian::Intersection(plane,sphere,circle))
+		{
+			list_sph.push_back(sphere);
+			list_cir.push_back(circle);
+			list_basis.push_back(Basis<3>::Ptr());
+		}
+	}
+	FillFrenetBasis(list_cir,list_basis);
 }
 
 void ComputeExt(const algorithm::skinning::OptionsContSkinning &options,
@@ -421,7 +449,16 @@ void ContinuousSkinning_helper(boundary::DiscreteBoundary<3>::Ptr disbnd,
 	Point<3> ptext1, ptext2;
 	Eigen::Vector3d norext1, norext2;
 	
-	ComputeCircles(contbr,options,list_sph,list_cir,list_basis);
+	switch(options.computebasis)
+	{
+		case algorithm::skinning::OptionsContSkinning::enum_computebasis::projbasis :
+			ComputeCirclesProjBasis(contbr,options,list_sph,list_cir,list_basis);
+			break;
+		case algorithm::skinning::OptionsContSkinning::enum_computebasis::frenet :
+			ComputeCirclesFrenet(contbr,options,list_sph,list_cir,list_basis);
+			break;
+		
+	}
 	ComputeExt(options,true,list_sph,list_cir,list_basis,ptext1,norext1);
 	ComputeExt(options,false,list_sph,list_cir,list_basis,ptext2,norext2);
 	
