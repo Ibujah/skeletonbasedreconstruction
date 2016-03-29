@@ -306,7 +306,17 @@ namespace skeleton
 
 					// second step, add the edge
 					if(v_found)
-						boost::add_edge(v_desc1,v_desc2,m_graph);
+					{
+						typename boost::graph_traits<GraphType>::adjacency_iterator ai, ai_end;
+
+						bool areneigh = false;
+						for(boost::tie(ai,ai_end) = boost::adjacent_vertices(v_desc1,m_graph); ai != ai_end && !areneigh; ai++)
+						{
+							if(*ai == v_desc2) areneigh = true;
+						}
+						if(!areneigh)
+							boost::add_edge(v_desc1,v_desc2,m_graph);
+					}
 				}
 				return v_found;
 			}
@@ -644,7 +654,9 @@ namespace skeleton
 				{
 					typename boost::graph_traits<GraphType>::adjacency_iterator ai, ai_end;
 
-					for(boost::tie(ai,ai_end) = boost::adjacent_vertices(v_desc,m_graph); ai != ai_end; ai++)
+					boost::tie(ai,ai_end) = boost::adjacent_vertices(v_desc,m_graph);
+
+					for(; ai != ai_end; ai++)
 					{
 						cont.push_back(m_graph[*ai].index);
 					}
