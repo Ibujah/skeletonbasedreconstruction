@@ -37,6 +37,7 @@ struct DatImg
 	std::map<unsigned int, Eigen::Vector2d> m_nod;
 	std::vector<unsigned int> clicknod;
 	cv::Mat &img;
+	cv::Scalar col;
 	
 	DatImg(cv::Mat &im) : img(im){};
 };
@@ -62,17 +63,18 @@ void extclickonMouse( int event, int xc, int yc, int, void* data )
 		}
 		datim->clicknod.push_back(ind);
 
-		cv::circle(datim->img,cv::Point(nodcoords.x(),nodcoords.y()),2,cv::Scalar(0,255,0),-1);
+		cv::circle(datim->img,cv::Point(nodcoords.x(),nodcoords.y()),2,datim->col,-1);
 	}
 }
 
 template<typename Model>
-std::vector<unsigned int> ClickSkelNodes_helper(cv::Mat &img, const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, unsigned int nbnod, const mathtools::affine::Frame<2>::Ptr frame)
+std::vector<unsigned int> ClickSkelNodes_helper(cv::Mat &img, const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, unsigned int nbnod, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &col)
 {
 	std::list<unsigned int> l_allnodes;
 	grskel->getAllNodes(l_allnodes);
 	
 	DatImg datim(img);
+	datim.col = col;
 	
 	for(std::list<unsigned int>::iterator it = l_allnodes.begin(); it != l_allnodes.end(); it++)
 	{
@@ -100,12 +102,12 @@ std::vector<unsigned int> ClickSkelNodes_helper(cv::Mat &img, const typename ske
 	return datim.clicknod;
 }
 
-std::vector<unsigned int> userinput::ClickSkelNodes(cv::Mat &img, const skeleton::GraphSkel2d::Ptr grskel, unsigned int nbnod, const mathtools::affine::Frame<2>::Ptr frame)
+std::vector<unsigned int> userinput::ClickSkelNodes(cv::Mat &img, const skeleton::GraphSkel2d::Ptr grskel, unsigned int nbnod, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &col)
 {
-	return ClickSkelNodes_helper<skeleton::model::Classic<2> >(img,grskel,nbnod,frame);
+	return ClickSkelNodes_helper<skeleton::model::Classic<2> >(img,grskel,nbnod,frame,col);
 }
 
-std::vector<unsigned int> userinput::ClickSkelNodes(cv::Mat &img, const skeleton::GraphProjSkel::Ptr grskel, unsigned int nbnod, const mathtools::affine::Frame<2>::Ptr frame)
+std::vector<unsigned int> userinput::ClickSkelNodes(cv::Mat &img, const skeleton::GraphProjSkel::Ptr grskel, unsigned int nbnod, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &col)
 {
-	return ClickSkelNodes_helper<skeleton::model::Projective>(img,grskel,nbnod,frame);
+	return ClickSkelNodes_helper<skeleton::model::Projective>(img,grskel,nbnod,frame,col);
 }
