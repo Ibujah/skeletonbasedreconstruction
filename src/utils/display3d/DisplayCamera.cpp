@@ -51,7 +51,7 @@ unsigned int display3d::DisplayCamera(DisplayClass &disclass, const camera::Came
 
 		for(unsigned int i = 0;i<4;i++)
 		{
-			Eigen::Vector2d vec = mathtools::affine::Point<2>(corner2d[i],cam->getIntrinsics()->getFrame()).getCoords();
+			Eigen::Vector2d vec = mathtools::affine::Point<2>(corner2d[i]).getCoords(cam->getIntrinsics()->getFrame());
 
 			corner3d[i] = mathtools::affine::Point<3>(0.5*vec(0),0.5*vec(1),0.5,cam->getExtrinsics()->getFrame()).getCoords();
 		}
@@ -63,7 +63,6 @@ unsigned int display3d::DisplayCamera(DisplayClass &disclass, const camera::Came
 		{
 			glVertex3f(oricam.x(),oricam.y(),oricam.z());
 			glVertex3f(corner3d[i].x(),corner3d[i].y(),corner3d[i].z());
-
 
 			glVertex3f(corner3d[i].x(),corner3d[i].y(),corner3d[i].z());
 			glVertex3f(corner3d[(i+1)%4].x(),corner3d[(i+1)%4].y(),corner3d[(i+1)%4].z());
