@@ -1,5 +1,4 @@
 before_script:
-  # g++4.9.1
   - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
   - sudo apt-get update -qq
 
@@ -22,6 +21,7 @@ before_script:
   - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
   - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
 
-script:
+comp:
+  script:
   - mkdir build && cd build && cmake .. && make
   - cd ../bin && ok=true; for i in `echo test*`; do "./"$i; if [ $? -ne 0 ]; then ok=false; fi; done; $ok;
