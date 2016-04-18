@@ -45,7 +45,7 @@ namespace algorithm
 		/**
 		 *  \brief Match options structure
 		 */
-		struct OptionsMatch
+		struct OptionsMatch2
 		{
 			/**
 			 *  \brief Several matching methods
@@ -73,7 +73,7 @@ namespace algorithm
 			/**
 			 *  \brief Default constructor
 			 */
-			OptionsMatch(enum_methodmatch methodmatch_ = graph, unsigned int nb_triang_ = 100, double lambda_ = 1.0) :
+			OptionsMatch2(enum_methodmatch methodmatch_ = graph, unsigned int nb_triang_ = 100, double lambda_ = 1.0) :
 				methodmatch(methodmatch_), nb_triang(nb_triang_), lambda(lambda_) {}
 		};
 		
@@ -89,7 +89,7 @@ namespace algorithm
 				skeleton::ReconstructionBranch::Ptr recbranch,
 				const skeleton::BranchContProjSkel::Ptr projbr1,
 				const skeleton::BranchContProjSkel::Ptr projbr2,
-				const OptionsMatch &options = OptionsMatch());
+				const OptionsMatch2 &options = OptionsMatch2());
 		
 		/**
 		 *  \brief Two skeletons matching algorithm
@@ -103,7 +103,7 @@ namespace algorithm
 				skeleton::ReconstructionSkeleton::Ptr recskel,
 				const skeleton::CompContProjSkel::Ptr projskel1,
 				const skeleton::CompContProjSkel::Ptr projskel2,
-				const OptionsMatch &options = OptionsMatch());
+				const OptionsMatch2 &options = OptionsMatch2());
 	}
 }
 

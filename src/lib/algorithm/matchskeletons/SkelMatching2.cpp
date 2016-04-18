@@ -39,7 +39,7 @@ void SkelMatchingGraph(
 		skeleton::ReconstructionBranch::Ptr recbranch,
 		const skeleton::BranchContProjSkel::Ptr projbr1,
 		const skeleton::BranchContProjSkel::Ptr projbr2,
-		const algorithm::matchskeletons::OptionsMatch &options)
+		const algorithm::matchskeletons::OptionsMatch2 &options)
 {
 	unsigned int size_map = options.nb_triang;
 	Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> map_energy(size_map,size_map);
@@ -143,11 +143,11 @@ void algorithm::matchskeletons::BranchMatching(
 		skeleton::ReconstructionBranch::Ptr recbranch,
 		const skeleton::BranchContProjSkel::Ptr projbr1,
 		const skeleton::BranchContProjSkel::Ptr projbr2,
-		const algorithm::matchskeletons::OptionsMatch &options)
+		const algorithm::matchskeletons::OptionsMatch2 &options)
 {
 	switch(options.methodmatch)
 	{
-		case OptionsMatch::enum_methodmatch::graph:
+		case OptionsMatch2::enum_methodmatch::graph:
 			SkelMatchingGraph(recbranch,projbr1,projbr2,options);
 			break;
 	}
@@ -157,7 +157,7 @@ void algorithm::matchskeletons::ComposedMatching(
 		skeleton::ReconstructionSkeleton::Ptr recskel,
 		const skeleton::CompContProjSkel::Ptr projskel1,
 		const skeleton::CompContProjSkel::Ptr projskel2,
-		const algorithm::matchskeletons::OptionsMatch &options)
+		const algorithm::matchskeletons::OptionsMatch2 &options)
 {
 	std::list<unsigned int> l_edge;
 	recskel->getAllEdges(l_edge);

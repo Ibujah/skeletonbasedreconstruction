@@ -204,7 +204,7 @@ int main(int argc, char** argv)
 	}
 	
 	std::cout << "Matching" << std::endl;
-	algorithm::matchskeletons::OptionsMatch optionsmatch;
+	algorithm::matchskeletons::OptionsMatch2 optionsmatch;
 	optionsmatch.lambda = lambda;
 	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
 	
