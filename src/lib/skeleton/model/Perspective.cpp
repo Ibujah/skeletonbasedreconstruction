@@ -28,11 +28,32 @@ SOFTWARE.
  */
 
 #include "Perspective.h"
+#include <mathtools/application/Compositor.h>
+#include <mathtools/application/LinearApp.h>
+#include <mathtools/application/Coord2Homog.h>
+
+using namespace mathtools::application;
 
 constexpr unsigned int skeleton::model::meta<skeleton::model::Perspective>::stordim;
 
 skeleton::model::Perspective::Perspective(const mathtools::affine::Frame<2>::Ptr frame2, const mathtools::affine::Frame<3>::Ptr frame3) : skeleton::model::Projective(frame2,frame3)
-{}
+{
+	Eigen::Matrix3d basis3 = frame3->getBasis()->getMatrix();
+	Eigen::Vector3d ori3   = frame3->getOrigin();
+	Eigen::Matrix<double,8,4> retromat;
+	retromat << 0.0			 , 0.0 			, 0.0 , ori3(0)	 ,
+				0.0 		 , 0.0  		, 0.0 , ori3(1)	 ,
+				0.0 		 , 0.0  		, 0.0 , ori3(2)	 ,
+				0.0 		 , 0.0  		, 0.0 , 0.0		 ,
+				basis3(0,0)  , basis3(0,1)	, 0.0 , basis3(0,2) ,
+				basis3(1,0)  , basis3(1,1)	, 0.0 , basis3(1,2) ,
+				basis3(2,0)  , basis3(2,1)	, 0.0 , basis3(2,2) ,
+				0.0			 , 0.0			, 1.0 , 0.0			 ;
+	
+	Compositor<LinearApp<8,4>,Coord2Homog<3> >::Ptr comp(new Compositor<LinearApp<8,4>,Coord2Homog<3> >(LinearApp<8,4>(retromat),Coord2Homog<3>()));
+	
+	m_r8fun = std::static_pointer_cast<Application<Eigen::Matrix<double,8,1>,Eigen::Vector3d> >(comp);
+}
 
 skeleton::model::Perspective::Perspective(const Perspective &model) : skeleton::model::Projective(model.m_frame2,model.m_frame3)
 {}

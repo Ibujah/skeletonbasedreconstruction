@@ -34,9 +34,6 @@ constexpr unsigned int skeleton::model::meta<skeleton::model::Projective>::stord
 skeleton::model::Projective::Projective(const mathtools::affine::Frame<2>::Ptr frame2, const mathtools::affine::Frame<3>::Ptr frame3) : m_frame2(frame2), m_frame3(frame3)
 {}
 
-skeleton::model::Projective::Projective(const Projective &model) : m_frame2(model.m_frame2), m_frame3(model.m_frame3)
-{}
-
 const mathtools::affine::Frame<2>::Ptr skeleton::model::Projective::getFrame2() const
 {
 	return m_frame2;
@@ -45,6 +42,11 @@ const mathtools::affine::Frame<2>::Ptr skeleton::model::Projective::getFrame2() 
 const mathtools::affine::Frame<3>::Ptr skeleton::model::Projective::getFrame3() const
 {
 	return m_frame3;
+}
+
+const mathtools::application::Application<Eigen::Matrix<double,8,1>,Eigen::Vector3d>::Ptr skeleton::model::Projective::getR8Fun() const
+{
+	return m_r8fun;
 }
 
 Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> skeleton::model::Projective::toVec(
