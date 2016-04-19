@@ -52,7 +52,8 @@ namespace algorithm
 			 */
 			enum enum_methodmatch
 			{
-				graph = 0
+				graph = 0,
+				ode
 			};
 			
 			/**
@@ -71,10 +72,32 @@ namespace algorithm
 			double lambda;
 			
 			/**
+			 *  \brief Min weight of the distance function between the lines (>0)
+			 */
+			double lambdamin;
+			
+			/**
+			 *  \brief Max weight of the distance function between the lines (>0)
+			 */
+			double lambdamax;
+			
+			/**
+			 *  \brief Discretization step between min and max lambda
+			 */
+			double lambdastep;
+			
+			/**
+			 *  \brief Time between two step for ODE
+			 */
+			double deltat;
+			
+			/**
 			 *  \brief Default constructor
 			 */
-			OptionsMatch2(enum_methodmatch methodmatch_ = graph, unsigned int nb_triang_ = 100, double lambda_ = 1.0) :
-				methodmatch(methodmatch_), nb_triang(nb_triang_), lambda(lambda_) {}
+			OptionsMatch2(enum_methodmatch methodmatch_ = graph, unsigned int nb_triang_ = 100, double lambda_ = 1.0,
+					      double lambdamin_ = 0.1, double lambdamax_ = 10.0, double lambdastep_ = 0.1, double deltat_ = 0.01) :
+				methodmatch(methodmatch_), nb_triang(nb_triang_), lambda(lambda_),
+				lambdamin(lambdamin_), lambdamax(lambdamax_), lambdastep(lambdastep_), deltat(deltat_) {}
 		};
 		
 		/**

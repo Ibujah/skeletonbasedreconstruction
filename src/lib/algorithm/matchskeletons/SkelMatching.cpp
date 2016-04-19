@@ -116,13 +116,11 @@ double SolveODE(
 {
 	double value = 0.0;
 	double valuef = 0.0;
-	Eigen::Matrix<double,Eigen::Dynamic,1> gradient;
-	Eigen::Matrix<double,Eigen::Dynamic,1> gradientf;
+	Eigen::Matrix<double,Eigen::Dynamic,1> gradient(q_init.rows(),1);
+	Eigen::Matrix<double,Eigen::Dynamic,1> gradientf(q_init.rows(),1);
 	v_tot = 0.0;
 	t_tot = 0.0;
 
-	gradient = gradientf;
-	value    = valuef;
 	Dist_grad(q_init,skel,valuef,gradientf);
 
 	list_pos.push_back(q_init);
@@ -132,8 +130,8 @@ double SolveODE(
 
 
 	//first step, to avoid boundary problem :
-	Eigen::MatrixXd q = q_init + v_init * deltat;
-	Eigen::MatrixXd v = v_init;
+	Eigen::Matrix<double,Eigen::Dynamic,1> q = q_init + v_init * deltat;
+	Eigen::Matrix<double,Eigen::Dynamic,1> v = v_init;
 
 	gradient = gradientf;
 	value    = valuef;
@@ -163,7 +161,7 @@ double SolveODE(
 	}
 
 
-	Eigen::Matrix<double,Eigen::Dynamic,1> qf = Eigen::Matrix<double,Eigen::Dynamic,1>::Ones(q.rows(),q.cols());
+	Eigen::Matrix<double,Eigen::Dynamic,1> qf = Eigen::Matrix<double,Eigen::Dynamic,1>::Ones(q.rows(),1);
 	value = valuef;
 	gradient = gradientf;
 	Dist_grad(qf,skel,valuef,gradientf);
@@ -222,7 +220,7 @@ double minFunODE(const std::vector<double> &x, std::vector<double> &, void *data
 			data->t_tot,
 			data->v_tot,
 			data->skel,
-			Eigen::Matrix<double,Eigen::Dynamic,1>::Zero(x.size()+1,1),
+			Eigen::Matrix<double,Eigen::Dynamic,1>::Zero(v_init.size(),1),
 			v_init,
 			data->lambda,
 			data->deltat);
@@ -234,7 +232,7 @@ double FindSpeed(DataODE &data)
 {
 	Eigen::Matrix<double,Eigen::Dynamic,1> q = Eigen::Matrix<double,Eigen::Dynamic,1>::Zero(data.skel.size(),1); //starting point
 	
-	std::list<Eigen::MatrixXd> list_pos;
+	std::list<Eigen::Matrix<double,Eigen::Dynamic,1> > list_pos;
 	
 	nlopt::opt opt(nlopt::LN_COBYLA, data.skel.size()-1);
 	
@@ -265,27 +263,9 @@ double FindSpeed(DataODE &data)
 
 	data.vit_init = vit_init;
 	
-	Eigen::Matrix<double,Eigen::Dynamic,1> v_init(vit_init.size()+1,1);
-	v_init *= 0;
-	v_init(0,0) = 1.0;
-	for(unsigned int i=0;i<vit_init.size();i++)
-	{
-		v_init *= cos(vit_init[i]);
-		v_init(i+1,0) = sin(vit_init[i]);
-	}
+	std::vector<double> tmp;
 
-	double val = SolveODE(
-			data.list_val,
-			data.list_pos,
-			data.list_vit,
-			data.list_grad,
-			data.t_tot,
-			data.v_tot,
-			data.skel,
-			Eigen::Matrix<double,Eigen::Dynamic,1>::Zero(data.skel.size()+1,1),
-			v_init,
-			data.lambda,
-			data.deltat);
+	double val = minFunODE(vit_init,tmp, &data);
 	
 	return val;
 }
