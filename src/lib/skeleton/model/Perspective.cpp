@@ -76,6 +76,26 @@ mathtools::affine::Point<2> skeleton::model::Perspective::toObj(
 	return mathtools::affine::Point<2>(vec(0),vec(1),m_frame2);
 }
 
+mathtools::geometry::euclidian::HyperEllipse<2> skeleton::model::Perspective::toObj(
+		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
+		const mathtools::geometry::euclidian::HyperEllipse<2> &) const
+{
+	double z = 1.0/(2.0*sqrt(vec(0)*vec(0) + vec(1)*vec(1) - vec(2)*vec(2) - 1.0));
+	double x = vec(0) * z;
+	double y = vec(1) * z;
+	
+	mathtools::affine::Point<2> pt(vec(0),vec(1),m_frame2);
+	
+	Eigen::Matrix2d mat;
+	mat << (x*x-1.0)/(z*z) , vec(0)*vec(1),
+		   vec(0)*vec(1)   , (y*y-1.0)/(z*z);
+	
+	Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> solv(mat);
+	Eigen::Matrix2d axes = m_frame2->getBasis()->getMatrix()*solv.operatorSqrt()*m_frame2->getBasis()->getMatrixInverse();
+
+	return mathtools::geometry::euclidian::HyperEllipse<2>(pt,axes);
+}
+
 mathtools::geometry::euclidian::Line<4> skeleton::model::Perspective::toObj(
 		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
 		const mathtools::geometry::euclidian::Line<4> &) const

@@ -67,6 +67,13 @@ mathtools::geometry::euclidian::HyperSphere<2> skeleton::model::Projective::toOb
 	throw std::logic_error("skeleton::model::Projective::toObj: not implemented in that skeleton type");
 }
 
+mathtools::geometry::euclidian::HyperEllipse<2> skeleton::model::Projective::toObj(
+		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &,
+		const mathtools::geometry::euclidian::HyperEllipse<2> &) const
+{
+	throw std::logic_error("skeleton::model::Projective::toObj: not implemented in that skeleton type");
+}
+
 mathtools::geometry::euclidian::Line<4> skeleton::model::Projective::toObj(
 		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &,
 		const mathtools::geometry::euclidian::Line<4> &) const
