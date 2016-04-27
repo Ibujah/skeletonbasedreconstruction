@@ -83,16 +83,16 @@ mathtools::geometry::euclidian::HyperEllipse<2> skeleton::model::Perspective::to
 	double z = 1.0/(2.0*sqrt(vec(0)*vec(0) + vec(1)*vec(1) - vec(2)*vec(2) - 1.0));
 	double x = vec(0) * z;
 	double y = vec(1) * z;
-	
-	mathtools::affine::Point<2> pt(vec(0),vec(1),m_frame2);
+
+	mathtools::affine::Point<2> pt((x*z)/(2.0-z*z),(y*z)/(2.0-z*z),m_frame2);
 	
 	Eigen::Matrix2d mat;
-	mat << (x*x-1.0)/(z*z) , vec(0)*vec(1),
-		   vec(0)*vec(1)   , (y*y-1.0)/(z*z);
+	mat << (1.0-x*x)/(2.0-z*z) , (x*y)/(2.0-z*z),
+		   (x*y)/(2.0-z*z)     , (1.0-y*y)/(2.0-z*z);
 	
 	Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> solv(mat);
 	Eigen::Matrix2d axes = m_frame2->getBasis()->getMatrix()*solv.operatorSqrt()*m_frame2->getBasis()->getMatrixInverse();
-
+	
 	return mathtools::geometry::euclidian::HyperEllipse<2>(pt,axes);
 }
 
