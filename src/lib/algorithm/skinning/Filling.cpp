@@ -46,14 +46,38 @@ void algorithm::skinning::Filling(shape::DiscreteShape<2>::Ptr shape, const skel
 
 void algorithm::skinning::Filling(shape::DiscreteShape<2>::Ptr shape, const skeleton::CompContSkel2d::Ptr contskl, const OptionsFilling &options)
 {
-	std::vector<unsigned int> node(0);
-	contskl->getAllNodes(node);
-	
 	std::vector<unsigned int> edge(0);
 	contskl->getAllEdges(edge);
 	
-	for(unsigned int i=0;i<node.size();i++)
-		contskl->addNode(node[i]);
+	for(unsigned int i=0;i<edge.size();i++)
+	{
+		std::pair<unsigned int,unsigned int> ext = contskl->getExtremities(edge[i]);
+		
+		Filling(shape,contskl->getBranch(ext.first,ext.second),options);
+	}
+}
+
+void algorithm::skinning::Filling(shape::DiscreteShape<2>::Ptr shape, const skeleton::BranchContProjSkel::Ptr contbr, const OptionsFilling &options)
+{
+	cv::Mat im_shape(shape->getHeight(),shape->getWidth(),CV_8U,&shape->getContainer()[0]);
+	
+	for(unsigned int i = 0; i < options.nbcer; i++)
+	{
+		double t = (double)i/(double)(options.nbcer-1);
+		mathtools::geometry::euclidian::HyperEllipse<2> ell = contbr->getNode<mathtools::geometry::euclidian::HyperEllipse<2> >(t);
+		
+		cv::RotatedRect rect(cv::Point2f(ell.getCenter().getCoords().x(),ell.getCenter().getCoords().y()),
+							 cv::Size2f(1.0/ell.getAxes().block<2,1>(0,0).norm(),1.0/ell.getAxes().block<2,1>(0,1).norm()),
+							 atan2(ell.getAxes()(1,0),ell.getAxes()(0,0)));
+
+		cv::ellipse(im_shape,rect,255,-1);
+	}
+}
+
+void algorithm::skinning::Filling(shape::DiscreteShape<2>::Ptr shape, const skeleton::CompContProjSkel::Ptr contskl, const OptionsFilling &options)
+{
+	std::vector<unsigned int> edge(0);
+	contskl->getAllEdges(edge);
 	
 	for(unsigned int i=0;i<edge.size();i++)
 	{

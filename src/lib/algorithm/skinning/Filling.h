@@ -77,6 +77,24 @@ namespace algorithm
  		 *  \param options filling options
  		 */
 		void Filling(shape::DiscreteShape<2>::Ptr shape, const skeleton::CompContSkel2d::Ptr contskl, const OptionsFilling &options = OptionsFilling());
+
+		/**
+ 		 *  \brief Computes filling of a shape from a projective skeletal branch
+ 		 *
+		 *  \param shape   shape to fill
+ 		 *  \param contbr  continuous branch to fill
+ 		 *  \param options filling options
+ 		 */
+		void Filling(shape::DiscreteShape<2>::Ptr shape, const skeleton::BranchContProjSkel::Ptr contbr, const OptionsFilling &options = OptionsFilling());
+
+		/**
+ 		 *  \brief Computes filling of a shape from a projective skeleton
+ 		 *
+		 *  \param shape   shape to fill
+ 		 *  \param contskl continuous skeleton to fill
+ 		 *  \param options filling options
+ 		 */
+		void Filling(shape::DiscreteShape<2>::Ptr shape, const skeleton::CompContProjSkel::Ptr contskl, const OptionsFilling &options = OptionsFilling());
 	}
 }
 
