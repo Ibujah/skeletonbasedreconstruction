@@ -31,16 +31,53 @@ SOFTWARE.
 #include <skeleton/model/Orthographic.h>
 #include <skeleton/model/Perspective.h>
 #include <mathtools/application/Application.h>
+#include <mathtools/application/Bspline.h>
+#include <mathtools/application/Nurbs.h>
 
 template<typename Model>
 skeleton::BranchContProjSkel::Ptr SkeletonProjection_helper(const skeleton::BranchContSkel3d::Ptr contbr, const camera::Camera::Ptr camera)
 {
 	skeleton::model::Projective::Ptr model(new Model(camera->getIntrinsics()->getFrame(),camera->getExtrinsics()->getFrame()));
+	skeleton::BranchContSkel3d::CompFun::Ptr compfun = contbr->getCompFun();
+	skeleton::BranchContSkel3d::NodeFun::Ptr nodefun = compfun->getFun();
+	skeleton::BranchContSkel3d::RevFun::Ptr revfun = compfun->next().getFun();
+	
 	mathtools::application::Application<Eigen::Vector3d,double>::Ptr nodefunproj;
 	
-	// use a NURBS
+	mathtools::application::Bspline<4>::Ptr bsplinenode = std::static_pointer_cast<mathtools::application::Bspline<4> >(nodefun);
 	
-	return skeleton::BranchContProjSkel::Ptr(new skeleton::BranchContProjSkel(model,nodefunproj));
+	if(bsplinenode)
+	{
+		const Eigen::Matrix<double,4,Eigen::Dynamic> &ctrlpt = bsplinenode->getCtrl();
+		const Eigen::Matrix<double,1,Eigen::Dynamic> &nodevec = bsplinenode->getNodeVec();
+		double degree = bsplinenode->getDegree();
+
+		Eigen::Matrix<double,3,Eigen::Dynamic> ctrlptrot(3,ctrlpt.cols());
+		ctrlptrot = camera->getExtrinsics()->getFrame()->getBasis()->getMatrixInverse()*ctrlpt.block(0,0,3,ctrlpt.cols()) +
+					camera->getExtrinsics()->getFrame()->getOrigin()*Eigen::Matrix<double,1,Eigen::Dynamic>::Ones(1,ctrlpt.cols());
+		
+		Eigen::Matrix<double,3,Eigen::Dynamic> ctrlptnurbs(3,ctrlpt.cols());
+		Eigen::Matrix<double,1,Eigen::Dynamic> weightnurbs(1,ctrlpt.cols());
+		
+		ctrlptnurbs.block(0,0,2,ctrlpt.cols()) = ctrlptrot.block(0,0,2,ctrlptrot.cols());
+		ctrlptnurbs.block(2,0,1,ctrlpt.cols()) = ctrlpt.block(3,0,1,ctrlpt.cols());
+		weightnurbs = ctrlptrot.block(2,0,1,ctrlpt.cols());
+		
+		nodefunproj = mathtools::application::Application<Eigen::Vector3d,double>::Ptr(new mathtools::application::Nurbs<3>(ctrlptnurbs,weightnurbs,nodevec,degree));
+	}
+	else
+	{
+		throw std::logic_error("SkeletonProjection_helper : Node function not managed");
+	}
+	
+	skeleton::BranchContProjSkel::Ptr projbr(new skeleton::BranchContProjSkel(model,nodefunproj));
+	
+	if(revfun->getSlope() < 0.0)
+	{
+		projbr = projbr->reverted();
+	}
+
+	return projbr;
 }
 
 skeleton::BranchContProjSkel::Ptr algorithm::projection::SkeletonProjection(const skeleton::BranchContSkel3d::Ptr contbr, const camera::Camera::Ptr camera)
@@ -53,7 +90,7 @@ skeleton::BranchContProjSkel::Ptr algorithm::projection::SkeletonProjection(cons
 			projbr = SkeletonProjection_helper<skeleton::model::Orthographic>(contbr,camera);
 			break;
 		case camera::Intrinsics::Type::pinhole:
-			projbr = SkeletonProjection_helper<skeleton::model::Projective>(contbr,camera);
+			projbr = SkeletonProjection_helper<skeleton::model::Perspective>(contbr,camera);
 			break;
 	}
 	

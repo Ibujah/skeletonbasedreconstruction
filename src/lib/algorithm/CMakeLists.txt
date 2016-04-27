@@ -13,7 +13,8 @@ set(SOURCE_FILES    extractboundary/MarchingSquares.cpp
 					fitbspline/Graph2Bspline.cpp
 					matchskeletons/SkelMatching2.cpp
 					matchskeletons/SkelTriangulation.cpp
-					skinning/ContinuousSkinning.cpp)
+					skinning/ContinuousSkinning.cpp
+					projection/SkeletonProjection.cpp)
 # make the library
 add_library(
     ${LIBRARY_NAME}
