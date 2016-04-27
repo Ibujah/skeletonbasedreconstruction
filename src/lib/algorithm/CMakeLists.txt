@@ -2,6 +2,7 @@ set(LIBRARY_NAME ${ALGORITHM_LIB})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/lib
 					${VOROPLUSPLUS_INCLUDE_DIR}
+					${OpenCV_INCLUDE_DIRS}
 					${Boost_INCLUDE_DIR})
 					
 set(SOURCE_FILES    extractboundary/MarchingSquares.cpp
