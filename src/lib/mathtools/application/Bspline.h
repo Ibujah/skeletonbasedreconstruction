@@ -223,6 +223,36 @@ namespace mathtools
 
 					return arr;
 				}
+				
+				/**
+				 *  \brief Degree getter
+				 *
+				 *  \return degree
+				 */
+				double getDegree() const
+				{
+					return m_degree;
+				}
+				
+				/**
+				 *  \brief Control points getter
+				 *
+				 *  \return control points
+				 */
+				const Eigen::Matrix<double,Dim,Eigen::Dynamic>& getCtrl() const
+				{
+					return m_ctrlpt;
+				}
+				
+				/**
+				 *  \brief Node vector getter
+				 *
+				 *  \return node vector
+				 */
+				const Eigen::Matrix<double,1,Eigen::Dynamic>& getNodeVec() const
+				{
+					return m_nodevec;
+				}
 
 				/**
 				 *  \brief Inferior boundary accessor
