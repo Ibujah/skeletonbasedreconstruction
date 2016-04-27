@@ -14,7 +14,8 @@ set(SOURCE_FILES    extractboundary/MarchingSquares.cpp
 					matchskeletons/SkelMatching2.cpp
 					matchskeletons/SkelTriangulation.cpp
 					skinning/ContinuousSkinning.cpp
-					projection/SkeletonProjection.cpp)
+					projection/SkeletonProjection.cpp
+					skinning/Filling.cpp)
 # make the library
 add_library(
     ${LIBRARY_NAME}
