@@ -38,7 +38,7 @@ double algorithm::evaluation::HausDist(const std::vector<shape::DiscreteShape<2>
 	double dist = 0.0;
 	for(unsigned int i = 0; i < vecproj.size(); i++)
 	{
-		cv::Mat img;
+		cv::Mat img(vecshape[i]->getHeight(),vecshape[i]->getWidth(),CV_8U);
 		cv::Mat im_shape(vecshape[i]->getHeight(),vecshape[i]->getWidth(),CV_8U,&vecshape[i]->getContainer()[0]);
 		cv::Mat im_proj(vecproj[i]->getHeight(),vecproj[i]->getWidth(),CV_8U,&vecproj[i]->getContainer()[0]);
 		cv::absdiff(im_shape,im_proj,img);
@@ -61,8 +61,7 @@ double algorithm::evaluation::HausDist(const skeleton::BranchContSkel3d::Ptr con
 		vecproj[i] = shape::DiscreteShape<2>::Ptr(
 				new shape::DiscreteShape<2>(
 					veccam[i]->getIntrinsics()->getWidth(), 
-					veccam[i]->getIntrinsics()->getHeight(), 
-					veccam[i]->getIntrinsics()->getFrame()));
+					veccam[i]->getIntrinsics()->getHeight()));
 		algorithm::skinning::Filling(vecproj[i],projbr);
 	}
 	
@@ -79,10 +78,9 @@ double algorithm::evaluation::HausDist(const skeleton::CompContSkel3d::Ptr conts
 		vecproj[i] = shape::DiscreteShape<2>::Ptr(
 				new shape::DiscreteShape<2>(
 					veccam[i]->getIntrinsics()->getWidth(), 
-					veccam[i]->getIntrinsics()->getHeight(), 
-					veccam[i]->getIntrinsics()->getFrame()));
+					veccam[i]->getIntrinsics()->getHeight()));
 		algorithm::skinning::Filling(vecproj[i],projskl);
 	}
-	
+
 	return HausDist(vecproj,vecshape);
 }
