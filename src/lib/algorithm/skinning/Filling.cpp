@@ -66,10 +66,12 @@ void algorithm::skinning::Filling(shape::DiscreteShape<2>::Ptr shape, const skel
 		double t = (double)i/(double)(options.nbcer-1);
 		mathtools::geometry::euclidian::HyperEllipse<2> ell = contbr->getNode<mathtools::geometry::euclidian::HyperEllipse<2> >(t);
 		
-		cv::RotatedRect rect(cv::Point2f(ell.getCenter().getCoords().x(),ell.getCenter().getCoords().y()),
-							 cv::Size2f(1.0/ell.getAxes().block<2,1>(0,0).norm(),1.0/ell.getAxes().block<2,1>(0,1).norm()),
-							 atan2(ell.getAxes()(1,0),ell.getAxes()(0,0)));
+		Eigen::Vector2d vec_ctr = ell.getCenter().getCoords(shape->getFrame());
 
+		cv::RotatedRect rect(cv::Point2f(vec_ctr.x(),vec_ctr.y()),
+							 cv::Size2f(2.0*ell.getAxes().block<2,1>(0,0).norm(),2.0*ell.getAxes().block<2,1>(0,1).norm()),
+							 atan2(ell.getAxes()(1,0),ell.getAxes()(0,0))*180/M_PI);
+		
 		cv::ellipse(im_shape,rect,255,-1);
 	}
 }
