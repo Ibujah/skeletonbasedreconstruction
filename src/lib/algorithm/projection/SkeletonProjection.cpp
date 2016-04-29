@@ -51,10 +51,10 @@ skeleton::BranchContProjSkel::Ptr SkeletonProjection_helper(const skeleton::Bran
 		const Eigen::Matrix<double,4,Eigen::Dynamic> &ctrlpt = bsplinenode->getCtrl();
 		const Eigen::Matrix<double,1,Eigen::Dynamic> &nodevec = bsplinenode->getNodeVec();
 		double degree = bsplinenode->getDegree();
-
+		
 		Eigen::Matrix<double,3,Eigen::Dynamic> ctrlptrot(3,ctrlpt.cols());
-		ctrlptrot = camera->getExtrinsics()->getFrame()->getBasis()->getMatrixInverse()*ctrlpt.block(0,0,3,ctrlpt.cols()) +
-					camera->getExtrinsics()->getFrame()->getOrigin()*Eigen::Matrix<double,1,Eigen::Dynamic>::Ones(1,ctrlpt.cols());
+		ctrlptrot = camera->getExtrinsics()->getFrame()->getFrameInverse()->getBasis()->getMatrix()*ctrlpt.block(0,0,3,ctrlpt.cols()) +
+					camera->getExtrinsics()->getFrame()->getFrameInverse()->getOrigin()*Eigen::Matrix<double,1,Eigen::Dynamic>::Ones(1,ctrlpt.cols());
 		
 		Eigen::Matrix<double,3,Eigen::Dynamic> ctrlptnurbs(3,ctrlpt.cols());
 		Eigen::Matrix<double,1,Eigen::Dynamic> weightnurbs(1,ctrlpt.cols());
@@ -62,6 +62,7 @@ skeleton::BranchContProjSkel::Ptr SkeletonProjection_helper(const skeleton::Bran
 		ctrlptnurbs.block(0,0,2,ctrlpt.cols()) = ctrlptrot.block(0,0,2,ctrlptrot.cols());
 		ctrlptnurbs.block(2,0,1,ctrlpt.cols()) = ctrlpt.block(3,0,1,ctrlpt.cols());
 		weightnurbs = ctrlptrot.block(2,0,1,ctrlpt.cols());
+		ctrlptnurbs = ctrlptnurbs.cwiseProduct((Eigen::Vector3d::Ones()*weightnurbs).cwiseInverse());
 		
 		nodefunproj = mathtools::application::Application<Eigen::Vector3d,double>::Ptr(new mathtools::application::Nurbs<3>(ctrlptnurbs,weightnurbs,nodevec,degree));
 	}
