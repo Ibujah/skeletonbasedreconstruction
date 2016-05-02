@@ -197,7 +197,7 @@ int main(int argc, char** argv)
 		vec_compcontpr[i] = algorithm::fitbspline::Graph2Bspline(vec_comppr[i]);
 	}
 	
-	algorithm::matchskeletons::OptionsMatch optionsmatch;
+	algorithm::matchskeletons::OptionsMatch2 optionsmatch;
 	optionsmatch.lambda = lambda;
 	std::vector<shape::DiscreteShape<2>::Ptr> vecshape(2);
 	vecshape[0] = shape1;
@@ -208,16 +208,27 @@ int main(int argc, char** argv)
 	std::cout.precision(2);
 	std::cout.setf(std::ios::fixed);
 	
-	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch::graph;
+	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch2::graph;
 	std::cout << "Matching graph" << std::endl;
 	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
 	
 	std::cout << "Triangulation" << std::endl;
-	skeleton::CompContSkel3d::Ptr skelreconstructed = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
+	skeleton::CompContSkel3d::Ptr skelreconstructedgraph = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
 
 	std::cout << "Reprojection error evaluation" << std::endl;
-	double err_graph = algorithm::evaluation::HausDist(skelreconstructed,vecshape,veccam);
+	double err_graph = algorithm::evaluation::HausDist(skelreconstructedgraph,vecshape,veccam);
 	std::cout << "Reprojection error : " << err_graph*100 << "%" << std::endl;
+	
+	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch2::ode;
+	std::cout << "Matching ode" << std::endl;
+	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
+	
+	std::cout << "Triangulation" << std::endl;
+	skeleton::CompContSkel3d::Ptr skelreconstructedode = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
+
+	std::cout << "Reprojection error evaluation" << std::endl;
+	double err_ode = algorithm::evaluation::HausDist(skelreconstructedode,vecshape,veccam);
+	std::cout << "Reprojection error : " << err_ode*100 << "%" << std::endl;
 	
 	return 0;
 }
