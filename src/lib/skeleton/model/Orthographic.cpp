@@ -90,6 +90,21 @@ mathtools::affine::Point<2> skeleton::model::Orthographic::toObj(
 	return mathtools::affine::Point<2>(vec(0),vec(1),m_frame2);
 }
 
+mathtools::geometry::euclidian::HyperEllipse<2> skeleton::model::Orthographic::toObj(
+		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
+		const mathtools::geometry::euclidian::HyperEllipse<2> &) const
+{
+	mathtools::affine::Point<2> pt(vec(0),vec(1),m_frame2);
+	
+	Eigen::Matrix2d mat;
+	mat << 1.0/vec(2) , 0.0,
+		   0.0 , 1.0/vec(2);
+	
+	Eigen::Matrix2d axes = m_frame2->getBasis()->getMatrix()*mat*m_frame2->getBasis()->getMatrixInverse();
+
+	return mathtools::geometry::euclidian::HyperEllipse<2>(pt,axes);
+}
+
 mathtools::geometry::euclidian::Line<4> skeleton::model::Orthographic::toObj(
 		const Eigen::Matrix<double,skeleton::model::meta<skeleton::model::Projective>::stordim,1> &vec,
 		const mathtools::geometry::euclidian::Line<4> &) const

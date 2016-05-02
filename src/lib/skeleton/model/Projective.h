@@ -35,6 +35,7 @@ SOFTWARE.
 #include <mathtools/affine/Frame.h>
 #include <mathtools/affine/Point.h>
 #include <mathtools/geometry/euclidian/HyperSphere.h>
+#include <mathtools/geometry/euclidian/HyperEllipse.h>
 #include <mathtools/geometry/euclidian/Line.h>
 #include <mathtools/application/Application.h>
 
@@ -230,6 +231,16 @@ namespace skeleton
 				 */
 				virtual mathtools::geometry::euclidian::HyperSphere<2> toObj(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec,
 																			 const mathtools::geometry::euclidian::HyperSphere<2> &) const;
+
+				/**
+				 *  \brief Associate an hyperellipse to a vector
+				 *
+				 *  \param vec vector to convert
+				 *
+				 *  \return hyperellipse
+				 */
+				virtual mathtools::geometry::euclidian::HyperEllipse<2> toObj(const Eigen::Matrix<double,meta<Projective>::stordim,1> &vec,
+																			  const mathtools::geometry::euclidian::HyperEllipse<2> &) const;
 
 				/**
 				 *  \brief Associate a line to a vector

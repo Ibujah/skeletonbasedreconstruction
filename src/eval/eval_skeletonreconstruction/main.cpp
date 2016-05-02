@@ -22,7 +22,7 @@ SOFTWARE.
 
 
 /**
- *  \brief Skeleton reconstruction software
+ *  \brief Skeleton reconstruction evaluation
  *  \author Bastien Durix
  */
 
@@ -53,18 +53,12 @@ SOFTWARE.
 #include <displayopencv/DisplayShapeOCV.h>
 #include <displayopencv/DisplayBoundaryOCV.h>
 #include <displayopencv/DisplaySkeletonOCV.h>
-#include <display3d/DisplayClass.h>
-#include <display3d/DisplayFrame.h>
-#include <display3d/DisplayCamera.h>
-#include <display3d/DisplaySkeleton.h>
-#include <display3d/DisplayBoundary.h>
 
 int main(int argc, char** argv)
 {
 	std::string imgfile;
 	std::string orifile;
 	std::string camfile;
-	std::string outbound;
 	double sat;
 	double lambda;
 	
@@ -75,7 +69,6 @@ int main(int argc, char** argv)
 		("imgfile", boost::program_options::value<std::string>(&imgfile)->default_value("mask"), "Binary image file (*.png)")
 		("orifile", boost::program_options::value<std::string>(&orifile)->default_value("img"), "Real image file (*.jpg)")
 		("camfile", boost::program_options::value<std::string>(&camfile)->default_value("cam"), "Camera file (*.xml)")
-		("outbound", boost::program_options::value<std::string>(&outbound)->default_value("skelrec.obj"), "Boundary output file")
 		("sat", boost::program_options::value<double>(&sat)->default_value(1.2), "Scale Axis Transform parameter")
 		("lambda", boost::program_options::value<double>(&lambda)->default_value(0.2), "Lambda parameter")
 		;
@@ -204,47 +197,27 @@ int main(int argc, char** argv)
 		vec_compcontpr[i] = algorithm::fitbspline::Graph2Bspline(vec_comppr[i]);
 	}
 	
-	std::cout << "Matching" << std::endl;
-	algorithm::matchskeletons::OptionsMatch2 optionsmatch;
+	algorithm::matchskeletons::OptionsMatch optionsmatch;
 	optionsmatch.lambda = lambda;
-	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
-	
-	std::cout << "Triangulation" << std::endl;
-	skeleton::CompContSkel3d::Ptr skelreconstructed = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
-
-	std::cout << "Reprojection error evaluation" << std::endl;
 	std::vector<shape::DiscreteShape<2>::Ptr> vecshape(2);
 	vecshape[0] = shape1;
 	vecshape[1] = shape2;
 	std::vector<camera::Camera::Ptr> veccam(2);
 	veccam[0] = cam1;
 	veccam[1] = cam2;
-	double err = algorithm::evaluation::HausDist(skelreconstructed,vecshape,veccam);
-	std::cout << "Reprojection error : " << err << std::endl;
+	std::cout.precision(2);
+	std::cout.setf(std::ios::fixed);
 	
-	std::cout << "Skinning" << std::endl;
-	boundary::DiscreteBoundary<3>::Ptr bnd = algorithm::skinning::ContinuousSkinning(skelreconstructed);
+	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch::graph;
+	std::cout << "Matching graph" << std::endl;
+	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
 	
-	std::cout << "Writing boundary" << std::endl;
-	fileio::WriteBoundaryOBJ(bnd,outbound);
-	
-	std::cout << "3D display" << std::endl;
-	display3d::DisplayClass disclass("Reconstructed skeleton");
-	
-	display3d::DisplayFrame(disclass,mathtools::affine::Frame<3>::CanonicFrame());
-	display3d::DisplaySkeleton(disclass,skelreconstructed);
-	display3d::DisplayBoundary_Wired(disclass,bnd);
-	display3d::DisplayCamera(disclass,cam1);
-	display3d::DisplayCamera(disclass,cam2,0.0,1.0,0.0);
-	
-	disclass.enableCtrl();
-	
-	while(disclass.isCtrlEnabled())
-	{
-		disclass.manageKeyboard();
-		disclass.display();
-	}
-	
+	std::cout << "Triangulation" << std::endl;
+	skeleton::CompContSkel3d::Ptr skelreconstructed = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
+
+	std::cout << "Reprojection error evaluation" << std::endl;
+	double err_graph = algorithm::evaluation::HausDist(skelreconstructed,vecshape,veccam);
+	std::cout << "Reprojection error : " << err_graph*100 << "%" << std::endl;
 	
 	return 0;
 }

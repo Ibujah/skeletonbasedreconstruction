@@ -22,13 +22,13 @@ SOFTWARE.
 
 
 /**
- *  \file Bspline.h
- *  \brief Defines bspline function
+ *  \file Nurbs.h
+ *  \brief Defines NURBS function
  *  \author Bastien Durix
  */
 
-#ifndef _BSPLINE_H_
-#define _BSPLINE_H_
+#ifndef _NURBS_H_
+#define _NURBS_H_
 
 #include <Eigen/Dense>
 #include <memory>
@@ -46,12 +46,12 @@ namespace mathtools
 	namespace application
 	{
 		/**
-		 *  \brief Defines Bspline curve
+		 *  \brief Defines Nurbs curve
 		 *
 		 *  \tparam Dim Curve dimension
 		 */
 		template<unsigned int Dim>
-		class Bspline : public Application<Eigen::Matrix<double,Dim,1>,double>
+		class Nurbs : public Application<Eigen::Matrix<double,Dim,1>,double>
 		{
 			public:
 				/**
@@ -67,13 +67,18 @@ namespace mathtools
 				/**
 				 *  \brief Shared pointer definition
 				 */
-				using Ptr = std::shared_ptr<Bspline>;
+				using Ptr = std::shared_ptr<Nurbs>;
 
 			protected:
 				/**
 				 *  \brief Control points
 				 */
 				Eigen::Matrix<double,Dim,Eigen::Dynamic> m_ctrlpt;
+
+				/**
+				 *  \brief Weight associated to control points
+				 */
+				Eigen::Matrix<double,1,Eigen::Dynamic> m_weight;
 
 				/**
 				 *  \brief Node vector
@@ -86,6 +91,11 @@ namespace mathtools
 				Eigen::Matrix<double,Dim,Eigen::Dynamic> m_ctrlptder;
 
 				/**
+				 *  \brief Weight for first derivative
+				 */
+				Eigen::Matrix<double,1,Eigen::Dynamic> m_weightder;
+
+				/**
 				 *  \brief Node vector for first derivative
 				 */
 				Eigen::Matrix<double,1,Eigen::Dynamic> m_nodevecder;
@@ -96,12 +106,17 @@ namespace mathtools
 				Eigen::Matrix<double,Dim,Eigen::Dynamic> m_ctrlptder2;
 
 				/**
+				 *  \brief Weight for second derivative
+				 */
+				Eigen::Matrix<double,1,Eigen::Dynamic> m_weightder2;
+
+				/**
 				 *  \brief Node vector for second derivative
 				 */
 				Eigen::Matrix<double,1,Eigen::Dynamic> m_nodevecder2;
 
 				/**
-				 *  \brief Bspline degree
+				 *  \brief Nurbs degree
 				 */
 				unsigned int m_degree;
 
@@ -111,60 +126,97 @@ namespace mathtools
 				 *
 				 *  \param ctrlpt   Control points
 				 *  \param nodevec  Node vector
-				 *  \param degree   Bspline degree
+				 *  \param degree   Nurbs degree
 				 *
 				 *  \throws std::logic_error if number of control points, nodes and degree does not match
 				 */
-				Bspline(const Eigen::Matrix<double,Dim,Eigen::Dynamic> &ctrlpt,
-						const Eigen::Matrix<double,1,Eigen::Dynamic>   &nodevec,
-						const unsigned int &degree) : 
+				Nurbs(const Eigen::Matrix<double,Dim,Eigen::Dynamic> &ctrlpt,
+					  const Eigen::Matrix<double,1,Eigen::Dynamic>   &weight,
+					  const Eigen::Matrix<double,1,Eigen::Dynamic>   &nodevec,
+					  const unsigned int &degree) : 
 					Application<Eigen::Matrix<double,Dim,1>,double>(),
-					m_ctrlpt(ctrlpt), m_nodevec(nodevec),
-					m_ctrlptder(Dim,1), m_nodevecder(1,1),
-					m_ctrlptder2(Dim,1), m_nodevecder2(1,1),
+					m_ctrlpt(ctrlpt), m_weight(weight), m_nodevec(nodevec),
+					m_ctrlptder(Dim,1), m_weightder(1,1), m_nodevecder(1,1),
+					m_ctrlptder2(Dim,1), m_weightder2(1,1), m_nodevecder2(1,1),
 					m_degree(degree)
 				{
 					if( ctrlpt.cols() + degree != nodevec.cols()+1  )
-						throw std::logic_error("Bspline : not verified #CtrlPt + degree = #NodeVec + 1");
+						throw std::logic_error("Nurbs : not verified #CtrlPt + degree = #NodeVec + 1");
 					if(m_degree>0)
 					{
-						ComputeDerivative<Dim>(m_degree, m_nodevec, m_ctrlpt, m_nodevecder, m_ctrlptder);
+						Eigen::Matrix<double,Dim+1,Eigen::Dynamic> mat(Dim+1,m_ctrlpt.cols());
+						Eigen::Matrix<double,Dim+1,Eigen::Dynamic> dermat(Dim+1,1);
+						for(unsigned int i = 0; i < m_ctrlpt.cols(); i++)
+						{
+							mat.template block<Dim,1>(0,i) = m_ctrlpt.template block<Dim,1>(0,i)*m_weight(i);
+						}
+						mat.block(Dim,0,1,m_ctrlpt.cols()) = m_weight;
+						
+						ComputeDerivative<Dim+1>(m_degree, m_nodevec, mat, m_nodevecder, dermat);
+						
+						m_ctrlptder.resize(Dim,dermat.cols());
+						m_weightder.resize(1,dermat.cols());
+						m_weightder = dermat.block(Dim,0,1,dermat.cols());
+						for(unsigned int i = 0; i < m_ctrlptder.cols(); i++)
+						{
+							m_ctrlptder.template block<Dim,1>(0,i) = dermat.template block<Dim,1>(0,i)/m_weightder(i);
+						}
 					}
 					if(m_degree>1)
 					{
-						ComputeDerivative<Dim>(m_degree-1, m_nodevecder, m_ctrlptder, m_nodevecder2, m_ctrlptder2);
+						Eigen::Matrix<double,Dim+1,Eigen::Dynamic> mat(Dim+1,m_ctrlptder.cols());
+						Eigen::Matrix<double,Dim+1,Eigen::Dynamic> dermat(Dim+1,1);
+						for(unsigned int i = 0; i < m_ctrlptder.cols(); i++)
+						{
+							mat.template block<Dim,1>(0,i) = m_ctrlptder.template block<Dim,1>(0,i)*m_weightder(i);
+						}
+						mat.block(Dim,0,1,m_ctrlptder.cols()) = m_weightder;
+						
+						ComputeDerivative<Dim+1>(m_degree-1, m_nodevecder, mat, m_nodevecder2, dermat);
+						
+						m_ctrlptder2.resize(Dim,dermat.cols());
+						m_weightder2.resize(1,dermat.cols());
+						m_weightder2 = dermat.block(Dim,0,1,dermat.cols());
+						for(unsigned int i = 0; i < m_ctrlptder2.cols(); i++)
+						{
+							m_ctrlptder2.template block<Dim,1>(0,i) = dermat.template block<Dim,1>(0,i)/m_weightder2(i);
+						}
 					}
 				}
 
 				/**
 				 *  \brief Copy constructor
 				 *
-				 *  \param bspline Bspline to copy
+				 *  \param nurbs Nurbs to copy
 				 */
-				Bspline(const Bspline<Dim> &bspline) : 
+				Nurbs(const Nurbs<Dim> &nurbs) : 
 					Application<Eigen::Matrix<double,Dim,1>,double>(),
-					m_ctrlpt(bspline.m_ctrlpt), m_nodevec(bspline.m_nodevec),
-					m_ctrlptder(bspline.m_ctrlptder), m_nodevecder(bspline.m_nodevecder),
-					m_ctrlptder2(bspline.m_ctrlptder2), m_nodevecder2(bspline.m_nodevecder2),
-					m_degree(bspline.m_degree) {};
+					m_ctrlpt(nurbs.m_ctrlpt), m_weight(nurbs.weight), m_nodevec(nurbs.m_nodevec),
+					m_ctrlptder(nurbs.m_ctrlptder), m_weightder(nurbs.weightder), m_nodevecder(nurbs.m_nodevecder),
+					m_ctrlptder2(nurbs.m_ctrlptder2), m_weightder2(nurbs.weightder2), m_nodevecder2(nurbs.m_nodevecder2),
+					m_degree(nurbs.m_degree) {};
 				
 				/**
-				 *  \brief Bspline call
+				 *  \brief Nurbs call
 				 *
-				 *  \param t Bspline parameter
+				 *  \param t Nurbs parameter
 				 * 
-				 *  \return Bspline evaluation at t
+				 *  \return Nurbs evaluation at t
 				 */
 				Eigen::Matrix<double,Dim,1> operator()(const double &t) const
 				{
 					Eigen::Matrix<double,Dim,1> res = Eigen::Matrix<double,Dim,1>::Zero();
-
-					for(unsigned int ind = 0; ind<m_ctrlpt.cols(); ind++)
+					double ratio = 0.0;
+					
+					for(unsigned int ind = 0; ind < m_ctrlpt.cols(); ind++)
 					{
 						double basis_ind = BsplineBasis(t,m_degree,ind,m_nodevec);
-						res+=m_ctrlpt.block(0,ind,Dim,1)*basis_ind;
+						res += m_ctrlpt.block(0,ind,Dim,1)*basis_ind*m_weight(ind);
+						ratio += basis_ind*m_weight(ind);
 					}
 
+					res *= (1.0/ratio);
+					
 					return res;
 				}
 
@@ -183,14 +235,17 @@ namespace mathtools
 					Eigen::Map<Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value> > res((double*)arr.data());
 
 					res.setZero();
+					double ratio = 0.0;
 					
 					if(m_degree > 0)
 					{
 						for(unsigned int ind = 0; ind<m_ctrlptder.cols(); ind++)
 						{
 							double basis_ind = BsplineBasis(t,m_degree-1,ind,m_nodevecder);
-							res+=m_ctrlptder.block(0,ind,Dim,1)*basis_ind;
+							res += m_ctrlptder.block(0,ind,Dim,1)*basis_ind*m_weightder(ind);
+							ratio += basis_ind*m_weightder(ind);
 						}
+						res *= (1.0/ratio);
 					}
 
 					return arr;
@@ -211,47 +266,20 @@ namespace mathtools
 					Eigen::Map<Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value> > res((double*)arr.data());
 					
 					res.setZero();
+					double ratio = 0.0;
 					
 					if(m_degree > 1)
 					{
 						for(unsigned int ind = 0; ind<m_ctrlptder2.cols(); ind++)
 						{
 							double basis_ind = BsplineBasis(t,m_degree-2,ind,m_nodevecder2);
-							res+=m_ctrlptder2.block(0,ind,Dim,1)*basis_ind;
+							res += m_ctrlptder2.block(0,ind,Dim,1)*basis_ind*m_weightder2(ind);
+							ratio += basis_ind*m_weightder2(ind);
 						}
+						res *= (1.0/ratio);
 					}
 
 					return arr;
-				}
-				
-				/**
-				 *  \brief Degree getter
-				 *
-				 *  \return degree
-				 */
-				double getDegree() const
-				{
-					return m_degree;
-				}
-				
-				/**
-				 *  \brief Control points getter
-				 *
-				 *  \return control points
-				 */
-				const Eigen::Matrix<double,Dim,Eigen::Dynamic>& getCtrl() const
-				{
-					return m_ctrlpt;
-				}
-				
-				/**
-				 *  \brief Node vector getter
-				 *
-				 *  \return node vector
-				 */
-				const Eigen::Matrix<double,1,Eigen::Dynamic>& getNodeVec() const
-				{
-					return m_nodevec;
 				}
 
 				/**
@@ -278,4 +306,4 @@ namespace mathtools
 }
 
 
-#endif //_BSPLINE_H_
+#endif //_NURBS_H_
