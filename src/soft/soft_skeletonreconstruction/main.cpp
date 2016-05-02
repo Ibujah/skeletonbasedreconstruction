@@ -45,6 +45,7 @@ SOFTWARE.
 #include <algorithm/matchskeletons/SkelMatching2.h>
 #include <algorithm/matchskeletons/SkelTriangulation.h>
 #include <algorithm/skinning/ContinuousSkinning.h>
+#include <algorithm/evaluation/ReprojError.h>
 
 #include <userinput/ClickSkelNode.h>
 #include <fileio/CameraFile.h>
@@ -210,6 +211,16 @@ int main(int argc, char** argv)
 	
 	std::cout << "Triangulation" << std::endl;
 	skeleton::CompContSkel3d::Ptr skelreconstructed = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
+
+	std::cout << "Reprojection error evaluation" << std::endl;
+	std::vector<shape::DiscreteShape<2>::Ptr> vecshape(2);
+	vecshape[0] = shape1;
+	vecshape[1] = shape2;
+	std::vector<camera::Camera::Ptr> veccam(2);
+	veccam[0] = cam1;
+	veccam[1] = cam2;
+	double err = algorithm::evaluation::HausDist(skelreconstructed,vecshape,veccam);
+	std::cout << "Reprojection error : " << err << std::endl;
 	
 	std::cout << "Skinning" << std::endl;
 	boundary::DiscreteBoundary<3>::Ptr bnd = algorithm::skinning::ContinuousSkinning(skelreconstructed);
