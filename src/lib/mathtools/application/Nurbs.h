@@ -206,16 +206,17 @@ namespace mathtools
 				Eigen::Matrix<double,Dim,1> operator()(const double &t) const
 				{
 					Eigen::Matrix<double,Dim,1> res = Eigen::Matrix<double,Dim,1>::Zero();
-					double ratio = 0.0;
+					double weight = 0.0;       // weight function
+					Eigen::Matrix<double,Dim,1> comb = Eigen::Matrix<double,Dim,1>::Zero();         // linear combination of coordinates
 					
 					for(unsigned int ind = 0; ind < m_ctrlpt.cols(); ind++)
 					{
 						double basis_ind = BsplineBasis(t,m_degree,ind,m_nodevec);
-						res += m_ctrlpt.block(0,ind,Dim,1)*basis_ind*m_weight(ind);
-						ratio += basis_ind*m_weight(ind);
+						comb += m_ctrlpt.block(0,ind,Dim,1)*basis_ind*m_weight(ind);
+						weight += basis_ind*m_weight(ind);
 					}
 
-					res *= (1.0/ratio);
+					res = comb * (1.0/weight);
 					
 					return res;
 				}
@@ -235,17 +236,27 @@ namespace mathtools
 					Eigen::Map<Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value> > res((double*)arr.data());
 
 					res.setZero();
-					double ratio = 0.0;
-					
 					if(m_degree > 0)
 					{
+						double weight = 0.0;       // weight function
+						double weight_prime = 0.0; // derivative of weight function
+						Eigen::Matrix<double,Dim,1> comb = Eigen::Matrix<double,Dim,1>::Zero();         // linear combination of coordinates
+						Eigen::Matrix<double,Dim,1> comb_prime = Eigen::Matrix<double,Dim,1>::Zero();   // derivative of linear combination of coordinates
+						
+						for(unsigned int ind = 0; ind < m_ctrlpt.cols(); ind++)
+						{
+							double basis_ind = BsplineBasis(t,m_degree,ind,m_nodevec);
+							comb += m_ctrlpt.block(0,ind,Dim,1)*basis_ind*m_weight(ind);
+							weight += basis_ind*m_weight(ind);
+						}
+
 						for(unsigned int ind = 0; ind<m_ctrlptder.cols(); ind++)
 						{
 							double basis_ind = BsplineBasis(t,m_degree-1,ind,m_nodevecder);
-							res += m_ctrlptder.block(0,ind,Dim,1)*basis_ind*m_weightder(ind);
-							ratio += basis_ind*m_weightder(ind);
+							comb_prime += m_ctrlptder.block(0,ind,Dim,1)*basis_ind*m_weightder(ind);
+							weight_prime += basis_ind*m_weightder(ind);
 						}
-						res *= (1.0/ratio);
+						res = (comb_prime*weight - comb*weight_prime)*(1.0/(weight*weight));
 					}
 
 					return arr;
@@ -266,17 +277,37 @@ namespace mathtools
 					Eigen::Map<Eigen::Matrix<double,dimension<outType>::value,dimension<inType>::value> > res((double*)arr.data());
 					
 					res.setZero();
-					double ratio = 0.0;
 					
 					if(m_degree > 1)
 					{
+						double weight = 0.0;        // weight function
+						double weight_prime = 0.0;  // derivative of weight function
+						double weight_second = 0.0; // second derivative of weight function
+						Eigen::Matrix<double,Dim,1> comb = Eigen::Matrix<double,Dim,1>::Zero();          // linear combination of coordinates
+						Eigen::Matrix<double,Dim,1> comb_prime = Eigen::Matrix<double,Dim,1>::Zero();    // derivative of linear combination of coordinates
+						Eigen::Matrix<double,Dim,1> comb_second = Eigen::Matrix<double,Dim,1>::Zero();   // second derivative of linear combination of coordinates
+						
+						for(unsigned int ind = 0; ind < m_ctrlpt.cols(); ind++)
+						{
+							double basis_ind = BsplineBasis(t,m_degree,ind,m_nodevec);
+							comb += m_ctrlpt.block(0,ind,Dim,1)*basis_ind*m_weight(ind);
+							weight += basis_ind*m_weight(ind);
+						}
+
+						for(unsigned int ind = 0; ind<m_ctrlptder.cols(); ind++)
+						{
+							double basis_ind = BsplineBasis(t,m_degree-1,ind,m_nodevecder);
+							comb_prime += m_ctrlptder.block(0,ind,Dim,1)*basis_ind*m_weightder(ind);
+							weight_prime += basis_ind*m_weightder(ind);
+						}
+
 						for(unsigned int ind = 0; ind<m_ctrlptder2.cols(); ind++)
 						{
 							double basis_ind = BsplineBasis(t,m_degree-2,ind,m_nodevecder2);
-							res += m_ctrlptder2.block(0,ind,Dim,1)*basis_ind*m_weightder2(ind);
-							ratio += basis_ind*m_weightder2(ind);
+							comb_second += m_ctrlptder2.block(0,ind,Dim,1)*basis_ind*m_weightder2(ind);
+							weight_second += basis_ind*m_weightder2(ind);
 						}
-						res *= (1.0/ratio);
+						res = (comb_second*weight*weight - comb*weight_second*weight - 2.0*comb_prime*weight_prime*weight + 2.0*comb*weight_prime*weight_prime)*(1.0/(weight*weight*weight));
 					}
 
 					return arr;
