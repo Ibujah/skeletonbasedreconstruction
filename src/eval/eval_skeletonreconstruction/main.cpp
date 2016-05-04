@@ -50,6 +50,7 @@ SOFTWARE.
 #include <userinput/ClickSkelNode.h>
 #include <fileio/CameraFile.h>
 #include <fileio/BoundaryFile.h>
+#include <fileio/RecSkelFile.h>
 #include <displayopencv/DisplayShapeOCV.h>
 #include <displayopencv/DisplayBoundaryOCV.h>
 #include <displayopencv/DisplaySkeletonOCV.h>
@@ -59,6 +60,7 @@ int main(int argc, char** argv)
 	std::string imgfile;
 	std::string orifile;
 	std::string camfile;
+	std::string recskelfile;
 	double sat;
 	double lambda;
 	
@@ -69,6 +71,7 @@ int main(int argc, char** argv)
 		("imgfile", boost::program_options::value<std::string>(&imgfile)->default_value("mask"), "Binary image file (*.png)")
 		("orifile", boost::program_options::value<std::string>(&orifile)->default_value("img"), "Real image file (*.jpg)")
 		("camfile", boost::program_options::value<std::string>(&camfile)->default_value("cam"), "Camera file (*.xml)")
+		("recskelfile", boost::program_options::value<std::string>(&recskelfile)->default_value("recskel.txt"), "Reconstruction DisplayGraphSkeleton file")
 		("sat", boost::program_options::value<double>(&sat)->default_value(1.2), "Scale Axis Transform parameter")
 		("lambda", boost::program_options::value<double>(&lambda)->default_value(0.2), "Lambda parameter")
 		;
@@ -105,15 +108,6 @@ int main(int argc, char** argv)
 	std::cout << "Extract projective skeleton" << std::endl;
 	skeleton::GraphProjSkel::Ptr prskel1 = algorithm::pruning::ScaleAxisTransform(algorithm::skeletonization::ProjectiveVoronoi(bnd1,cam1),sat);
 	
-	std::cout << "Display" << std::endl;
-	cv::Mat image1(shpimg1.rows,shpimg1.cols,CV_8UC3,cv::Scalar(0,0,0));
-	displayopencv::DisplayDiscreteShape(shape1,image1,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,255,255));
-	displayopencv::DisplayGraphSkeleton(prskel1,image1,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,0,0));
-
-	cv::namedWindow("Shape 1", CV_WINDOW_AUTOSIZE);
-    cv::imshow("Shape 1",image1);
-	
-	
 	
 	std::cout << "Image 2" << std::endl;
 	std::cout << "Opening camera file" << std::endl;
@@ -136,53 +130,57 @@ int main(int argc, char** argv)
 	std::cout << "Extract projective skeleton" << std::endl;
 	skeleton::GraphProjSkel::Ptr prskel2 = algorithm::pruning::ScaleAxisTransform(algorithm::skeletonization::ProjectiveVoronoi(bnd2,cam2),sat);
 	
-	std::cout << "Display" << std::endl;
-	cv::Mat image2(shpimg2.rows,shpimg2.cols,CV_8UC3,cv::Scalar(0,0,0));
-	displayopencv::DisplayDiscreteShape(shape2,image2,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,255,255));
-	displayopencv::DisplayGraphSkeleton(prskel2,image2,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,0,0));
-	
-	cv::namedWindow("Shape 2", CV_WINDOW_AUTOSIZE);
-    cv::imshow("Shape 2",image2);
-	cv::waitKey(10);
-	cv::waitKey(10);
-	
 	std::cout << "Creating reconstruction skeleton" << std::endl;
-	skeleton::ReconstructionSkeleton::Ptr recskel(new skeleton::ReconstructionSkeleton());
+	skeleton::ReconstructionSkeleton::Ptr recskel = fileio::ReadRecSkel(recskelfile);
 
-	std::cout << "How many branches have to be reconstructed?" << std::endl;
-	unsigned int nbbranches;
-	std::cin >> nbbranches;
-
-	for(unsigned int i = 0; i < nbbranches; i++)
+	if(!recskel)
 	{
-		std::cout << "Please click extremities of branch " << (i+1) << std::endl;
-		std::vector<unsigned int> indnod1 = userinput::ClickSkelNodes(image1,prskel1,2,mathtools::affine::Frame<2>::CanonicFrame());
-		std::vector<unsigned int> indnod2 = userinput::ClickSkelNodes(image2,prskel2,2,mathtools::affine::Frame<2>::CanonicFrame());
+		std::cout << "Display" << std::endl;
+		cv::Mat image1(shpimg1.rows,shpimg1.cols,CV_8UC3,cv::Scalar(0,0,0));
+		displayopencv::DisplayDiscreteShape(shape1,image1,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,255,255));
+		displayopencv::DisplayGraphSkeleton(prskel1,image1,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,0,0));
 
-		std::vector<unsigned int> vecindpr(2);
-		vecindpr[0] = 0;
-		vecindpr[1] = 1;
-		std::vector<unsigned int> firstext(2);
-		firstext[0] = indnod1[0];
-		firstext[1] = indnod2[0];
-		std::vector<unsigned int> lastext(2);
-		lastext[0] = indnod1[1];
-		lastext[1] = indnod2[1];
-		skeleton::ReconstructionBranch::Ptr recbr(new skeleton::ReconstructionBranch(vecindpr,firstext,lastext));
+		cv::namedWindow("Shape 1", CV_WINDOW_AUTOSIZE);
+		cv::imshow("Shape 1",image1);
 
-		recskel->addNode(i*2);
-		recskel->addNode(i*2+1);
-		recskel->addEdge(i*2,i*2+1,recbr);
+		cv::Mat image2(shpimg2.rows,shpimg2.cols,CV_8UC3,cv::Scalar(0,0,0));
+		displayopencv::DisplayDiscreteShape(shape2,image2,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,255,255));
+		displayopencv::DisplayGraphSkeleton(prskel2,image2,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,0,0));
+
+		cv::namedWindow("Shape 2", CV_WINDOW_AUTOSIZE);
+		cv::imshow("Shape 2",image2);
+		cv::waitKey(10);
+		cv::waitKey(10);
+
+
+		recskel = skeleton::ReconstructionSkeleton::Ptr(new skeleton::ReconstructionSkeleton());
+		std::cout << "How many branches have to be reconstructed?" << std::endl;
+		unsigned int nbbranches;
+		std::cin >> nbbranches;
+
+		for(unsigned int i = 0; i < nbbranches; i++)
+		{
+			std::cout << "Please click extremities of branch " << (i+1) << std::endl;
+			std::vector<unsigned int> indnod1 = userinput::ClickSkelNodes(image1,prskel1,2,mathtools::affine::Frame<2>::CanonicFrame());
+			std::vector<unsigned int> indnod2 = userinput::ClickSkelNodes(image2,prskel2,2,mathtools::affine::Frame<2>::CanonicFrame());
+
+			std::vector<unsigned int> vecindpr(2);
+			vecindpr[0] = 0;
+			vecindpr[1] = 1;
+			std::vector<unsigned int> firstext(2);
+			firstext[0] = indnod1[0];
+			firstext[1] = indnod2[0];
+			std::vector<unsigned int> lastext(2);
+			lastext[0] = indnod1[1];
+			lastext[1] = indnod2[1];
+			skeleton::ReconstructionBranch::Ptr recbr(new skeleton::ReconstructionBranch(vecindpr,firstext,lastext));
+
+			recskel->addNode(i*2);
+			recskel->addNode(i*2+1);
+			recskel->addEdge(i*2,i*2+1,recbr);
+		}
+		fileio::WriteRecSkel(recskel,recskelfile);
 	}
-
-
-	cv::namedWindow("Shape 1", CV_WINDOW_AUTOSIZE);
-    cv::imshow("Shape 1",image1);
-	cv::namedWindow("Shape 2", CV_WINDOW_AUTOSIZE);
-    cv::imshow("Shape 2",image2);
-
-	cv::waitKey(10);
-	
 	
 	std::vector<typename skeleton::GraphProjSkel::Ptr> vec_prskel(2);
 	vec_prskel[0] = prskel1;
