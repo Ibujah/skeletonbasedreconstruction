@@ -85,7 +85,8 @@ void EncodeEdge(const skeleton::GraphProjSkel::Ptr skel, const std::pair<unsigne
 /**
  *  \brief Asociate the first node to two sets representing an edge
  */
-unsigned int AssociatedNode(const skeleton::GraphProjSkel::Ptr skel, const std::vector<unsigned int> &assocext, const std::set<unsigned int> &set_ext1, const std::set<unsigned int> &set_ext2)
+template<typename SkelType>
+unsigned int AssociatedNode(const SkelType skel, const std::vector<unsigned int> &assocext, const std::set<unsigned int> &set_ext1, const std::set<unsigned int> &set_ext2)
 {
 	std::set<unsigned int> set_nod;
 	for(std::set<unsigned int>::const_iterator it = set_ext1.begin(); it != set_ext1.end(); it++)
@@ -130,7 +131,8 @@ unsigned int AssociatedNode(const skeleton::GraphProjSkel::Ptr skel, const std::
 /**
  *  \brief Decodes an edge, from the extremities its separates
  */
-void DecodeEdge(const skeleton::GraphProjSkel::Ptr skel, const std::vector<unsigned int> &assocext, const std::set<std::set<unsigned int> > &set_edg, std::pair<unsigned int, unsigned int> &edge)
+template<typename SkelType>
+void DecodeEdge(const SkelType skel, const std::vector<unsigned int> &assocext, const std::set<std::set<unsigned int> > &set_edg, std::pair<unsigned int, unsigned int> &edge)
 {
 	edge.first  = AssociatedNode(skel,assocext,(*set_edg.begin()),(*set_edg.rbegin()));
 	edge.second = AssociatedNode(skel,assocext,(*set_edg.rbegin()),(*set_edg.begin()));
@@ -239,5 +241,92 @@ skeleton::ReconstructionSkeleton::Ptr algorithm::graphoperation::TopoMatch(const
 		}
 	}
 	
+	// build the final graph
+	skeleton::ReconstructionSkeleton::Ptr recskel(new skeleton::ReconstructionSkeleton());
+	unsigned int nbext = assoc_ext[0].size();
+	std::vector<unsigned int> assoc_med(nbext);
+	recskel->addNode(nbext);
+	// edges connected to extremities
+	for(std::list<std::set<std::set<unsigned int> > >::iterator it = keptedg.begin(); it != keptedg.end(); it++)
+	{
+		std::set<std::set<unsigned int> > &set_ext = *it;
+		const std::set<unsigned int> &set1 = *(set_ext.begin()),
+									  set2 = *(set_ext.rbegin());
+		if(set1.size() == 1 || set2.size() == 1)
+		{
+			unsigned int indnod;
+			if(set1.size() == 1)
+				indnod = *(set1.begin());
+			else
+				indnod = *(set2.begin());
+
+			assoc_med[indnod] = indnod;
+
+			recskel->addNode(indnod);
+			
+			// branch creation
+			std::vector<unsigned int> indskel(assoc_ext.size());
+			std::vector<unsigned int> firstext(assoc_ext.size());
+			std::vector<unsigned int> secondext(assoc_ext.size());
+			for(unsigned int j = 0; j < indskel.size(); j++)
+			{
+				indskel[j] = j;
+				
+				std::pair<unsigned int,unsigned int> edge;
+				DecodeEdge(vec_skelsimp[j],assoc_ext[j],set_ext,edge);
+
+				firstext[j] = edge.first;
+				secondext[j] = edge.second;
+			}
+			skeleton::ReconstructionBranch::Ptr br(new skeleton::ReconstructionBranch(indskel,firstext,secondext));
+
+			if(set1.size() == 1)
+				recskel->addEdge(indnod,nbext,br);
+			else
+				recskel->addEdge(nbext,indnod,br);
+		}
+	}
 	
+	// other edges
+	for(std::list<std::set<std::set<unsigned int> > >::iterator it = keptedg.begin(); it != keptedg.end(); it++)
+	{
+		std::set<std::set<unsigned int> > &set_ext = *it;
+		const std::set<unsigned int> &set1 = *(set_ext.begin()),
+									  set2 = *(set_ext.rbegin());
+		if(set1.size() != 1 && set2.size() != 1)
+		{
+			std::pair<unsigned int,unsigned int> edge_med;
+			DecodeEdge(recskel,assoc_med,set_ext,edge_med);
+			
+			// branch creation
+			std::vector<unsigned int> indskel(assoc_ext.size());
+			std::vector<unsigned int> firstext(assoc_ext.size());
+			std::vector<unsigned int> secondext(assoc_ext.size());
+			for(unsigned int j = 0; j < indskel.size(); j++)
+			{
+				indskel[j] = j;
+				
+				std::pair<unsigned int,unsigned int> edge;
+				DecodeEdge(vec_skelsimp[j],assoc_ext[j],set_ext,edge);
+				
+				firstext[j] = edge.first;
+				secondext[j] = edge.second;
+			}
+			
+			unsigned int prev_nod = edge_med.first;
+			unsigned int added_node = recskel->addNode();
+			
+			for(std::set<unsigned int>::const_iterator its = set2.begin(); its != set2.end(); its++)
+			{
+				skeleton::ReconstructionBranch::Ptr br;
+				recskel->remEdge(prev_nod,*its,br);
+				recskel->addEdge(added_node,*its,br);
+			}
+
+			skeleton::ReconstructionBranch::Ptr br(new skeleton::ReconstructionBranch(indskel,firstext,secondext));
+			recskel->addEdge(prev_nod,added_node,br);
+		}
+	}
+
+	return recskel;
 }
