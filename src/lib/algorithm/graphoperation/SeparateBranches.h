@@ -105,6 +105,17 @@ namespace algorithm
 		std::list<std::vector<unsigned int> > GetNodes(const typename skeleton::GraphProjSkel::Ptr grskel, unsigned int first, unsigned int last);
 
 		/**
+		 *  \brief Gets the nodes indices between two nodes
+		 *
+		 *  \param grskel  Composed skeleton in which get the branch
+		 *  \param first   Branch first node 
+		 *  \param last    Branch last node 
+		 *
+		 *  \return List of node indices between the nodes
+		 */
+		std::list<std::vector<unsigned int> > GetNodes(const typename skeleton::ReconstructionSkeleton::Ptr grskel, unsigned int first, unsigned int last);
+
+		/**
 		 *  \brief Gets a skeletal branch between two nodes
 		 *
 		 *  \param grskel  Skeleton in which get the branch
