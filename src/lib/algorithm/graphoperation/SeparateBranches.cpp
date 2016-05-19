@@ -272,6 +272,38 @@ std::list<typename skeleton::GraphBranch<Model>::Ptr> GetBranch_helper(const typ
 	return l_br;
 }
 
+template<typename Model>
+std::list<std::vector<unsigned int> > GetNodes_helper(const typename skeleton::GraphCurveSkeleton<Model>::Ptr grskel, unsigned int first, unsigned int last)
+{
+	std::list<std::list<unsigned int> > paths;
+	BrowsePath<Model>(paths,grskel,first,last);
+	
+	std::list<std::vector<unsigned int> > l_br;
+
+	for(std::list<std::list<unsigned int> >::iterator it = paths.begin(); it != paths.end(); it++)
+	{
+		std::vector<unsigned int> vec(it->begin(),it->end());
+		l_br.push_back(vec);
+	}
+	
+	return l_br;
+}
+
+std::list<std::vector<unsigned int> > algorithm::graphoperation::GetNodes(const typename skeleton::GraphSkel2d::Ptr grskel, unsigned int first, unsigned int last)
+{
+	return GetNodes_helper<skeleton::model::Classic<2> >(grskel,first,last);
+}
+
+std::list<std::vector<unsigned int> > algorithm::graphoperation::GetNodes(const typename skeleton::GraphSkel3d::Ptr grskel, unsigned int first, unsigned int last)
+{
+	return GetNodes_helper<skeleton::model::Classic<3> >(grskel,first,last);
+}
+
+std::list<std::vector<unsigned int> > algorithm::graphoperation::GetNodes(const typename skeleton::GraphProjSkel::Ptr grskel, unsigned int first, unsigned int last)
+{
+	return GetNodes_helper<skeleton::model::Projective>(grskel,first,last);
+}
+
 std::list<typename skeleton::BranchGraphSkel2d::Ptr> algorithm::graphoperation::GetBranch(const typename skeleton::GraphSkel2d::Ptr grskel, unsigned int first, unsigned int last)
 {
 	return GetBranch_helper<skeleton::model::Classic<2> >(grskel,first,last);
