@@ -375,3 +375,34 @@ std::vector<typename skeleton::CompGraphProjSkel::Ptr> algorithm::graphoperation
 	
 	return vec_compskel;
 }
+
+template<typename SkelType>
+void DeleteExtremity_helper(SkelType grskel, unsigned int ext)
+{
+	std::list<unsigned int> lnei;
+	grskel->getNeighbors(ext,lnei);
+	while(lnei.size() == 1)
+	{
+		grskel->remNode(ext);
+		
+		ext = *(lnei.begin());
+		lnei.clear();
+
+		grskel->getNeighbors(ext,lnei);
+	}
+}
+
+void algorithm::graphoperation::DeleteExtremity(skeleton::GraphSkel2d::Ptr grskel, unsigned int ext)
+{
+	DeleteExtremity_helper(grskel,ext);
+}
+
+void algorithm::graphoperation::DeleteExtremity(skeleton::GraphSkel3d::Ptr grskel, unsigned int ext)
+{
+	DeleteExtremity_helper(grskel,ext);
+}
+
+void algorithm::graphoperation::DeleteExtremity(skeleton::GraphProjSkel::Ptr grskel, unsigned int ext)
+{
+	DeleteExtremity_helper(grskel,ext);
+}

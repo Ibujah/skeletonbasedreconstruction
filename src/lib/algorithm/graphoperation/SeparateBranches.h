@@ -160,6 +160,30 @@ namespace algorithm
 		 *  \throws std::logic_error if a skeleton contains a cycle, or if a branch does not exist
 		 */
 		std::vector<typename skeleton::CompGraphProjSkel::Ptr> GetComposed(const typename skeleton::ReconstructionSkeleton::Ptr recskel, const std::vector<skeleton::GraphProjSkel::Ptr> &vec_prskel);
+
+		/**
+		 *  \brief Delete branch from an extremity
+		 *
+		 *  \param grskel  Skeleton in which delete the branch
+		 *  \param ext     Extremity from which start
+		 */
+		void DeleteExtremity(skeleton::GraphSkel2d::Ptr grskel, unsigned int ext);
+
+		/**
+		 *  \brief Delete branch from an extremity
+		 *
+		 *  \param grskel  Skeleton in which delete the branch
+		 *  \param ext     Extremity from which start
+		 */
+		void DeleteExtremity(skeleton::GraphSkel3d::Ptr grskel, unsigned int ext);
+
+		/**
+		 *  \brief Delete branch from an extremity
+		 *
+		 *  \param grskel  Skeleton in which delete the branch
+		 *  \param ext     Extremity from which start
+		 */
+		void DeleteExtremity(skeleton::GraphProjSkel::Ptr grskel, unsigned int ext);
 	}
 }
 
