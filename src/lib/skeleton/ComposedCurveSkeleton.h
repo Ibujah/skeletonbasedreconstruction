@@ -468,13 +468,13 @@ namespace skeleton
 					{
 						cont.push_back(m_graph[*ai].index);
 					}
+				
+					typename boost::graph_traits<GraphType>::in_edge_iterator aiinv, aiinv_end;
 
-					/*typename boost::graph_traits<GraphType>::inv_adjacency_iterator aiinv, aiinv_end;
-
-					for(boost::tie(aiinv,aiinv_end) = boost::inv_adjacent_vertices(v_desc,m_graph); aiinv != aiinv_end; aiinv++)
+					for(boost::tie(aiinv,aiinv_end) = boost::in_edges(v_desc,m_graph); aiinv != aiinv_end; aiinv++)
 					{
-						cont.push_back(m_graph[*aiinv].index);
-					}*/
+						cont.push_back(m_graph[source(*aiinv,m_graph)].index);
+					}
 				}
 			}
 
