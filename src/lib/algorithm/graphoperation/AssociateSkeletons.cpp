@@ -35,13 +35,26 @@ SOFTWARE.
 /**
  *  \brief Removes all degree 2 nodes
  */
-skeleton::GraphProjSkel::Ptr SimplifySkeleton(const skeleton::GraphProjSkel::Ptr skel)
+skeleton::GraphProjSkel::Ptr SimplifySkeleton(const skeleton::GraphProjSkel::Ptr skel, const std::vector<unsigned int> &assoc_ext)
 {
 	skeleton::GraphProjSkel::Ptr skelsimp(new skeleton::GraphProjSkel(*skel));
 	
 	std::list<unsigned int> listnodes;
-	skelsimp->getAllNodes(listnodes);
+	
+	skelsimp->getNodesByDegree(0,listnodes);
+	skelsimp->getNodesByDegree(1,listnodes);
+	
+	for(std::list<unsigned int>::iterator it = listnodes.begin(); it != listnodes.end(); it++)
+	{
+		if(std::find(assoc_ext.begin(),assoc_ext.end(),*it) == assoc_ext.end())
+		{
+			algorithm::graphoperation::DeleteExtremity(skelsimp,*it);
+		}
+	}
 
+	listnodes.clear();
+	skelsimp->getAllNodes(listnodes);
+	
 	for(std::list<unsigned int>::iterator it = listnodes.begin(); it != listnodes.end(); it++)
 	{
 		std::vector<unsigned int> neigh(0);
@@ -70,13 +83,14 @@ void EncodeEdge(const skeleton::GraphProjSkel::Ptr skel, const std::pair<unsigne
 	for(std::list<skeleton::GraphProjSkel::Ptr>::iterator it = listcomp.begin(); it != listcomp.end(); it++)
 	{
 		std::list<unsigned int> node_ext;
-		(*it)->getNodesByDegree(0,node_ext);
-		(*it)->getNodesByDegree(1,node_ext);
+		(*it)->getAllNodes(node_ext);
 		
 		std::set<unsigned int> set_ext;
 		for(std::list<unsigned int>::iterator itn = node_ext.begin(); itn != node_ext.end(); itn++)
 		{
-			set_ext.insert(std::find(assocext.begin(),assocext.end(),*itn)-assocext.begin());
+			unsigned int ind = std::find(assocext.begin(),assocext.end(),*itn)-assocext.begin();
+			if(ind != assocext.size())
+				set_ext.insert(ind);
 		}
 		set_edg.insert(set_ext);
 	}
@@ -97,19 +111,24 @@ unsigned int AssociatedNode(const SkelType skel, const std::vector<unsigned int>
 	unsigned int opp_nod = assocext[*(set_ext2.begin())];
 	
 	std::list<std::vector<unsigned int> > paths = algorithm::graphoperation::GetNodes(skel,*(set_nod.begin()),opp_nod);
-	
+
+	if(paths.size() < 1)
+	{
+		throw std::logic_error("Not able to find the path.");
+	}
+
 	std::vector<unsigned int> &path = *(paths.begin());
-	
+
 	std::map<unsigned int, unsigned int> used;
-	
+
 	for(unsigned int i = 0; i < path.size(); i++)
 		used[path[i]] = 1;
-	
+
 	for(std::set<unsigned int>::iterator it = std::next(set_nod.begin()); it != set_nod.end(); it++)
 	{
 		std::list<std::vector<unsigned int> > paths2 = algorithm::graphoperation::GetNodes(skel,*(set_nod.begin()),opp_nod);
 		std::vector<unsigned int> &path2 = *(paths2.begin());
-		
+
 		for(unsigned int i = 0; i < path2.size(); i++)
 		{
 			std::map<unsigned int, unsigned int>::iterator itu = used.find(path2[i]);
@@ -175,7 +194,7 @@ skeleton::ReconstructionSkeleton::Ptr algorithm::graphoperation::TopoMatch(const
 	// converts edges into sets, an count number of occurences
 	for(unsigned int i = 0; i < vec_skel.size(); i++)
 	{
-		vec_skelsimp[i] = SimplifySkeleton(vec_skel[i]);
+		vec_skelsimp[i] = SimplifySkeleton(vec_skel[i],assoc_ext[i]);
 		
 		std::list<std::pair<unsigned int,unsigned int> > listedges;
 		vec_skelsimp[i]->getAllEdges(listedges);
@@ -200,6 +219,7 @@ skeleton::ReconstructionSkeleton::Ptr algorithm::graphoperation::TopoMatch(const
 	{
 		std::vector<std::pair<unsigned int,unsigned int> > vecedges(0);
 		vec_skelsimp[i]->getAllEdges(vecedges);
+
 		std::vector<std::set<std::set<unsigned int> > > vecedgset(vecedges.size());
 
 		for(unsigned int j = 0; j < vecedges.size() ; j++)
@@ -295,6 +315,7 @@ skeleton::ReconstructionSkeleton::Ptr algorithm::graphoperation::TopoMatch(const
 									  set2 = *(set_ext.rbegin());
 		if(set1.size() != 1 && set2.size() != 1)
 		{
+
 			std::pair<unsigned int,unsigned int> edge_med;
 			DecodeEdge(recskel,assoc_med,set_ext,edge_med);
 			
