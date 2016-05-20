@@ -43,7 +43,9 @@ std::list<typename GraphSkel::Ptr> SeparateComponents_helper(const typename Grap
 	std::vector<unsigned int> nodekey(0); // all node keys
 	grskel->getAllNodes(nodekey);
 
-	std::vector<unsigned int> connect_comp(nodekey.size(),0); // connected component associated to each node
+	std::map<unsigned int, unsigned int> connect_comp; // connected component associated to each node
+	for(unsigned int i = 0; i < nodekey.size(); i++)
+		connect_comp[nodekey[i] ] = 0;
 
 	std::list<typename GraphSkel::Ptr> list_comp;
 	if(nodekey.size())
@@ -62,11 +64,11 @@ std::list<typename GraphSkel::Ptr> SeparateComponents_helper(const typename Grap
 			/*
 			 * Get the first node not labelled
 			 */
-			for(unsigned int i=0;i<connect_comp.size() && alllabelled;i++)
+			for(std::map<unsigned int, unsigned int>::iterator it = connect_comp.begin(); it !=connect_comp.end() && alllabelled; it++)
 			{
-				if(!connect_comp[i])
+				if(it->second == 0)
 				{
-					firstnotlabelled = i;
+					firstnotlabelled = it->first;
 					alllabelled=false;
 				}
 			}
@@ -88,14 +90,10 @@ std::list<typename GraphSkel::Ptr> SeparateComponents_helper(const typename Grap
 					 * If the node key is not labelled,
 					 * add all its neighbors to the tolabel list
 					 */
-					if(!connect_comp[key])
+					if(connect_comp[key] == 0)
 					{
-						for(unsigned int i=0;i<connect_comp.size();i++)
-						{
-							if(nodekey[i]==key)
-								connect_comp[i]=labelcomp;
-						}
-						grskel->getNeighbors(nodekey[key],tolabel);
+						connect_comp[key]=labelcomp;
+						grskel->getNeighbors(key,tolabel);
 					}
 				}
 				
@@ -116,36 +114,36 @@ std::list<typename GraphSkel::Ptr> SeparateComponents_helper(const typename Grap
 			/*
 			 * Add each labelled node to the current skeleton
 			 */
-			for(unsigned int i = 0; i < connect_comp.size(); i++)
+			for(std::map<unsigned int, unsigned int>::iterator it = connect_comp.begin(); it !=connect_comp.end(); it++)
 			{
-				if(connect_comp[i] == label)
+				if(it->second == label)
 				{
 					/*
 					 * If node node i is labelled,
 					 * add the node nodekey[i]
 					 */
-					grskl_comp->addNode(nodekey[i],grskel->getNode(nodekey[i]));
+					grskl_comp->addNode(it->first,grskel->getNode(it->first));
 				}
 			}
 			
-			for(unsigned int i = 0; i < connect_comp.size(); i++)
+			for(std::map<unsigned int, unsigned int>::iterator it = connect_comp.begin(); it !=connect_comp.end(); it++)
 			{
-				if(connect_comp[i] == label)
+				if(it->second == label)
 				{
 					/*
 					 * If the node i is in the skeleton,
 					 * add its neighbors
 					 */
 					std::vector<unsigned int> neigh(0);
-					grskel->getNeighbors(nodekey[i],neigh);
+					grskel->getNeighbors(it->first,neigh);
 
 					/*
 					 * As the nodes do have the sames indices,
 					 * we can add directly the edge
 					 */
-					for(unsigned int j=0; j < neigh.size(); j++)
+					for(unsigned int j = 0; j < neigh.size(); j++)
 					{
-						grskl_comp->addEdge(nodekey[i],neigh[j]);
+						grskl_comp->addEdge(it->first,neigh[j]);
 					}
 				}
 			}
