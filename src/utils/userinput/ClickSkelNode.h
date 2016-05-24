@@ -48,11 +48,12 @@ namespace userinput
 	 *  \param grskel  2d graph skeleton
 	 *  \param nbnod   number of nodes to click
 	 *  \param frame   frame of the image
+	 *  \param ext     click only the extremities
 	 *  \param col     color of the clickes nodes
 	 *
 	 *  \return id of clicked nodes
 	 */
-	std::vector<unsigned int> ClickSkelNodes(cv::Mat &img, const skeleton::GraphSkel2d::Ptr grskel, unsigned int nbnod, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &col = cv::Scalar(0,255,0));
+	std::vector<unsigned int> ClickSkelNodes(cv::Mat &img, const skeleton::GraphSkel2d::Ptr grskel, unsigned int nbnod, const mathtools::affine::Frame<2>::Ptr frame, const bool ext = false, const cv::Scalar &col = cv::Scalar(0,255,0));
 
 	/**
 	 *  \brief Click skeleton nodes on projective graph skeleton
@@ -61,11 +62,12 @@ namespace userinput
 	 *  \param grskel  projective graph skeleton
 	 *  \param nbnod   number of nodes to click
 	 *  \param frame   frame of the image
+	 *  \param ext     click only the extremities
 	 *  \param col     color of the clickes nodes
 	 *
 	 *  \return id of clicked nodes
 	 */
-	std::vector<unsigned int> ClickSkelNodes(cv::Mat &img, const skeleton::GraphProjSkel::Ptr grskel, unsigned int nbnod, const mathtools::affine::Frame<2>::Ptr frame, const cv::Scalar &col = cv::Scalar(0,255,0));
+	std::vector<unsigned int> ClickSkelNodes(cv::Mat &img, const skeleton::GraphProjSkel::Ptr grskel, unsigned int nbnod, const mathtools::affine::Frame<2>::Ptr frame, const bool ext = false, const cv::Scalar &col = cv::Scalar(0,255,0));
 }
 
 #endif //_CLICKSKELNODE_H_
