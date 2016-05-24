@@ -41,6 +41,7 @@ SOFTWARE.
 #include <algorithm/skeletonization/VoronoiSkeleton2D.h>
 #include <algorithm/pruning/ScaleAxisTransform.h>
 #include <algorithm/graphoperation/SeparateBranches.h>
+#include <algorithm/graphoperation/AssociateSkeletons.h>
 #include <algorithm/fitbspline/Graph2Bspline.h>
 #include <algorithm/matchskeletons/SkelMatching2.h>
 #include <algorithm/matchskeletons/SkelTriangulation.h>
@@ -50,6 +51,7 @@ SOFTWARE.
 #include <userinput/ClickSkelNode.h>
 #include <fileio/CameraFile.h>
 #include <fileio/BoundaryFile.h>
+#include <fileio/ExtClickFile.h>
 #include <displayopencv/DisplayShapeOCV.h>
 #include <displayopencv/DisplayBoundaryOCV.h>
 #include <displayopencv/DisplaySkeletonOCV.h>
@@ -65,6 +67,7 @@ int main(int argc, char** argv)
 	std::string orifile;
 	std::string camfile;
 	std::string outbound;
+	std::string extskelfile;
 	double sat;
 	double lambda;
 	
@@ -76,6 +79,7 @@ int main(int argc, char** argv)
 		("orifile", boost::program_options::value<std::string>(&orifile)->default_value("img"), "Real image file (*.jpg)")
 		("camfile", boost::program_options::value<std::string>(&camfile)->default_value("cam"), "Camera file (*.xml)")
 		("outbound", boost::program_options::value<std::string>(&outbound)->default_value("skelrec.obj"), "Boundary output file")
+		("extskelfile", boost::program_options::value<std::string>(&extskelfile)->default_value("extskel.txt"), "Extremities Skeleton file")
 		("sat", boost::program_options::value<double>(&sat)->default_value(1.2), "Scale Axis Transform parameter")
 		("lambda", boost::program_options::value<double>(&lambda)->default_value(0.2), "Lambda parameter")
 		;
@@ -155,45 +159,42 @@ int main(int argc, char** argv)
 	
 	std::cout << "Creating reconstruction skeleton" << std::endl;
 	skeleton::ReconstructionSkeleton::Ptr recskel(new skeleton::ReconstructionSkeleton());
-
-	std::cout << "How many branches have to be reconstructed?" << std::endl;
-	unsigned int nbbranches;
-	std::cin >> nbbranches;
-
-	for(unsigned int i = 0; i < nbbranches; i++)
+	
+	std::vector<std::vector<unsigned int> > assoc_ext;
+	
+	assoc_ext = fileio::ReadExtSkel(extskelfile);
+	if(assoc_ext.size() == 0)
 	{
-		std::cout << "Please click extremities of branch " << (i+1) << std::endl;
-		std::vector<unsigned int> indnod1 = userinput::ClickSkelNodes(image1,prskel1,2,mathtools::affine::Frame<2>::CanonicFrame());
-		std::vector<unsigned int> indnod2 = userinput::ClickSkelNodes(image2,prskel2,2,mathtools::affine::Frame<2>::CanonicFrame());
-
-		std::vector<unsigned int> vecindpr(2);
-		vecindpr[0] = 0;
-		vecindpr[1] = 1;
-		std::vector<unsigned int> firstext(2);
-		firstext[0] = indnod1[0];
-		firstext[1] = indnod2[0];
-		std::vector<unsigned int> lastext(2);
-		lastext[0] = indnod1[1];
-		lastext[1] = indnod2[1];
-		skeleton::ReconstructionBranch::Ptr recbr(new skeleton::ReconstructionBranch(vecindpr,firstext,lastext));
-
-		recskel->addNode(i*2);
-		recskel->addNode(i*2+1);
-		recskel->addEdge(i*2,i*2+1,recbr);
+		std::cout << "How many extremities are visible in all images?" << std::endl;
+		unsigned int nbext;
+		std::cin >> nbext;
+		
+		std::cout << "Please click extremities of graphs " << std::endl;
+		std::vector<unsigned int> indnod1 = userinput::ClickSkelNodes(image1,prskel1,nbext,mathtools::affine::Frame<2>::CanonicFrame(),true);
+		std::vector<unsigned int> indnod2 = userinput::ClickSkelNodes(image2,prskel2,nbext,mathtools::affine::Frame<2>::CanonicFrame(),true);
+		
+		assoc_ext.resize(2);
+		assoc_ext[0] = indnod1;
+		assoc_ext[1] = indnod2;
+		fileio::WriteExtSkel(assoc_ext,extskelfile);
 	}
-
-
+	
 	cv::namedWindow("Shape 1", CV_WINDOW_AUTOSIZE);
     cv::imshow("Shape 1",image1);
 	cv::namedWindow("Shape 2", CV_WINDOW_AUTOSIZE);
     cv::imshow("Shape 2",image2);
-
+	
 	cv::waitKey(10);
 	
 	
 	std::vector<typename skeleton::GraphProjSkel::Ptr> vec_prskel(2);
 	vec_prskel[0] = prskel1;
 	vec_prskel[1] = prskel2;
+	
+	std::cout << "Topologic matching" << std::endl;
+	recskel = algorithm::graphoperation::TopoMatch(vec_prskel,assoc_ext);
+	std::cout << "Done" << std::endl;
+	
 	std::vector<typename skeleton::CompGraphProjSkel::Ptr> vec_comppr = algorithm::graphoperation::GetComposed(recskel,vec_prskel);
 	
 	std::vector<typename skeleton::CompContProjSkel::Ptr> vec_compcontpr(2);
@@ -220,7 +221,9 @@ int main(int argc, char** argv)
 	veccam[0] = cam1;
 	veccam[1] = cam2;
 	double err = algorithm::evaluation::HausDist(skelreconstructed,vecshape,veccam);
-	std::cout << "Reprojection error : " << err << std::endl;
+	std::cout.precision(2);
+	std::cout.setf(std::ios::fixed);
+	std::cout << "Reprojection error : " << err*100 << "%" << std::endl;
 	
 	std::cout << "Skinning" << std::endl;
 	boundary::DiscreteBoundary<3>::Ptr bnd = algorithm::skinning::ContinuousSkinning(skelreconstructed);
