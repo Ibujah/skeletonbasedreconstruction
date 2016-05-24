@@ -220,6 +220,8 @@ namespace skeleton
 					//Adds the vertex in the graph, with index and storage information
 					typename boost::graph_traits<GraphType>::vertex_descriptor v_desc = boost::add_vertex(m_graph);
 					m_graph[v_desc].index = index;
+					if(m_nodelast<=index)
+						m_nodelast = index+1;
 				}
 				return index;
 			}
@@ -301,28 +303,39 @@ namespace skeleton
 			 *
 			 *  \return false if one of the two nodes is not in the skeleton, or if they are not neighbors
 			 */
-			bool remEdge(unsigned int ind1, unsigned int ind2, typename BranchType::Ptr branch)
+			bool remEdge(unsigned int ind1, unsigned int ind2, typename BranchType::Ptr &branch)
 			{
-				bool v_found = false;
-				if(ind1 != ind2)
-				{
-					// first step, get the descriptors corresponding to indices
-					typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
-					v_found = getDesc(ind1,ind2,v_desc1,v_desc2);
+				typename boost::graph_traits<GraphType>::vertex_descriptor v_desc1, v_desc2;
+				if(!getDesc(ind1,ind2,v_desc1,v_desc2))
+					throw std::logic_error("skeleton::ComposedCurveSkeleton::remEdge(): Node index is not in the skeleton");
 
-					// second step, add the edge
-					if(v_found)
+				typename boost::graph_traits<GraphType>::edge_descriptor ei;
+				
+				bool areneigh = false;
+				branch = NULL;
+
+				boost::tie(ei,areneigh) = boost::edge(v_desc1,v_desc2,m_graph);
+				
+				if(areneigh)
+				{
+					branch = m_graph[ei].branch;
+					boost::remove_edge(ei,m_graph);
+				}
+				if(!areneigh)
+				{
+					boost::tie(ei,areneigh) = boost::edge(v_desc2,v_desc1,m_graph);
+					if(areneigh)
 					{
-						typename boost::graph_traits<GraphType>::edge_descriptor e_desc;
-						boost::tie(e_desc,v_found) = boost::edge(v_desc1,v_desc2,m_graph);
-						if(v_found)
+						branch = m_graph[ei].branch->reverted();
+						if(!branch)
 						{
-							branch = m_graph[e_desc].branch;
-							boost::remove_edge(e_desc,m_graph);
+							branch = m_graph[ei].branch;
 						}
+						boost::remove_edge(ei,m_graph);
 					}
 				}
-				return v_found;
+				
+				return areneigh;
 			}
 
 			/**
@@ -512,9 +525,11 @@ namespace skeleton
 					if(areneigh)
 					{
 						br = m_graph[ei].branch->reverted();
+						if(!br)
+						{
+							br = m_graph[ei].branch;
+						}
 					}
-					if(!br)
-						br = m_graph[ei].branch;
 				}
 				
 				if(!areneigh)
