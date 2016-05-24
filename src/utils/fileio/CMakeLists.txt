@@ -3,7 +3,8 @@ set(LIBRARY_NAME ${FILEIO_LIB})
 include_directories(${CMAKE_SOURCE_DIR}/src/lib)
 set(SOURCE_FILES   CameraFile.cpp
 				   BoundaryFile.cpp
-				   RecSkelFile.cpp)
+				   RecSkelFile.cpp
+				   ExtClickFile.cpp)
 
 # make the library
 add_library(
