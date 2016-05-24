@@ -126,7 +126,7 @@ unsigned int AssociatedNode(const SkelType skel, const std::vector<unsigned int>
 
 	for(std::set<unsigned int>::iterator it = std::next(set_nod.begin()); it != set_nod.end(); it++)
 	{
-		std::list<std::vector<unsigned int> > paths2 = algorithm::graphoperation::GetNodes(skel,*(set_nod.begin()),opp_nod);
+		std::list<std::vector<unsigned int> > paths2 = algorithm::graphoperation::GetNodes(skel,*it,opp_nod);
 		std::vector<unsigned int> &path2 = *(paths2.begin());
 
 		for(unsigned int i = 0; i < path2.size(); i++)
@@ -144,7 +144,7 @@ unsigned int AssociatedNode(const SkelType skel, const std::vector<unsigned int>
 	while(used[path[indexnode]] != nbusedmax && indexnode != path.size()-1)
 		indexnode++;
 
-	return indexnode;
+	return path[indexnode];
 }
 
 /**
@@ -315,7 +315,6 @@ skeleton::ReconstructionSkeleton::Ptr algorithm::graphoperation::TopoMatch(const
 									  set2 = *(set_ext.rbegin());
 		if(set1.size() != 1 && set2.size() != 1)
 		{
-
 			std::pair<unsigned int,unsigned int> edge_med;
 			DecodeEdge(recskel,assoc_med,set_ext,edge_med);
 			
@@ -337,7 +336,17 @@ skeleton::ReconstructionSkeleton::Ptr algorithm::graphoperation::TopoMatch(const
 			unsigned int prev_nod = edge_med.first;
 			unsigned int added_node = recskel->addNode();
 			
+			std::set<unsigned int> add_set; // get nodes connected to prev_nod, on the path to the extremities
 			for(std::set<unsigned int>::const_iterator its = set2.begin(); its != set2.end(); its++)
+			{
+				std::list<std::vector<unsigned int> > paths = algorithm::graphoperation::GetNodes(recskel,prev_nod,*its);
+				std::vector<unsigned int> &path = *(paths.begin());
+				
+				add_set.insert(path[1]);
+			}
+			
+			// add edges from added_node to add_set
+			for(std::set<unsigned int>::const_iterator its = add_set.begin(); its != add_set.end(); its++)
 			{
 				skeleton::ReconstructionBranch::Ptr br;
 				recskel->remEdge(prev_nod,*its,br);
