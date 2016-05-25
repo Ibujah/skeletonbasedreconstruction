@@ -199,8 +199,7 @@ int main(int argc, char** argv)
 		cv::namedWindow("Shape 2", CV_WINDOW_AUTOSIZE);
 		cv::imshow("Shape 2",image2);
 
-		cv::waitKey(10);
-		cv::waitKey(10);
+		cv::waitKey(100);
 
 		recskelclick = skeleton::ReconstructionSkeleton::Ptr(new skeleton::ReconstructionSkeleton());
 		std::cout << "How many branches have to be reconstructed?" << std::endl;
@@ -246,6 +245,13 @@ int main(int argc, char** argv)
 	assoc_ext = fileio::ReadExtSkel(extskelfile);
 	if(assoc_ext.size() == 0)
 	{
+		cv::namedWindow("Shape 1", CV_WINDOW_AUTOSIZE);
+		cv::imshow("Shape 1",image1);
+		cv::namedWindow("Shape 2", CV_WINDOW_AUTOSIZE);
+		cv::imshow("Shape 2",image2);
+
+		cv::waitKey(100);
+
 		std::cout << "How many extremities are visible in all images?" << std::endl;
 		unsigned int nbext;
 		std::cin >> nbext;
