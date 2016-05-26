@@ -80,6 +80,7 @@ void EncodeEdge(const skeleton::GraphProjSkel::Ptr skel, const std::pair<unsigne
 	
 	std::list<skeleton::GraphProjSkel::Ptr> listcomp = algorithm::graphoperation::SeparateComponents(skelcut);
 
+	set_edg = std::set<std::set<unsigned int> >();
 	for(std::list<skeleton::GraphProjSkel::Ptr>::iterator it = listcomp.begin(); it != listcomp.end(); it++)
 	{
 		std::list<unsigned int> node_ext;
