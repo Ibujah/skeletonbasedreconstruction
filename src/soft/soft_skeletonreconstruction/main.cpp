@@ -208,6 +208,7 @@ int main(int argc, char** argv)
 	std::cout << "Matching" << std::endl;
 	algorithm::matchskeletons::OptionsMatch2 optionsmatch;
 	optionsmatch.lambda = lambda;
+	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch2::enum_methodmatch::ode;
 	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
 	
 	std::cout << "Triangulation" << std::endl;
@@ -235,8 +236,8 @@ int main(int argc, char** argv)
 	display3d::DisplayClass disclass("Reconstructed skeleton");
 	
 	display3d::DisplayFrame(disclass,mathtools::affine::Frame<3>::CanonicFrame());
-	display3d::DisplaySkeleton(disclass,skelreconstructed);
 	display3d::DisplayBoundary_Wired(disclass,bnd);
+	display3d::DisplaySkeleton(disclass,skelreconstructed,1.0,0.0,0.0);
 	display3d::DisplayCamera(disclass,cam1);
 	display3d::DisplayCamera(disclass,cam2,0.0,1.0,0.0);
 	
