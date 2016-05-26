@@ -35,11 +35,13 @@ SOFTWARE.
 #include <mathtools/geometry/euclidian/Line.h>
 #include <mathtools/geometry/euclidian/LineTriangulation.h>
 
+#include "SkelMatching.h"
+
 void SkelMatchingGraph(
 		skeleton::ReconstructionBranch::Ptr recbranch,
 		const skeleton::BranchContProjSkel::Ptr projbr1,
 		const skeleton::BranchContProjSkel::Ptr projbr2,
-		const algorithm::matchskeletons::OptionsMatch &options)
+		const algorithm::matchskeletons::OptionsMatch2 &options)
 {
 	unsigned int size_map = options.nb_triang;
 	Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> map_energy(size_map,size_map);
@@ -139,16 +141,37 @@ void SkelMatchingGraph(
 	recbranch->setMatch(vectcoords);
 }
 
+void SkelMatchingOde(
+		skeleton::ReconstructionBranch::Ptr recbranch,
+		const skeleton::BranchContProjSkel::Ptr projbr1,
+		const skeleton::BranchContProjSkel::Ptr projbr2,
+		const algorithm::matchskeletons::OptionsMatch2 &options2)
+{
+	std::vector<skeleton::BranchContProjSkel::Ptr> vecprojbr(2);
+	vecprojbr[0] = projbr1;
+	vecprojbr[1] = projbr2;
+	algorithm::matchskeletons::OptionsMatch options;
+	options.methodmatch = algorithm::matchskeletons::OptionsMatch::ode;
+	options.lambdamin = options2.lambdamin;
+	options.lambdamax = options2.lambdamax;
+	options.lambdastep = options2.lambdastep;
+	options.deltat = options2.deltat;
+	algorithm::matchskeletons::BranchMatching(recbranch,vecprojbr,options);
+}
+
 void algorithm::matchskeletons::BranchMatching(
 		skeleton::ReconstructionBranch::Ptr recbranch,
 		const skeleton::BranchContProjSkel::Ptr projbr1,
 		const skeleton::BranchContProjSkel::Ptr projbr2,
-		const algorithm::matchskeletons::OptionsMatch &options)
+		const algorithm::matchskeletons::OptionsMatch2 &options)
 {
 	switch(options.methodmatch)
 	{
-		case OptionsMatch::enum_methodmatch::graph:
+		case OptionsMatch2::enum_methodmatch::graph:
 			SkelMatchingGraph(recbranch,projbr1,projbr2,options);
+			break;
+		case OptionsMatch2::enum_methodmatch::ode:
+			SkelMatchingOde(recbranch,projbr1,projbr2,options);
 			break;
 	}
 }
@@ -157,7 +180,7 @@ void algorithm::matchskeletons::ComposedMatching(
 		skeleton::ReconstructionSkeleton::Ptr recskel,
 		const skeleton::CompContProjSkel::Ptr projskel1,
 		const skeleton::CompContProjSkel::Ptr projskel2,
-		const algorithm::matchskeletons::OptionsMatch &options)
+		const algorithm::matchskeletons::OptionsMatch2 &options)
 {
 	std::list<unsigned int> l_edge;
 	recskel->getAllEdges(l_edge);

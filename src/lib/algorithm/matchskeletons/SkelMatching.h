@@ -22,13 +22,13 @@ SOFTWARE.
 
 
 /**
- *  \file SkelMatching2.h
- *  \brief Matches two skeletal branches
+ *  \file SkelMatching.h
+ *  \brief Matches multiple skeletal branches
  *  \author Bastien Durix
  */
 
-#ifndef _SKELMATCHING2_H_
-#define _SKELMATCHING2_H_
+#ifndef _SKELMATCHING_H_
+#define _SKELMATCHING_H_
 
 #include <skeleton/Skeletons.h>
 
@@ -45,31 +45,20 @@ namespace algorithm
 		/**
 		 *  \brief Match options structure
 		 */
-		struct OptionsMatch2
+		struct OptionsMatch
 		{
 			/**
 			 *  \brief Several matching methods
 			 */
 			enum enum_methodmatch
 			{
-				graph = 0,
-				ode
+				ode = 0
 			};
 			
 			/**
 			 *  \brief Matching method
 			 */
 			enum_methodmatch methodmatch;
-			
-			/**
-			 *  \brief Number of matching points
-			 */
-			unsigned int nb_triang;
-			
-			/**
-			 *  \brief Weight of the distance function between the lines (>0)
-			 */
-			double lambda;
 			
 			/**
 			 *  \brief Min weight of the distance function between the lines (>0)
@@ -94,41 +83,35 @@ namespace algorithm
 			/**
 			 *  \brief Default constructor
 			 */
-			OptionsMatch2(enum_methodmatch methodmatch_ = graph, unsigned int nb_triang_ = 100, double lambda_ = 1.0,
-					      double lambdamin_ = 0.1, double lambdamax_ = 10.0, double lambdastep_ = 0.1, double deltat_ = 0.01) :
-				methodmatch(methodmatch_), nb_triang(nb_triang_), lambda(lambda_),
-				lambdamin(lambdamin_), lambdamax(lambdamax_), lambdastep(lambdastep_), deltat(deltat_) {}
+			OptionsMatch(enum_methodmatch methodmatch_ = ode, double lambdamin_ = 0.1, double lambdamax_ = 10.0, double lambdastep_ = 0.1, double deltat_ = 0.01) :
+				methodmatch(methodmatch_), lambdamin(lambdamin_), lambdamax(lambdamax_), lambdastep(lambdastep_), deltat(deltat_) {}
 		};
 		
 		/**
-		 *  \brief Two branches matching algorithm
+		 *  \brief Multiple branches matching algorithm
 		 *
 		 *  \param recbranch branch containing reconstruction data
-		 *  \param projbr1   first projective branch
-		 *  \param projbr2   second projective branch
+		 *  \param projbr    projective branches
 		 *  \param options   algorithm options
 		 */
 		void BranchMatching(
 				skeleton::ReconstructionBranch::Ptr recbranch,
-				const skeleton::BranchContProjSkel::Ptr projbr1,
-				const skeleton::BranchContProjSkel::Ptr projbr2,
-				const OptionsMatch2 &options = OptionsMatch2());
+				const std::vector<skeleton::BranchContProjSkel::Ptr> projbr,
+				const OptionsMatch &options = OptionsMatch());
 		
 		/**
 		 *  \brief Two skeletons matching algorithm
 		 *
-		 *  \param recskel   skeleton containing reconstruction data
-		 *  \param projskel1 first projective skeleton
-		 *  \param projskel2 second projective skeleton
-		 *  \param options   algorithm options
+		 *  \param recskel  skeleton containing reconstruction data
+		 *  \param projskel projective skeletons
+		 *  \param options  algorithm options
 		 */
 		void ComposedMatching(
 				skeleton::ReconstructionSkeleton::Ptr recskel,
-				const skeleton::CompContProjSkel::Ptr projskel1,
-				const skeleton::CompContProjSkel::Ptr projskel2,
-				const OptionsMatch2 &options = OptionsMatch2());
+				const std::vector<skeleton::CompContProjSkel::Ptr> projskel,
+				const OptionsMatch &options = OptionsMatch());
 	}
 }
 
 
-#endif //_SKELMATCHING2_H_
+#endif //_SKELMATCHING_H_

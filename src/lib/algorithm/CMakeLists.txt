@@ -14,6 +14,7 @@ set(SOURCE_FILES    extractboundary/MarchingSquares.cpp
 					fitbspline/ComputeNodeVector.cpp
 					fitbspline/Graph2Bspline.cpp
 					matchskeletons/SkelMatching2.cpp
+					matchskeletons/SkelMatching.cpp
 					matchskeletons/SkelTriangulation.cpp
 					skinning/ContinuousSkinning.cpp
 					projection/SkeletonProjection.cpp
@@ -33,5 +34,6 @@ target_link_libraries(${LIBRARY_NAME} ${MATHTOOLS_LIB}
 									  ${SKELETON_LIB}
 									  ${BOUNDARY_LIB}
 									  ${CAMERA_LIB}
-									  ${VOROPLUSPLUS_LIBRARY})
+									  ${VOROPLUSPLUS_LIBRARY}
+									  ${NLOPT_LIBRARY})
 

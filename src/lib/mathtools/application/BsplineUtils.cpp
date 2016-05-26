@@ -51,7 +51,11 @@ double mathtools::application::BsplineBasis(double t, unsigned int degree, unsig
 	 *           1 if t >= 0
 	 *
 	 */
-	if(degree == 0)
+	if(node.cols() == 0)
+	{
+		res = 1.0;
+	}
+	else if(degree == 0)
 	{
 		if(indice == 0)
 		{

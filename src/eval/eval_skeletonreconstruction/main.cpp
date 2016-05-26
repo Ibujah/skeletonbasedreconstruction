@@ -57,7 +57,7 @@ SOFTWARE.
 #include <displayopencv/DisplayBoundaryOCV.h>
 #include <displayopencv/DisplaySkeletonOCV.h>
 
-void ReconstructionEvals(algorithm::matchskeletons::OptionsMatch &optionsmatch,
+void ReconstructionEvals(algorithm::matchskeletons::OptionsMatch2 &optionsmatch,
 						 const std::vector<typename skeleton::GraphProjSkel::Ptr> &vec_prskel,
 						 const skeleton::ReconstructionSkeleton::Ptr recskel,
 						 const std::vector<camera::Camera::Ptr> &veccam,
@@ -72,13 +72,28 @@ void ReconstructionEvals(algorithm::matchskeletons::OptionsMatch &optionsmatch,
 		vec_compcontpr[i] = algorithm::fitbspline::Graph2Bspline(vec_comppr[i]);
 	}
 	
-	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch::graph;
+
+
+
+	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch2::graph;
 	std::cout << std::endl << "~~ Matching graph ~~" << std::endl;
 	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
 	skeleton::CompContSkel3d::Ptr skelreconstructed = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
 
 	double err_graph = algorithm::evaluation::HausDist(skelreconstructed,vecshape,veccam);
 	std::cout << "Reprojection error : " << err_graph*100 << "%" << std::endl;
+	
+
+
+
+	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch2::ode;
+	std::cout << std::endl << "~~ Matching ode ~~" << std::endl;
+	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
+	
+	skeleton::CompContSkel3d::Ptr skelreconstructedode = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
+
+	double err_ode = algorithm::evaluation::HausDist(skelreconstructedode,vecshape,veccam);
+	std::cout << "Reprojection error : " << err_ode*100 << "%" << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -171,7 +186,7 @@ int main(int argc, char** argv)
 	displayopencv::DisplayGraphSkeleton(prskel2,image2,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,0,0));
 
 
-	algorithm::matchskeletons::OptionsMatch optionsmatch;
+	algorithm::matchskeletons::OptionsMatch2 optionsmatch;
 	optionsmatch.lambda = lambda;
 	std::vector<shape::DiscreteShape<2>::Ptr> vecshape(2);
 	vecshape[0] = shape1;
@@ -270,6 +285,6 @@ int main(int argc, char** argv)
 	
 	ReconstructionEvals(optionsmatch,vec_prskel,recskeltopo,veccam,vecshape);
 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-	
+
 	return 0;
 }

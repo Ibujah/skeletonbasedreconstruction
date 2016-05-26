@@ -37,6 +37,7 @@ SOFTWARE.
 #include <mathtools/geometry/euclidian/HyperSphere.h>
 #include <mathtools/geometry/euclidian/HyperEllipse.h>
 #include <mathtools/geometry/euclidian/Line.h>
+#include <mathtools/application/Application.h>
 
 /**
  *  \brief Skeleton representations
@@ -99,6 +100,11 @@ namespace skeleton
 				 */
 				mathtools::affine::Frame<3>::Ptr m_frame3;
 
+				/**
+				 *  \brief Conversion function to R^4 vector (representing a line in R^4)
+				 */
+				mathtools::application::Application<Eigen::Matrix<double,8,1>,Eigen::Vector3d>::Ptr m_r8fun;
+
 			public:
 				/**
 				 *  \brief Constructor
@@ -108,13 +114,6 @@ namespace skeleton
 				 */
 				Projective(const mathtools::affine::Frame<2>::Ptr frame2 = mathtools::affine::Frame<2>::CanonicFrame(),
 						   const mathtools::affine::Frame<3>::Ptr frame3 = mathtools::affine::Frame<3>::CanonicFrame());
-
-				/**
-				 *  \brief Copy constructor
-				 *
-				 *  \param model model to copy
-				 */
-				Projective(const Projective &model);
 
 				/**
 				 *  \brief 2d frame getter
@@ -129,6 +128,13 @@ namespace skeleton
 				 *  \return skeleton 3d frame
 				 */
 				const mathtools::affine::Frame<3>::Ptr getFrame3() const;
+				
+				/**
+				 *  \brief R8 conversion function getter
+				 *
+				 *  \return R8 conversion function
+				 */
+				const mathtools::application::Application<Eigen::Matrix<double,8,1>,Eigen::Vector3d>::Ptr getR8Fun() const;
 
 				/**
 				 *  \brief Converts an object into a vector
