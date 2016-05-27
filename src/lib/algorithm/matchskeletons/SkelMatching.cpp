@@ -302,7 +302,7 @@ void SkelMatchingOde(
 		vectcoords.resize(101);
 		for(unsigned int i = 0; i<101; i++)
 		{
-			vectcoords[i] = Eigen::Matrix<double,Eigen::Dynamic,1>::Ones(projbr.size(),1)*(1.0/100.0);
+			vectcoords[i] = Eigen::Matrix<double,Eigen::Dynamic,1>::Ones(projbr.size(),1)*((double)i/100.0);
 		}
 	}
 
