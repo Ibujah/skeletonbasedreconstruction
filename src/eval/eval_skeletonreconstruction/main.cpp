@@ -44,6 +44,7 @@ SOFTWARE.
 #include <algorithm/graphoperation/AssociateSkeletons.h>
 #include <algorithm/fitbspline/Graph2Bspline.h>
 #include <algorithm/matchskeletons/SkelMatching2.h>
+#include <algorithm/matchskeletons/SkelMatching.h>
 #include <algorithm/matchskeletons/SkelTriangulation.h>
 #include <algorithm/skinning/ContinuousSkinning.h>
 #include <algorithm/evaluation/ReprojError.h>
@@ -57,38 +58,78 @@ SOFTWARE.
 #include <displayopencv/DisplayBoundaryOCV.h>
 #include <displayopencv/DisplaySkeletonOCV.h>
 
-void ReconstructionEvals(algorithm::matchskeletons::OptionsMatch2 &optionsmatch,
+void ReconstructionEvals(algorithm::matchskeletons::OptionsMatch &optionsmatch,
 						 const std::vector<typename skeleton::GraphProjSkel::Ptr> &vec_prskel,
 						 const skeleton::ReconstructionSkeleton::Ptr recskel,
 						 const std::vector<camera::Camera::Ptr> &veccam,
-						 const std::vector<shape::DiscreteShape<2>::Ptr> &vecshape)
+						 const std::vector<shape::DiscreteShape<2>::Ptr> &vecshape,
+						 const double lambda)
 {
 	std::vector<typename skeleton::CompGraphProjSkel::Ptr> vec_comppr = algorithm::graphoperation::GetComposed(recskel,vec_prskel);
 	
-	std::vector<typename skeleton::CompContProjSkel::Ptr> vec_compcontpr(2);
+	std::vector<typename skeleton::CompContProjSkel::Ptr> vec_compcontpr(vec_comppr.size());
 	
 	for(unsigned int i = 0; i < vec_comppr.size(); i++)
 	{
 		vec_compcontpr[i] = algorithm::fitbspline::Graph2Bspline(vec_comppr[i]);
 	}
-	
 
+	algorithm::matchskeletons::OptionsMatch2 optionsmatch2;
+	optionsmatch2.lambda = lambda;
+	optionsmatch2.methodmatch = algorithm::matchskeletons::OptionsMatch2::graph;
 
-	if(vec_prskel.size() <=2)
+	double minerr_graph = 1.0;
+
+	std::cout << std::endl << "~~ Matching graph ~~" << std::endl;
+	for(unsigned int sel0 = 0; sel0 < vec_prskel.size()-1; sel0++)
 	{
-		optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch2::graph;
-		std::cout << std::endl << "~~ Matching graph ~~" << std::endl;
-		algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
-		skeleton::CompContSkel3d::Ptr skelreconstructed = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
+		for(unsigned int sel1 = sel0+1; sel1 < vec_prskel.size(); sel1++)
+		{
+			skeleton::ReconstructionSkeleton::Ptr recskel2(new skeleton::ReconstructionSkeleton());
+			std::list<unsigned int> lnodes;
+			recskel->getAllNodes(lnodes);
+			for(std::list<unsigned int>::iterator it = lnodes.begin(); it != lnodes.end(); it++)
+			{
+				recskel2->addNode(*it);
+			}
+			std::list<unsigned int> ledges;
+			recskel->getAllEdges(ledges);
+			for(std::list<unsigned int>::iterator it = ledges.begin(); it != ledges.end(); it++)
+			{
+				std::pair<unsigned int,unsigned int> ext = recskel->getExtremities(*it);
+				const skeleton::ReconstructionBranch::Ptr br = recskel->getBranch(ext.first,ext.second);
+				std::vector<unsigned int> indskel(2);
+				std::vector<unsigned int> firstext(2);
+				std::vector<unsigned int> lastext(2);
 
-		double err_graph = algorithm::evaluation::HausDist(skelreconstructed,vecshape,veccam);
-		std::cout << "Reprojection error : " << err_graph*100 << "%" << std::endl;
+				indskel[0] = sel0;
+				indskel[1] = sel1;
+				firstext[0] = br->getFirstExt()[sel0];
+				firstext[1] = br->getFirstExt()[sel1];
+				lastext[0] = br->getLastExt()[sel0];
+				lastext[1] = br->getLastExt()[sel1];
+
+				const skeleton::ReconstructionBranch::Ptr br2(new skeleton::ReconstructionBranch(indskel,firstext,lastext));
+				recskel2->addEdge(ext.first,ext.second,br2);
+			}
+
+			std::cout << "Images " << sel0 << " and " << sel1 << " -> ";
+			algorithm::matchskeletons::ComposedMatching(recskel2,vec_compcontpr[sel0],vec_compcontpr[sel1],optionsmatch2);
+			skeleton::CompContSkel3d::Ptr skelreconstructed = algorithm::matchskeletons::ComposedTriangulation(recskel2,vec_compcontpr);
+
+			double err_graph = algorithm::evaluation::HausDist(skelreconstructed,vecshape,veccam);
+			std::cout << "Reprojection error : " << err_graph*100 << "%" << std::endl;
+
+			if(minerr_graph > err_graph)
+				minerr_graph = err_graph;
+		}
 	}
 
+	std::cout << "Minimal reprojection error : " << minerr_graph*100 << "%" << std::endl;
 
-	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch2::ode;
+	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch::ode;
 	std::cout << std::endl << "~~ Matching ode ~~" << std::endl;
-	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
+	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr,optionsmatch);
 	
 	skeleton::CompContSkel3d::Ptr skelreconstructedode = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
 
@@ -146,13 +187,11 @@ int main(int argc, char** argv)
 
 	for(unsigned int i = 0; i < nbimg; i++)
 	{
-		std::cout << "Image " << i+1 << std::endl;
-		std::cout << "Opening camera file" << std::endl;
+		std::cout << "Image " << i+1 << "... ";
 		std::ostringstream camfilename;
 		camfilename << camfile << i+1 << ".xml";
 		veccam[i] = fileio::ReadCamera(camfilename.str());
 
-		std::cout << "Opening image file" << std::endl;
 		std::ostringstream imgfilename;
 		imgfilename << imgfile << i+1 << ".png";
 		cv::Mat shpimg = cv::imread(imgfilename.str(),CV_LOAD_IMAGE_GRAYSCALE);
@@ -161,20 +200,17 @@ int main(int argc, char** argv)
 		cv::Mat cpymat(shpimg.rows,shpimg.cols,CV_8U,&vecshape[i]->getContainer()[0]);
 		shpimg.copyTo(cpymat);
 
-		std::cout << "Extract boundary" << std::endl;
 		boundary::DiscreteBoundary<2>::Ptr bnd = algorithm::extractboundary::MarchingSquare(vecshape[i],4);
 
-		std::cout << "Extract projective skeleton" << std::endl;
 		vecprskel[i] = algorithm::pruning::ScaleAxisTransform(algorithm::skeletonization::ProjectiveVoronoi(bnd,veccam[i]),sat);
 
-		std::cout << "Display" << std::endl;
 		vecimage[i] = cv::Mat(shpimg.rows,shpimg.cols,CV_8UC3,cv::Scalar(0,0,0));
 		displayopencv::DisplayDiscreteShape(vecshape[i],vecimage[i],mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,255,255));
 		displayopencv::DisplayGraphSkeleton(vecprskel[i],vecimage[i],mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,0,0));
+		std::cout << "Done" << std::endl;
 	}
 
-	algorithm::matchskeletons::OptionsMatch2 optionsmatch;
-	optionsmatch.lambda = lambda;
+	algorithm::matchskeletons::OptionsMatch optionsmatch;
 	std::cout.precision(2);
 	std::cout.setf(std::ios::fixed);
 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
@@ -215,7 +251,7 @@ int main(int argc, char** argv)
 			{
 				std::vector<unsigned int> indnod = userinput::ClickSkelNodes(vecimage[i],vecprskel[i],2,mathtools::affine::Frame<2>::CanonicFrame());
 				firstext[i] = indnod[0];
-				lastext[i] = indnod[2];
+				lastext[i] = indnod[1];
 				vecindpr[i] = i;
 			}
 
@@ -228,7 +264,7 @@ int main(int argc, char** argv)
 		fileio::WriteRecSkel(recskelclick,recskelfile);
 	}
 	
-	ReconstructionEvals(optionsmatch,vecprskel,recskelclick,veccam,vecshape);
+	ReconstructionEvals(optionsmatch,vecprskel,recskelclick,veccam,vecshape,lambda);
 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
 	/********************************************************************************************
@@ -265,7 +301,7 @@ int main(int argc, char** argv)
 	
 	skeleton::ReconstructionSkeleton::Ptr recskeltopo = algorithm::graphoperation::TopoMatch(vecprskel,assoc_ext);
 	
-	ReconstructionEvals(optionsmatch,vecprskel,recskeltopo,veccam,vecshape);
+	ReconstructionEvals(optionsmatch,vecprskel,recskeltopo,veccam,vecshape,lambda);
 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
 	return 0;

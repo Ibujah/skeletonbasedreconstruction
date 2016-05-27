@@ -43,7 +43,7 @@ SOFTWARE.
 #include <algorithm/graphoperation/SeparateBranches.h>
 #include <algorithm/graphoperation/AssociateSkeletons.h>
 #include <algorithm/fitbspline/Graph2Bspline.h>
-#include <algorithm/matchskeletons/SkelMatching2.h>
+#include <algorithm/matchskeletons/SkelMatching.h>
 #include <algorithm/matchskeletons/SkelTriangulation.h>
 #include <algorithm/skinning/ContinuousSkinning.h>
 #include <algorithm/evaluation/ReprojError.h>
@@ -174,7 +174,7 @@ int main(int argc, char** argv)
 	
 	std::vector<typename skeleton::CompGraphProjSkel::Ptr> vec_comppr = algorithm::graphoperation::GetComposed(recskel,vecprskel);
 	
-	std::vector<typename skeleton::CompContProjSkel::Ptr> vec_compcontpr(2);
+	std::vector<typename skeleton::CompContProjSkel::Ptr> vec_compcontpr(nbimg);
 	
 	std::cout << "Fitting Bspline" << std::endl;
 	for(unsigned int i = 0; i < vec_comppr.size(); i++)
@@ -183,9 +183,9 @@ int main(int argc, char** argv)
 	}
 	
 	std::cout << "Matching" << std::endl;
-	algorithm::matchskeletons::OptionsMatch2 optionsmatch;
-	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch2::enum_methodmatch::ode;
-	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
+	algorithm::matchskeletons::OptionsMatch optionsmatch;
+	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch::enum_methodmatch::ode;
+	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr,optionsmatch);
 	
 	std::cout << "Triangulation" << std::endl;
 	skeleton::CompContSkel3d::Ptr skelreconstructed = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
