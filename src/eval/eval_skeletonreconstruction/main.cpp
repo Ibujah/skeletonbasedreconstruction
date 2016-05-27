@@ -249,7 +249,8 @@ int main(int argc, char** argv)
 			std::vector<unsigned int> vecindpr(nbimg);
 			for(unsigned int i = 0; i < nbimg; i++)
 			{
-				std::vector<unsigned int> indnod = userinput::ClickSkelNodes(vecimage[i],vecprskel[i],2,mathtools::affine::Frame<2>::CanonicFrame());
+				cv::Mat imgcpy = vecimage[i].clone();
+				std::vector<unsigned int> indnod = userinput::ClickSkelNodes(imgcpy,vecprskel[i],2,mathtools::affine::Frame<2>::CanonicFrame());
 				firstext[i] = indnod[0];
 				lastext[i] = indnod[1];
 				vecindpr[i] = i;
