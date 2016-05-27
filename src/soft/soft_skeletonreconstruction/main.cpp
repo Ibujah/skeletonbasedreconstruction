@@ -69,7 +69,6 @@ int main(int argc, char** argv)
 	std::string outbound;
 	std::string extskelfile;
 	double sat;
-	double lambda;
 	
 	boost::program_options::options_description desc("OPTIONS");
 	
@@ -81,7 +80,6 @@ int main(int argc, char** argv)
 		("outbound", boost::program_options::value<std::string>(&outbound)->default_value("skelrec.obj"), "Boundary output file")
 		("extskelfile", boost::program_options::value<std::string>(&extskelfile)->default_value("extskel.txt"), "Extremities Skeleton file")
 		("sat", boost::program_options::value<double>(&sat)->default_value(1.2), "Scale Axis Transform parameter")
-		("lambda", boost::program_options::value<double>(&lambda)->default_value(0.2), "Lambda parameter")
 		;
 	
 	boost::program_options::variables_map vm;
@@ -207,7 +205,6 @@ int main(int argc, char** argv)
 	
 	std::cout << "Matching" << std::endl;
 	algorithm::matchskeletons::OptionsMatch2 optionsmatch;
-	optionsmatch.lambda = lambda;
 	optionsmatch.methodmatch = algorithm::matchskeletons::OptionsMatch2::enum_methodmatch::ode;
 	algorithm::matchskeletons::ComposedMatching(recskel,vec_compcontpr[0],vec_compcontpr[1],optionsmatch);
 	
