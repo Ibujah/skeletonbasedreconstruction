@@ -69,11 +69,13 @@ int main(int argc, char** argv)
 	std::string outbound;
 	std::string extskelfile;
 	double sat;
+	unsigned int nbimg;
 	
 	boost::program_options::options_description desc("OPTIONS");
 	
 	desc.add_options()
 		("help", "Help message")
+		("nbimg", boost::program_options::value<unsigned int>(&nbimg)->default_value(2), "Number of images")
 		("imgfile", boost::program_options::value<std::string>(&imgfile)->default_value("mask"), "Binary image file (*.png)")
 		("orifile", boost::program_options::value<std::string>(&orifile)->default_value("img"), "Real image file (*.jpg)")
 		("camfile", boost::program_options::value<std::string>(&camfile)->default_value("cam"), "Camera file (*.xml)")
@@ -90,77 +92,56 @@ int main(int argc, char** argv)
 		std::cout << desc << std::endl;
 		return 0;
 	}
-	
-	
-	
-	std::cout << "Image 1" << std::endl;
-	std::cout << "Opening camera file" << std::endl;
-	std::ostringstream camfilename1;
-	camfilename1 << camfile << 1 << ".xml";
-	camera::Camera::Ptr cam1 = fileio::ReadCamera(camfilename1.str());
-	
-	std::cout << "Opening image file" << std::endl;
-	std::ostringstream imgfilename1;
-	imgfilename1 << imgfile << 1 << ".png";
-	cv::Mat shpimg1 = cv::imread(imgfilename1.str(),CV_LOAD_IMAGE_GRAYSCALE);
-	
-	shape::DiscreteShape<2>::Ptr shape1(new shape::DiscreteShape<2>(shpimg1.cols,shpimg1.rows));
-	cv::Mat cpymat1(shpimg1.rows,shpimg1.cols,CV_8U,&shape1->getContainer()[0]);
-	shpimg1.copyTo(cpymat1);
-	
-	std::cout << "Extract boundary" << std::endl;
-	boundary::DiscreteBoundary<2>::Ptr bnd1 = algorithm::extractboundary::MarchingSquare(shape1,4);
-	
-	std::cout << "Extract projective skeleton" << std::endl;
-	skeleton::GraphProjSkel::Ptr prskel1 = algorithm::pruning::ScaleAxisTransform(algorithm::skeletonization::ProjectiveVoronoi(bnd1,cam1),sat);
-	
-	std::cout << "Display" << std::endl;
-	cv::Mat image1(shpimg1.rows,shpimg1.cols,CV_8UC3,cv::Scalar(0,0,0));
-	displayopencv::DisplayDiscreteShape(shape1,image1,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,255,255));
-	displayopencv::DisplayGraphSkeleton(prskel1,image1,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,0,0));
 
-	cv::namedWindow("Shape 1", CV_WINDOW_AUTOSIZE);
-    cv::imshow("Shape 1",image1);
+	std::vector<std::vector<unsigned int> > assoc_ext;
+	assoc_ext = fileio::ReadExtSkel(extskelfile);
+	if(assoc_ext.size() != 0)
+		nbimg = assoc_ext.size();
 	
-	
-	
-	std::cout << "Image 2" << std::endl;
-	std::cout << "Opening camera file" << std::endl;
-	std::ostringstream camfilename2;
-	camfilename2 << camfile << 2 << ".xml";
-	camera::Camera::Ptr cam2 = fileio::ReadCamera(camfilename2.str());
-	
-	std::cout << "Opening image file" << std::endl;
-	std::ostringstream imgfilename2;
-	imgfilename2 << imgfile << 2 << ".png";
-	cv::Mat shpimg2 = cv::imread(imgfilename2.str(),CV_LOAD_IMAGE_GRAYSCALE);
-	
-	shape::DiscreteShape<2>::Ptr shape2(new shape::DiscreteShape<2>(shpimg2.cols,shpimg2.rows));
-	cv::Mat cpymat2(shpimg2.rows,shpimg2.cols,CV_8U,&shape2->getContainer()[0]);
-	shpimg2.copyTo(cpymat2);
-	
-	std::cout << "Extract boundary" << std::endl;
-	boundary::DiscreteBoundary<2>::Ptr bnd2 = algorithm::extractboundary::MarchingSquare(shape2,4);
-	
-	std::cout << "Extract projective skeleton" << std::endl;
-	skeleton::GraphProjSkel::Ptr prskel2 = algorithm::pruning::ScaleAxisTransform(algorithm::skeletonization::ProjectiveVoronoi(bnd2,cam2),sat);
-	
-	std::cout << "Display" << std::endl;
-	cv::Mat image2(shpimg2.rows,shpimg2.cols,CV_8UC3,cv::Scalar(0,0,0));
-	displayopencv::DisplayDiscreteShape(shape2,image2,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,255,255));
-	displayopencv::DisplayGraphSkeleton(prskel2,image2,mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,0,0));
-	
-	cv::namedWindow("Shape 2", CV_WINDOW_AUTOSIZE);
-    cv::imshow("Shape 2",image2);
-	cv::waitKey(10);
-	cv::waitKey(10);
+	std::vector<camera::Camera::Ptr> veccam(nbimg);
+	std::vector<shape::DiscreteShape<2>::Ptr> vecshape(nbimg);
+	std::vector<cv::Mat> vecimage(nbimg);
+	std::vector<typename skeleton::GraphProjSkel::Ptr> vecprskel(nbimg);
+
+	for(unsigned int i = 0; i < nbimg; i++)
+	{
+		std::cout << "Image " << i+1 << std::endl;
+		std::cout << "Opening camera file" << std::endl;
+		std::ostringstream camfilename;
+		camfilename << camfile << i+1 << ".xml";
+		veccam[i] = fileio::ReadCamera(camfilename.str());
+
+		std::cout << "Opening image file" << std::endl;
+		std::ostringstream imgfilename;
+		imgfilename << imgfile << i+1 << ".png";
+		cv::Mat shpimg = cv::imread(imgfilename.str(),CV_LOAD_IMAGE_GRAYSCALE);
+
+		vecshape[i] = shape::DiscreteShape<2>::Ptr(new shape::DiscreteShape<2>(shpimg.cols,shpimg.rows));
+		cv::Mat cpymat(shpimg.rows,shpimg.cols,CV_8U,&vecshape[i]->getContainer()[0]);
+		shpimg.copyTo(cpymat);
+
+		std::cout << "Extract boundary" << std::endl;
+		boundary::DiscreteBoundary<2>::Ptr bnd = algorithm::extractboundary::MarchingSquare(vecshape[i],4);
+
+		std::cout << "Extract projective skeleton" << std::endl;
+		vecprskel[i] = algorithm::pruning::ScaleAxisTransform(algorithm::skeletonization::ProjectiveVoronoi(bnd,veccam[i]),sat);
+
+		std::cout << "Display" << std::endl;
+		vecimage[i] = cv::Mat(shpimg.rows,shpimg.cols,CV_8UC3,cv::Scalar(0,0,0));
+		displayopencv::DisplayDiscreteShape(vecshape[i],vecimage[i],mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,255,255));
+		displayopencv::DisplayGraphSkeleton(vecprskel[i],vecimage[i],mathtools::affine::Frame<2>::CanonicFrame(),cv::Scalar(255,0,0));
+
+		std::ostringstream winname;
+		winname << "Shape " << i+1;
+		cv::namedWindow(winname.str(), CV_WINDOW_AUTOSIZE);
+		cv::imshow(winname.str(),vecimage[i]);
+		cv::waitKey(100);
+	}
+
 	
 	std::cout << "Creating reconstruction skeleton" << std::endl;
 	skeleton::ReconstructionSkeleton::Ptr recskel(new skeleton::ReconstructionSkeleton());
 	
-	std::vector<std::vector<unsigned int> > assoc_ext;
-	
-	assoc_ext = fileio::ReadExtSkel(extskelfile);
 	if(assoc_ext.size() == 0)
 	{
 		std::cout << "How many extremities are visible in all images?" << std::endl;
@@ -168,32 +149,30 @@ int main(int argc, char** argv)
 		std::cin >> nbext;
 		
 		std::cout << "Please click extremities of graphs " << std::endl;
-		std::vector<unsigned int> indnod1 = userinput::ClickSkelNodes(image1,prskel1,nbext,mathtools::affine::Frame<2>::CanonicFrame(),true);
-		std::vector<unsigned int> indnod2 = userinput::ClickSkelNodes(image2,prskel2,nbext,mathtools::affine::Frame<2>::CanonicFrame(),true);
+		assoc_ext.resize(nbimg);
+		for(unsigned int i = 0; i < nbimg; i++)
+		{
+			assoc_ext[i] = userinput::ClickSkelNodes(vecimage[i],vecprskel[i],nbext,mathtools::affine::Frame<2>::CanonicFrame(),true);
+		}
 		
-		assoc_ext.resize(2);
-		assoc_ext[0] = indnod1;
-		assoc_ext[1] = indnod2;
 		fileio::WriteExtSkel(assoc_ext,extskelfile);
 	}
 	
-	cv::namedWindow("Shape 1", CV_WINDOW_AUTOSIZE);
-    cv::imshow("Shape 1",image1);
-	cv::namedWindow("Shape 2", CV_WINDOW_AUTOSIZE);
-    cv::imshow("Shape 2",image2);
+	for(unsigned int i = 0; i < nbimg; i++)
+	{
+		std::ostringstream winname;
+		winname << "Shape " << i+1;
+		cv::namedWindow(winname.str(), CV_WINDOW_AUTOSIZE);
+		cv::imshow(winname.str(),vecimage[i]);
+	}
 	
 	cv::waitKey(10);
 	
-	
-	std::vector<typename skeleton::GraphProjSkel::Ptr> vec_prskel(2);
-	vec_prskel[0] = prskel1;
-	vec_prskel[1] = prskel2;
-	
 	std::cout << "Topologic matching" << std::endl;
-	recskel = algorithm::graphoperation::TopoMatch(vec_prskel,assoc_ext);
+	recskel = algorithm::graphoperation::TopoMatch(vecprskel,assoc_ext);
 	std::cout << "Done" << std::endl;
 	
-	std::vector<typename skeleton::CompGraphProjSkel::Ptr> vec_comppr = algorithm::graphoperation::GetComposed(recskel,vec_prskel);
+	std::vector<typename skeleton::CompGraphProjSkel::Ptr> vec_comppr = algorithm::graphoperation::GetComposed(recskel,vecprskel);
 	
 	std::vector<typename skeleton::CompContProjSkel::Ptr> vec_compcontpr(2);
 	
@@ -212,12 +191,6 @@ int main(int argc, char** argv)
 	skeleton::CompContSkel3d::Ptr skelreconstructed = algorithm::matchskeletons::ComposedTriangulation(recskel,vec_compcontpr);
 
 	std::cout << "Reprojection error evaluation" << std::endl;
-	std::vector<shape::DiscreteShape<2>::Ptr> vecshape(2);
-	vecshape[0] = shape1;
-	vecshape[1] = shape2;
-	std::vector<camera::Camera::Ptr> veccam(2);
-	veccam[0] = cam1;
-	veccam[1] = cam2;
 	double err = algorithm::evaluation::HausDist(skelreconstructed,vecshape,veccam);
 	std::cout.precision(2);
 	std::cout.setf(std::ios::fixed);
@@ -235,8 +208,8 @@ int main(int argc, char** argv)
 	display3d::DisplayFrame(disclass,mathtools::affine::Frame<3>::CanonicFrame());
 	display3d::DisplayBoundary_Wired(disclass,bnd);
 	display3d::DisplaySkeleton(disclass,skelreconstructed,1.0,0.0,0.0);
-	display3d::DisplayCamera(disclass,cam1);
-	display3d::DisplayCamera(disclass,cam2,0.0,1.0,0.0);
+	for(unsigned int i = 0; i < nbimg; i++)
+		display3d::DisplayCamera(disclass,veccam[i]);
 	
 	disclass.enableCtrl();
 	
