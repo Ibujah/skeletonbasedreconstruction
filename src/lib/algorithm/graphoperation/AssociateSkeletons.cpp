@@ -31,7 +31,6 @@ SOFTWARE.
 #include "ConnectedComponents.h"
 #include "SeparateBranches.h"
 #include <set>
-
 /**
  *  \brief Removes all degree 2 nodes
  */
@@ -89,9 +88,13 @@ void EncodeEdge(const skeleton::GraphProjSkel::Ptr skel, const std::pair<unsigne
 		std::set<unsigned int> set_ext;
 		for(std::list<unsigned int>::iterator itn = node_ext.begin(); itn != node_ext.end(); itn++)
 		{
-			unsigned int ind = std::find(assocext.begin(),assocext.end(),*itn)-assocext.begin();
-			if(ind != assocext.size())
+			std::vector<unsigned int>::const_iterator its = std::find(assocext.begin(),assocext.end(),*itn);
+			while(its != assocext.end())
+			{
+				unsigned int ind = its-assocext.begin();
 				set_ext.insert(ind);
+				its = std::find(std::next(its),assocext.end(),*itn);
+			}
 		}
 		set_edg.insert(set_ext);
 	}
@@ -203,6 +206,7 @@ skeleton::ReconstructionSkeleton::Ptr algorithm::graphoperation::TopoMatch(const
 		{
 			std::set<std::set<unsigned int> > edgset;
 			EncodeEdge(vec_skelsimp[i],*it,assoc_ext[i],edgset);
+			
 			std::map<std::set<std::set<unsigned int> >,unsigned int>::iterator its = cptedg.find(edgset);
 			if(its == cptedg.end())
 			{
@@ -231,7 +235,7 @@ skeleton::ReconstructionSkeleton::Ptr algorithm::graphoperation::TopoMatch(const
 		for(std::map<std::set<std::set<unsigned int> >,unsigned int>::iterator it = cptedg.begin(); it != cptedg.end(); it++)
 		{
 			//if the edge is not kept, it is contracted
-			if(it->second <= vec_skel.size()/2)
+			if(it->second <= vec_skel.size()/2 && it->first.begin()->size() != 1 && it->first.rbegin()->size() != 1)
 			{
 				unsigned int ind = std::find(vecedgset.begin(),vecedgset.end(),it->first) - vecedgset.begin();
 				if(ind != vecedgset.size())
@@ -252,11 +256,11 @@ skeleton::ReconstructionSkeleton::Ptr algorithm::graphoperation::TopoMatch(const
 	}
 
 	std::list<std::set<std::set<unsigned int> > > keptedg;
-
+	
 	// get most present edges
 	for(std::map<std::set<std::set<unsigned int> >, unsigned int>::iterator it = cptedg.begin(); it != cptedg.end(); it++)
 	{
-		if(it->second > vec_skel.size()/2)
+		if(it->second > vec_skel.size()/2 || it->first.begin()->size() == 1 || it->first.rbegin()->size() == 1)
 		{
 			keptedg.push_back(it->first);
 		}
