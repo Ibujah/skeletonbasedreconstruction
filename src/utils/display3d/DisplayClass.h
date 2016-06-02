@@ -35,6 +35,7 @@ SOFTWARE.
 #include <memory>
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
+#include <SFML/Graphics.hpp>
 
 #include <camera/Camera.h>
 #include <camera/Intrinsics.h>
@@ -62,6 +63,21 @@ namespace display3d
  			 */
 			sf::Window m_window;
 
+			/**
+			 *  \brief Background texture
+			 */
+			sf::Image m_bgimg;
+			
+			/**
+			 *  \brief Background texture indice
+			 */
+			GLuint m_bgtexture;
+			
+			/**
+			 *  \brief Use background image
+			 */
+			bool m_usebg;
+			
 			/**
  			 *  \brief Number of lists created
  			 */
@@ -158,6 +174,13 @@ namespace display3d
 			sf::Window& getWindow();
 			
 			/**
+			 *  \brief Set background for one frame
+			 *
+			 *  \param bgimg background image to use
+			 */
+			void setBackground(const sf::Image &bgimg);
+
+			/**
  			 *  \brief Gets the number of lists
  			 *
  			 *  \return number of lists
@@ -179,6 +202,13 @@ namespace display3d
 			template<typename Container>
 			void display(const Container &cont);
 			
+			/**
+			 *  \brief Acquire current image
+			 *
+			 *  \param img  output acquired image
+			 */
+			void getRender(sf::Image &img);
+
 			/**
 			 *  \brief Enable control for the window, until a key is pressed
 			 *

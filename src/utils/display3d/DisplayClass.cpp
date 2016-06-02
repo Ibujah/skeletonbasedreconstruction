@@ -35,10 +35,14 @@ SOFTWARE.
 #include <camera/PinHole.h>
 
 display3d::DisplayClass::DisplayClass(const std::string &title, unsigned int width, unsigned int height) :
-	m_window(sf::VideoMode(width,height),title,sf::Style::Titlebar), m_nblists(0), m_clock(), m_ctrlenabled(false), m_campos(0,0,0), m_camrot(0,0,0)
+	m_window(sf::VideoMode(width,height),title,sf::Style::Titlebar), m_usebg(false), m_nblists(0), m_clock(), m_ctrlenabled(false), m_campos(0,0,0), m_camrot(0,0,0)
 {
 	setView();
 	m_window.setVerticalSyncEnabled(true);
+	m_window.setActive(true);
+
+	m_bgimg.create(1024,1024);
+	glGenTextures(1,&m_bgtexture);
 }
 
 unsigned int display3d::DisplayClass::startList()
@@ -154,7 +158,17 @@ sf::Window& display3d::DisplayClass::getWindow()
 {
 	return m_window;
 }
-			
+
+void display3d::DisplayClass::setBackground(const sf::Image &bgimg)
+{
+	int width = bgimg.getSize().x;
+	int height = bgimg.getSize().y;
+	if(width>1024) width = 1024;
+	if(height>1024) height = 1024;
+	m_bgimg.copy(bgimg,0,0,sf::IntRect(0,0,width,height));
+	m_usebg = true;
+}
+
 unsigned int display3d::DisplayClass::getNblists() const
 {
 	return m_nblists;
@@ -165,6 +179,49 @@ void display3d::DisplayClass::display()
 	m_window.setActive(true);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glClearColor(1.0,1.0,1.0,0);
+	
+	if(m_usebg)
+	{ 
+		glLineWidth(1.0);
+        glBindTexture( GL_TEXTURE_2D, m_bgtexture );
+		glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S , GL_REPEAT );
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+        glEnable(GL_TEXTURE_2D);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_bgimg.getPixelsPtr());
+         
+        //Switch to Ortho for drawing background
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+		glLoadIdentity();
+        glOrtho(0.0, m_window.getSize().x, m_window.getSize().y, 0.0, -10000, 10000);
+
+        //Finally, draw the texture using a simple quad with texture coords in corners.
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+		glLoadIdentity();
+        glTranslated(0,0,-9999);//why these parameters?!
+
+        glBegin(GL_QUADS);
+		glColor3f(1.0,1.0,1.0);
+        glTexCoord2i(0, 0); glVertex2i(0, 0);
+        glTexCoord2i(1, 0); glVertex2i(1024, 0);
+        glTexCoord2i(1, 1); glVertex2i(1024, 1024);
+        glTexCoord2i(0, 1); glVertex2i(0, 1024);
+        glEnd();
+
+
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+		
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+
+        glDisable(GL_TEXTURE_2D);
+		m_usebg=false;
+	}
 	
 	glMatrixMode(GL_MODELVIEW);
 
@@ -180,6 +237,7 @@ void display3d::DisplayClass::display()
 	glPopMatrix();
 
 	m_window.display();
+	m_usebg = false;
 }
 			
 template<typename Container>
@@ -188,6 +246,49 @@ void display3d::DisplayClass::display(const Container &cont)
 	m_window.setActive(true);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glClearColor(1.0,1.0,1.0,0);
+	
+	if(m_usebg)
+	{ 
+		glLineWidth(1.0);
+        glBindTexture( GL_TEXTURE_2D, m_bgtexture );
+		glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S , GL_REPEAT );
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+        glEnable(GL_TEXTURE_2D);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_RGB, GL_UNSIGNED_BYTE, m_bgimg.getPixelsPtr());
+         
+        //Switch to Ortho for drawing background
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+		glLoadIdentity();
+        glOrtho(0.0, m_window.getSize().x, m_window.getSize().y, 0.0, -10000, 10000);
+
+        //Finally, draw the texture using a simple quad with texture coords in corners.
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+		glLoadIdentity();
+        glTranslated(0,0,-9999);//why these parameters?!
+
+        glBegin(GL_QUADS);
+		glColor3f(1.0,1.0,1.0);
+        glTexCoord2i(0, 0); glVertex2i(0, 0);
+        glTexCoord2i(1, 0); glVertex2i(1024, 0);
+        glTexCoord2i(1, 1); glVertex2i(1024, 1024);
+        glTexCoord2i(0, 1); glVertex2i(0, 1024);
+        glEnd();
+
+
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+		
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+
+        glDisable(GL_TEXTURE_2D);
+		m_usebg=false;
+	}
 
 	glMatrixMode(GL_MODELVIEW);
 
@@ -204,13 +305,20 @@ void display3d::DisplayClass::display(const Container &cont)
 	m_window.display();
 }
 
+void display3d::DisplayClass::getRender(sf::Image &img)
+{
+	std::vector<unsigned char> image(m_window.getSize().x*m_window.getSize().y*4);
+	glReadPixels(0,0,m_window.getSize().x,m_window.getSize().y,GL_RGBA,GL_UNSIGNED_BYTE,&image[0]);
+	img.create(m_window.getSize().x,m_window.getSize().y,&image[0]);
+	img.flipVertically();
+}
 
 namespace display3d
 {
-	template<>
+	template
 	void display3d::DisplayClass::display<std::vector<unsigned int> >(const std::vector<unsigned int> &cont);
 
-	template<>
+	template
 	void display3d::DisplayClass::display<std::list<unsigned int> >(const std::list<unsigned int> &cont);
 }
 
@@ -241,8 +349,6 @@ void display3d::DisplayClass::manageKeyboard(float camvit)
 		float sec = m_clock.getElapsedTime().asSeconds();
 		m_clock.restart();
 		
-
-
 		// Position
 		float dx = 0, dy = 0, dz = 0;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Z))

@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wno-enum-compare -Wno-deprec
 find_package(Boost REQUIRED COMPONENTS unit_test_framework program_options)
 find_package(EIGEN REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(SFML 2 COMPONENTS system window)
+find_package(SFML 2 COMPONENTS system window graphics)
 find_package(NLOPT REQUIRED)
 
 find_package(VoroPlusPlus)
