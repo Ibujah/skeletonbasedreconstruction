@@ -354,15 +354,15 @@ void display3d::DisplayClass::manageKeyboard(float camvit)
 		float dx = 0, dy = 0, dz = 0;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
 		{
-			dx =  sin(m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
-			dy =  sin(-m_camrot.x/180.0*3.14159);
-			dz =  cos(m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
+			dx = -sin(m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
+			dy = -sin(-m_camrot.x/180.0*3.14159);
+			dz = -cos(m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
 		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		{
-			dx =  -sin( m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
-			dy =  -sin(-m_camrot.x/180.0*3.14159);
-			dz =  -cos( m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
+			dx =   sin( m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
+			dy =   sin(-m_camrot.x/180.0*3.14159);
+			dz =   cos( m_camrot.y/180.0*3.14159)*cos(-m_camrot.x/180.0*3.14159);
 		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 		{
@@ -401,7 +401,7 @@ void display3d::DisplayClass::manageKeyboard(float camvit)
 		m_camrot.x -= (float)coords.y/2.0;
 		if(m_camrot.x<-90.0) m_camrot.x=-90.0;
 		if(m_camrot.x>90.0) m_camrot.x=90.0;
-		m_camrot.y -= (float)coords.x/2.0;
+		m_camrot.y += (float)coords.x/2.0;
 		if(m_camrot.y<0.0) m_camrot.y+=360.0;
 		if(m_camrot.y>360.0) m_camrot.y-=360.0;
 
