@@ -230,6 +230,8 @@ int main(int argc, char** argv)
 		display3d::DisplayCamera(disclass,veccam[i]);
 	}
 	
+	disclass.setView();
+
 	disclass.enableCtrl();
 	
 	while(disclass.isCtrlEnabled())
