@@ -37,7 +37,7 @@ else()
 	message(STATUS "-- Found OpenGL" )
 endif(NOT OPENGL_FOUND)
 
-
+find_package(ARToolKit5)
 
 
 # Enable OpenMP
