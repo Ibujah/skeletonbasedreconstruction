@@ -60,6 +60,8 @@ set(FILEIO_LIB     "FileIO")
 set(DISPLAYOCV_LIB "DisplayOCV")
 set(DISPLAY3D_LIB  "Display3D")
 
+set(TRACKING_LIB   "Tracking")
+
 include_directories(${EIGEN_INCLUDE_DIRS})
 
 add_subdirectory(src/)
