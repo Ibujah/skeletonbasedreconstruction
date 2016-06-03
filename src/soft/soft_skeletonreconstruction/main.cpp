@@ -205,11 +205,30 @@ int main(int argc, char** argv)
 	std::cout << "3D display" << std::endl;
 	display3d::DisplayClass disclass("Reconstructed skeleton");
 	
+	std::list<unsigned int> indaff;
 	display3d::DisplayFrame(disclass,mathtools::affine::Frame<3>::CanonicFrame());
-	display3d::DisplayBoundary_Wired(disclass,bnd);
+	indaff.push_back(display3d::DisplayBoundary_Wired(disclass,bnd));
 	display3d::DisplaySkeleton(disclass,skelreconstructed,1.0,0.0,0.0);
 	for(unsigned int i = 0; i < nbimg; i++)
+	{
+		std::ostringstream imgname;
+		imgname << orifile << i+1 << ".jpg";
+		
+		sf::Image img;
+		img.loadFromFile(imgname.str());
+
+		disclass.setView(veccam[i]);
+		disclass.setBackground(img);
+		disclass.display(indaff);
+		disclass.getRender(img);
+		
+		std::ostringstream imgrndname;
+		imgrndname << orifile << "_render" << i+1 << ".jpg";
+		
+		img.saveToFile(imgrndname.str());
+		
 		display3d::DisplayCamera(disclass,veccam[i]);
+	}
 	
 	disclass.enableCtrl();
 	
