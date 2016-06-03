@@ -77,8 +77,8 @@ void display3d::DisplayClass::setIntrinsics(const camera::Intrinsics::Ptr intrin
 	unsigned int width = intrinsics->getWidth();
 	unsigned int height = intrinsics->getHeight();
 	m_window.setSize(sf::Vector2u(width,height));
-	Eigen::Vector2d origin = intrinsics->getFrame()->getOrigin();
-	Eigen::Matrix2d basis = intrinsics->getFrame()->getBasis()->getMatrix();
+	Eigen::Vector2d origin = intrinsics->getFrame()->getFrameInverse()->getOrigin();
+	Eigen::Matrix2d basis = intrinsics->getFrame()->getFrameInverse()->getBasis()->getMatrix();
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 	switch(intrinsics->getType())
@@ -116,7 +116,7 @@ void display3d::DisplayClass::setIntrinsics()
 			origin.y()*ZNEAR,
 			ZNEAR,
 			ZFAR);
-	glScalef(1,-1,1);
+	glScalef(1,1,-1);
 	glViewport( 0, 0, width, height );
 }
 
@@ -124,8 +124,8 @@ void display3d::DisplayClass::setExtrinsics(const camera::Extrinsics::Ptr extrin
 {
 	m_window.setActive(true);
 	Eigen::Matrix4d trmat = Eigen::Matrix4d::Identity();
- 	trmat.block<3,3>(0,0) = extrinsics->getFrame()->getBasis()->getMatrix();
- 	trmat.block<3,1>(0,3) = extrinsics->getFrame()->getOrigin();
+ 	trmat.block<3,3>(0,0) = extrinsics->getFrame()->getFrameInverse()->getBasis()->getMatrix();
+ 	trmat.block<3,1>(0,3) = extrinsics->getFrame()->getFrameInverse()->getOrigin();
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity( );
@@ -223,7 +223,7 @@ void display3d::DisplayClass::display()
 		m_usebg=false;
 	}
 	
-	glMatrixMode(GL_MODELVIEW);
+	glMatrixMode(GL_PROJECTION);
 
 	glPushMatrix( );
 	glRotatef( -m_camrot.x, 1, 0, 0 );
@@ -234,10 +234,10 @@ void display3d::DisplayClass::display()
 	for(unsigned int i = 0; i < m_nblists; i++)
 		glCallList(i+1);
 	
+	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 
 	m_window.display();
-	m_usebg = false;
 }
 			
 template<typename Container>
@@ -257,7 +257,7 @@ void display3d::DisplayClass::display(const Container &cont)
 		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 
         glEnable(GL_TEXTURE_2D);
-        glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_RGB, GL_UNSIGNED_BYTE, m_bgimg.getPixelsPtr());
+        glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_bgimg.getPixelsPtr());
          
         //Switch to Ortho for drawing background
         glMatrixMode(GL_PROJECTION);
@@ -290,7 +290,7 @@ void display3d::DisplayClass::display(const Container &cont)
 		m_usebg=false;
 	}
 
-	glMatrixMode(GL_MODELVIEW);
+	glMatrixMode(GL_PROJECTION);
 
 	glPushMatrix( );
 	glRotatef( -m_camrot.x, 1, 0, 0 );
@@ -301,6 +301,7 @@ void display3d::DisplayClass::display(const Container &cont)
 	for(typename Container::const_iterator it = cont.begin(); it != cont.end(); it++)
 		glCallList(*it+1);
 
+	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	m_window.display();
 }
