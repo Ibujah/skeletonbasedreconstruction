@@ -27,6 +27,8 @@ SOFTWARE.
  */
 
 #include <boost/program_options.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 
 #include <camera/Camera.h>
@@ -37,26 +39,72 @@ SOFTWARE.
 int main(int argc, char** argv)
 {
 	std::string camfile;
-	
+	unsigned int camID;
+
 	boost::program_options::options_description desc("OPTIONS");
-	
+
 	desc.add_options()
 		("help", "Help message")
 		("camfile", boost::program_options::value<std::string>(&camfile)->default_value("cam.xml"), "Camera file")
+		("camID", boost::program_options::value<unsigned int>(&camID)->default_value(1), "Camera number")
 		;
-	
+
 	boost::program_options::variables_map vm;
 	boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
 	boost::program_options::notify(vm);
-	
+
 	if (vm.count("help")) {
 		std::cout << desc << std::endl;
 		return 0;
 	}
-	
+
 	camera::Camera::Ptr cam = fileio::ReadCamera(camfile);
 	tracking::Tracker tracker;
-	tracker.Init(cam);
+	tracker.init(cam);
+
+	cv::VideoCapture capture;
+	capture.open( camID );
+	capture.set(CV_CAP_PROP_FRAME_WIDTH, cam->getIntrinsics()->getWidth());
+	capture.set(CV_CAP_PROP_FRAME_HEIGHT, cam->getIntrinsics()->getHeight());
+	capture.set(CV_CAP_PROP_FPS, 20);
+
+	const std::string WINDOW_NAME = "Images acquisition";
+	bool fini = false;
+
+	while(!fini)
+	{
+        cv::Mat view;
+		cv::Mat aff;
+		// get the new frame from capture and copy it to view
+        capture >> aff;
+		aff.copyTo(view);
+
+       	// if no more images to process exit the loop
+        if(view.empty())
+		{
+			std::cerr << "No acquired view" <<  std::endl;
+        	break;
+		}
+
+        // detect the markers
+		tracker.detect(aff);
+        
+		imshow(WINDOW_NAME , view);
+
+		char key;
+		if( (key=cv::waitKey( 10 )) >= 0)
+		{
+			if(key=='q' || key=='Q')
+			{
+				fini = true;
+			}
+		}
+	}
+
+	cv::destroyWindow(WINDOW_NAME);
+
+	capture.release();
+
 
 	return 0;
 }
