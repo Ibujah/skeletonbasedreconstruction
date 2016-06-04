@@ -31,6 +31,8 @@ SOFTWARE.
 #define _TRACKER_H_
 
 #include <AR/ar.h>
+#include <opencv2/core/core.hpp>
+
 #include <camera/Camera.h>
 
 /**
@@ -58,23 +60,28 @@ namespace tracking
  			 *  \brief Constructor
  			 */
 			Tracker();
-
+			
+			/**
+ 			 *  \brief Destructor
+ 			 */
+			~Tracker();
+			
 			/**
  			 *  \brief Method initialising the tracker
  			 *
  			 *  \param cam  Camera acquiring the scene
  			 */
-			void Init(const camera::Camera::Ptr cam);
-
+			void init(const camera::Camera::Ptr cam);
+			
 			/**
  			 *  \brief Cleaning method
  			 */
-			void Clean();
+			void clean();
 
 			/**
- 			 *  \brief Destructor
+ 			 *  \brief Detects patterns from an image
  			 */
-			~Tracker();
+			void detect(cv::Mat &img);
 	};
 }
 

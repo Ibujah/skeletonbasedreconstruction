@@ -29,14 +29,20 @@ SOFTWARE.
 
 
 #include "Tracker.h"
+#include <iostream>
 
 tracking::Tracker::Tracker() : m_arhandle(NULL), m_arparamlt(NULL)
 {
 }
 
-void tracking::Tracker::Init(const camera::Camera::Ptr cam)
+tracking::Tracker::~Tracker()
 {
-	Clean();
+	clean();
+}
+
+void tracking::Tracker::init(const camera::Camera::Ptr cam)
+{
+	clean();
 	ARParam arparam;
 	arparam.xsize = cam->getIntrinsics()->getWidth();
 	arparam.ysize = cam->getIntrinsics()->getHeight();
@@ -61,20 +67,28 @@ void tracking::Tracker::Init(const camera::Camera::Ptr cam)
     arparam.dist_function_version = 4;
 
 	m_arparamlt = arParamLTCreate(&arparam,0);
+	
 	m_arhandle = arCreateHandle(m_arparamlt);
+	arSetPixelFormat(m_arhandle,AR_PIXEL_FORMAT_BGR);
 }
 
-void tracking::Tracker::Clean()
+void tracking::Tracker::clean()
 {
-	if(m_arhandle != NULL)
+	if(m_arhandle)
 		arDeleteHandle(m_arhandle);
 	m_arhandle = NULL;
-	if(m_arparamlt != NULL)
+
+	if(m_arparamlt)
     	arParamLTFree(&m_arparamlt);
 	m_arparamlt = NULL;
 }
 
-tracking::Tracker::~Tracker()
+void tracking::Tracker::detect(cv::Mat &img)
 {
-	Clean();
+	ARUint8 *dataPtr = img.ptr();
+
+	arDetectMarker(m_arhandle,dataPtr);
+	
+	if(arGetMarkerNum(m_arhandle))
+		std::cout << "found" << std::endl;
 }
