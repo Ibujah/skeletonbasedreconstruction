@@ -30,6 +30,9 @@ SOFTWARE.
 #ifndef _TRACKER_H_
 #define _TRACKER_H_
 
+#include <AR/ar.h>
+#include <camera/Camera.h>
+
 /**
  *  \brief Tracking methods
  */
@@ -40,7 +43,38 @@ namespace tracking
 	 */
 	class Tracker
 	{
-		
+		protected:
+			/**
+ 			 *  \brief main ARToolKit structure, storing informations about camera, patterns, etc...
+ 			 */
+			ARHandle *m_arhandle;
+			
+			/**
+ 			 *  \brief ARToolKit structure containing camera calibration
+ 			 */
+			ARParamLT *m_arparamlt;
+		public:
+			/**
+ 			 *  \brief Constructor
+ 			 */
+			Tracker();
+
+			/**
+ 			 *  \brief Method initialising the tracker
+ 			 *
+ 			 *  \param cam  Camera acquiring the scene
+ 			 */
+			void Init(const camera::Camera::Ptr cam);
+
+			/**
+ 			 *  \brief Cleaning method
+ 			 */
+			void Clean();
+
+			/**
+ 			 *  \brief Destructor
+ 			 */
+			~Tracker();
 	};
 }
 

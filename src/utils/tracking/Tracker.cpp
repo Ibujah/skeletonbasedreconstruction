@@ -29,3 +29,52 @@ SOFTWARE.
 
 
 #include "Tracker.h"
+
+tracking::Tracker::Tracker() : m_arhandle(NULL)
+{
+}
+
+void tracking::Tracker::Init(const camera::Camera::Ptr cam)
+{
+	Clean();
+	ARParam arparam;
+	arparam.xsize = cam->getIntrinsics()->getWidth();
+	arparam.ysize = cam->getIntrinsics()->getHeight();
+
+	arparam.mat[0][0] = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(0,0);
+	arparam.mat[0][1] = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(0,1);
+	arparam.mat[0][2] = 0.0;
+	arparam.mat[0][3] = cam->getIntrinsics()->getFrame()->getOrigin().x();
+
+	arparam.mat[1][0] = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(1,0);
+	arparam.mat[1][1] = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(1,1);
+	arparam.mat[1][2] = 0.0;
+	arparam.mat[1][3] = cam->getIntrinsics()->getFrame()->getOrigin().y();
+
+	arparam.mat[2][0] = 0.0; 
+	arparam.mat[2][1] = 0.0; 
+	arparam.mat[2][2] = 0.0;
+	arparam.mat[2][3] = 1.0;
+
+	for(unsigned int i = 0; i < AR_DIST_FACTOR_NUM_MAX; i++)
+		arparam.dist_factor[i] = 0.0;
+    arparam.dist_function_version = 4;
+
+	m_arparamlt = arParamLTCreate(&arparam,0);
+	m_arhandle = arCreateHandle(m_arparamlt);
+}
+
+void tracking::Tracker::Clean()
+{
+	if(m_arhandle != NULL)
+		arDeleteHandle(m_arhandle);
+	m_arhandle = NULL;
+	if(m_arparamlt != NULL)
+    	arParamLTFree(&m_arparamlt);
+	m_arparamlt = NULL;
+}
+
+tracking::Tracker::~Tracker()
+{
+	Clean();
+}

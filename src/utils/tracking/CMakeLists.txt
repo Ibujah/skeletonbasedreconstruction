@@ -10,7 +10,7 @@ add_library(
 	)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/lib/
-					${ARTOOLKIT5_INCLUDE})
+					${ARTOOLKIT5_INCLUDE_DIR})
 
 target_link_libraries(${LIBRARY_NAME} ${MATHTOOLS_LIB}
 									  ${CAMERA_LIB}
