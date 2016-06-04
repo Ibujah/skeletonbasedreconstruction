@@ -22,10 +22,10 @@ SOFTWARE.
 
 
 /**
- *  \file ImagesAcquisition.cpp
+ *  \file Tracker.cpp
  *  \brief Provides methods to acquire calibrated images
  *  \author Bastien Durix
  */
 
 
-#include "ImagesAcquisition.h"
+#include "Tracker.h"

@@ -1,6 +1,6 @@
 set(LIBRARY_NAME ${TRACKING_LIB})
 
-set(SOURCE_FILES ImagesAcquisition.cpp)
+set(SOURCE_FILES Tracker.cpp)
 
 # make the library
 add_library(

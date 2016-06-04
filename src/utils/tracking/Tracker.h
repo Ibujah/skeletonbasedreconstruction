@@ -22,13 +22,13 @@ SOFTWARE.
 
 
 /**
- *  \file ImagesAcquisition.h
+ *  \file Tracker.h
  *  \brief Provides methods to acquire calibrated images
  *  \author Bastien Durix
  */
 
-#ifndef _IMAGESACQUISITION_H_
-#define _IMAGESACQUISITION_H_
+#ifndef _TRACKER_H_
+#define _TRACKER_H_
 
 /**
  *  \brief Tracking methods
@@ -44,4 +44,4 @@ namespace tracking
 	};
 }
 
-#endif //_IMAGESACQUISITION_H_
+#endif //_TRACKER_H_
