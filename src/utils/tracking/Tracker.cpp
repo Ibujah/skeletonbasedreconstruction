@@ -30,7 +30,7 @@ SOFTWARE.
 
 #include "Tracker.h"
 
-tracking::Tracker::Tracker() : m_arhandle(NULL)
+tracking::Tracker::Tracker() : m_arhandle(NULL), m_arparamlt(NULL)
 {
 }
 
