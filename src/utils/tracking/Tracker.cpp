@@ -49,27 +49,40 @@ void tracking::Tracker::init(const camera::Camera::Ptr cam)
 
 	arparam.mat[0][0] = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(0,0);
 	arparam.mat[0][1] = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(0,1);
-	arparam.mat[0][2] = 0.0;
-	arparam.mat[0][3] = cam->getIntrinsics()->getFrame()->getOrigin().x();
+	arparam.mat[0][2] = cam->getIntrinsics()->getFrame()->getOrigin().x();
+	arparam.mat[0][3] = 0.0;
 
 	arparam.mat[1][0] = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(1,0);
 	arparam.mat[1][1] = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(1,1);
-	arparam.mat[1][2] = 0.0;
-	arparam.mat[1][3] = cam->getIntrinsics()->getFrame()->getOrigin().y();
+	arparam.mat[1][2] = cam->getIntrinsics()->getFrame()->getOrigin().y();
+	arparam.mat[1][3] = 0.0;
 
 	arparam.mat[2][0] = 0.0; 
 	arparam.mat[2][1] = 0.0; 
-	arparam.mat[2][2] = 0.0;
-	arparam.mat[2][3] = 1.0;
+	arparam.mat[2][2] = 1.0;
+	arparam.mat[2][3] = 0.0;
 
-	for(unsigned int i = 0; i < AR_DIST_FACTOR_NUM_MAX; i++)
-		arparam.dist_factor[i] = 0.0;
+	arparam.dist_factor[0] = 0.0;
+	arparam.dist_factor[1] = 0.0;
+	arparam.dist_factor[2] = 0.0;
+	arparam.dist_factor[3] = 0.0;
+	arparam.dist_factor[4] = 675;
+	arparam.dist_factor[5] = 673;
+	arparam.dist_factor[6] = 331;
+	arparam.dist_factor[7] = 233;
+	arparam.dist_factor[8] = 1;
     arparam.dist_function_version = 4;
 
-	m_arparamlt = arParamLTCreate(&arparam,0);
+	arParamDisp(&arparam);
+
+	m_arparamlt = arParamLTCreate(&arparam,AR_PARAM_LT_DEFAULT_OFFSET);
 	
 	m_arhandle = arCreateHandle(m_arparamlt);
+	
 	arSetPixelFormat(m_arhandle,AR_PIXEL_FORMAT_BGR);
+	arSetPatternDetectionMode(m_arhandle,AR_MATRIX_CODE_DETECTION);
+	arSetMatrixCodeType(m_arhandle,AR_MATRIX_CODE_3x3);
+	arSetDebugMode(m_arhandle,AR_DEBUG_DISABLE);
 }
 
 void tracking::Tracker::clean()
@@ -89,6 +102,10 @@ void tracking::Tracker::detect(cv::Mat &img)
 
 	arDetectMarker(m_arhandle,dataPtr);
 	
-	if(arGetMarkerNum(m_arhandle))
-		std::cout << "found" << std::endl;
+	if(m_arhandle->marker_num)
+	{
+		std::cout << m_arhandle->marker_num << std::endl;
+	}
+	//cv::Mat bwimg(img.rows,img.cols,CV_8UC1,m_arhandle->labelInfo.bwImage);
+	//bwimg.copyTo(img);
 }
