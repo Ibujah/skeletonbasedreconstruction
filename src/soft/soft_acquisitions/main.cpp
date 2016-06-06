@@ -89,7 +89,7 @@ int main(int argc, char** argv)
         // detect the markers
 		tracker.detect(aff);
         
-		imshow(WINDOW_NAME , view);
+		imshow(WINDOW_NAME , aff);
 
 		char key;
 		if( (key=cv::waitKey( 10 )) >= 0)
