@@ -16,5 +16,6 @@ add_executable(${EXEC_NAME} ${source_files})
 target_link_libraries(${EXEC_NAME} ${MATHTOOLS_LIB}
 								   ${TRACKING_LIB}
 								   ${FILEIO_LIB}
-								   ${Boost_PROGRAM_OPTIONS_LIBRARY})
+								   ${Boost_PROGRAM_OPTIONS_LIBRARY}
+								   ${ARTOOLKIT5_LIBRARIES})
 
