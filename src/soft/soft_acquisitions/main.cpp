@@ -82,7 +82,7 @@ int main(int argc, char** argv)
        	// if no more images to process exit the loop
         if(view.empty())
 		{
-			std::cerr << "No acquired view" <<  std::endl;
+			std::cerr << "No view taken" <<  std::endl;
         	break;
 		}
 
@@ -94,13 +94,61 @@ int main(int argc, char** argv)
 		char key;
 		if( (key=cv::waitKey( 10 )) >= 0)
 		{
+			if(key == 'a' || key == 'A')
+			{
+				tracker.addCurrDetection();
+			}
+			if(key=='q' || key=='Q')
+			{
+				std::cout << "Computing markers relative position..." << std::endl;
+				fini = tracker.computeMulti();
+				if(!fini)
+					std::cout << "Not enough images" << std::endl;
+			}
+		}
+	}
+
+	std::cout << "Success !! " << std::endl;
+	
+	fini = false;
+	while(!fini)
+	{
+        cv::Mat view;
+		cv::Mat aff;
+		// get the new frame from capture and copy it to view
+        capture >> aff;
+		aff.copyTo(view);
+
+       	// if no more images to process exit the loop
+        if(view.empty())
+		{
+			std::cerr << "No acquired view" <<  std::endl;
+        	break;
+		}
+
+        // detect the markers
+		tracker.detect(aff);
+		Eigen::Matrix<double,3,4> matTr = tracker.getCurrTr();
+        
+		imshow(WINDOW_NAME , aff);
+
+		char key;
+		if( (key=cv::waitKey( 10 )) >= 0)
+		{
+			if(key == 'a' || key == 'A')
+			{
+				mathtools::affine::Frame<3>::Ptr frame_cur;
+				frame_cur = mathtools::affine::Frame<3>::CreateFrame(matTr.col(3),matTr.col(0),matTr.col(1),matTr.col(2));
+				camera::Extrinsics::Ptr extr(new camera::Extrinsics(frame_cur));
+				camera::Camera::Ptr camimg(new camera::Camera(cam->getIntrinsics(),extr));
+			}
 			if(key=='q' || key=='Q')
 			{
 				fini = true;
 			}
 		}
 	}
-
+	
 	cv::destroyWindow(WINDOW_NAME);
 
 	capture.release();
