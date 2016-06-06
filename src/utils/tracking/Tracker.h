@@ -31,7 +31,10 @@ SOFTWARE.
 #define _TRACKER_H_
 
 #include <AR/ar.h>
+#include <AR/arMulti.h>
 #include <opencv2/core/core.hpp>
+#include <list>
+#include <map>
 
 #include <camera/Camera.h>
 
@@ -55,11 +58,41 @@ namespace tracking
  			 *  \brief ARToolKit structure containing camera calibration
  			 */
 			ARParamLT *m_arparamlt;
+
+			/**
+			 *  \brief ARToolKit structure for 3D informations
+			 */
+			AR3DHandle *m_ar3dhandle;
+
+			/**
+			 *  \brief ARToolKit structure to handle multiple 3D markers
+			 */
+			ARMultiMarkerInfoT *m_armulti;
+
+			/**
+			 *  \brief Number of detected markers
+			 */
+			int m_nbmarkers;
+
+			/**
+			 *  \brief Markers size
+			 */
+			double m_markersize;
+			
+			/**
+			 *  \brief Saved coordinates that are used to compute relative pose of markers
+			 */
+			std::map<int, std::list<std::vector<cv::Point2f> > > m_savedcoords;
+			
+			/**
+			 *  \brief Estimated 3d coordinates that are used to compute relative pose of markers
+			 */
+			std::map<int, std::list<std::vector<cv::Point3f> > > m_savedcoords3d;
 		public:
 			/**
  			 *  \brief Constructor
  			 */
-			Tracker();
+			Tracker(unsigned int nbmarkers = 6, double markersize = 4.0);
 			
 			/**
  			 *  \brief Destructor
@@ -80,8 +113,26 @@ namespace tracking
 
 			/**
  			 *  \brief Detects patterns from an image
+			 *
+			 *  \param img  Image where detect the patterns (out : draws the detected patterns)
+			 *
+			 *  \return number of detected patterns
  			 */
-			void detect(cv::Mat &img);
+			int detect(cv::Mat &img);
+
+			/**
+			 *  \brief Adds current detection to the set of detection, which is used to compute the relative position of the markers
+			 *
+			 *  \return false if there is not enough detected markers
+			 */
+			bool addCurrDetection();
+
+			/**
+			 *  \brief Computes relative pose of markers (needs at least 3 images)
+			 *
+			 *  \return true if correctly computed
+			 */
+			bool computeMulti();
 	};
 }
 

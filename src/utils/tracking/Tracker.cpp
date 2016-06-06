@@ -31,7 +31,11 @@ SOFTWARE.
 #include "Tracker.h"
 #include <iostream>
 
-tracking::Tracker::Tracker() : m_arhandle(NULL), m_arparamlt(NULL)
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
+
+tracking::Tracker::Tracker(unsigned int nbmarkers, double markersize) : m_arhandle(NULL), m_arparamlt(NULL), m_armulti(NULL), m_nbmarkers(nbmarkers), m_markersize(markersize)
 {
 }
 
@@ -61,27 +65,27 @@ void tracking::Tracker::init(const camera::Camera::Ptr cam)
 	arparam.mat[2][1] = 0.0; 
 	arparam.mat[2][2] = 1.0;
 	arparam.mat[2][3] = 0.0;
-
+	
 	arparam.dist_factor[0] = 0.0;
 	arparam.dist_factor[1] = 0.0;
 	arparam.dist_factor[2] = 0.0;
 	arparam.dist_factor[3] = 0.0;
-	arparam.dist_factor[4] = 675;
-	arparam.dist_factor[5] = 673;
-	arparam.dist_factor[6] = 331;
-	arparam.dist_factor[7] = 233;
+	arparam.dist_factor[4] = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(0,0);
+	arparam.dist_factor[5] = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(1,1);
+	arparam.dist_factor[6] = cam->getIntrinsics()->getFrame()->getOrigin().x();
+	arparam.dist_factor[7] = cam->getIntrinsics()->getFrame()->getOrigin().y();
 	arparam.dist_factor[8] = 1;
     arparam.dist_function_version = 4;
-
-	arParamDisp(&arparam);
 
 	m_arparamlt = arParamLTCreate(&arparam,AR_PARAM_LT_DEFAULT_OFFSET);
 	
 	m_arhandle = arCreateHandle(m_arparamlt);
+
+	m_ar3dhandle = ar3DCreateHandle(&arparam);
 	
 	arSetPixelFormat(m_arhandle,AR_PIXEL_FORMAT_BGR);
 	arSetPatternDetectionMode(m_arhandle,AR_MATRIX_CODE_DETECTION);
-	arSetMatrixCodeType(m_arhandle,AR_MATRIX_CODE_3x3);
+	arSetMatrixCodeType(m_arhandle,AR_MATRIX_CODE_6x6);
 	arSetDebugMode(m_arhandle,AR_DEBUG_DISABLE);
 }
 
@@ -94,9 +98,15 @@ void tracking::Tracker::clean()
 	if(m_arparamlt)
     	arParamLTFree(&m_arparamlt);
 	m_arparamlt = NULL;
+	if(m_armulti)
+	{
+		delete[] m_armulti->marker;
+		delete m_armulti;
+		m_armulti = NULL;
+	}
 }
 
-void tracking::Tracker::detect(cv::Mat &img)
+int tracking::Tracker::detect(cv::Mat &img)
 {
 	ARUint8 *dataPtr = img.ptr();
 
@@ -104,8 +114,196 @@ void tracking::Tracker::detect(cv::Mat &img)
 	
 	if(m_arhandle->marker_num)
 	{
-		std::cout << m_arhandle->marker_num << std::endl;
+		for(int i = 0; i < m_arhandle->marker_num; i++)
+		{
+			for(int j = 0; j < 4; j++)
+			{
+				int ind1 = j;
+				int ind2 = (ind1 + 1)%4;
+				cv::Point2i pt1(m_arhandle->markerInfo[i].vertex[ind1][0],m_arhandle->markerInfo[i].vertex[ind1][1]),
+							pt2(m_arhandle->markerInfo[i].vertex[ind2][0],m_arhandle->markerInfo[i].vertex[ind2][1]);
+				if(m_arhandle->markerInfo[i].cf > 0.5)
+					cv::line(img,pt1,pt2,cv::Scalar(0,255,0),2);
+				else
+					cv::line(img,pt1,pt2,cv::Scalar(0,0,255),2);
+			}
+		}
 	}
-	//cv::Mat bwimg(img.rows,img.cols,CV_8UC1,m_arhandle->labelInfo.bwImage);
-	//bwimg.copyTo(img);
+	
+	return m_arhandle->marker_num;
+}
+
+bool tracking::Tracker::addCurrDetection()
+{
+	std::map<int, std::vector<cv::Point2f> > curcoords;
+	std::map<int, std::vector<cv::Point3f> > curcoords3d;
+	
+	if(m_arhandle->marker_num >= m_nbmarkers)
+	{
+		for(int i = 0; i < m_arhandle->marker_num; i++)
+		{
+			if(m_arhandle->markerInfo[i].cf > 0.5)
+			{
+				ARdouble conv[3][4];
+				arGetTransMatSquare( m_ar3dhandle, m_arhandle->markerInfo + i, m_markersize, conv);
+
+				std::vector<cv::Point2f> coords(4);
+				std::vector<cv::Point3f> coords3d(4);
+				for(int j = 0; j < 4; j++)
+				{
+					int ind = (4-m_arhandle->markerInfo[i].dirMatrix + j)%4;
+					//save 2d position for each point
+					coords[j] = cv::Point2f(m_arhandle->markerInfo[i].vertex[ind][0],m_arhandle->markerInfo[i].vertex[ind][1]);
+					//estimate 3d position for each point
+					coords3d[j] = cv::Point3f(m_arhandle->markerInfo[i].vertex[ind][0]*conv[0][0] + m_arhandle->markerInfo[i].vertex[ind][1]*conv[0][1] + conv[0][2] + conv[0][3],
+											  m_arhandle->markerInfo[i].vertex[ind][0]*conv[1][0] + m_arhandle->markerInfo[i].vertex[ind][1]*conv[1][1] + conv[1][2] + conv[1][3],
+											  m_arhandle->markerInfo[i].vertex[ind][0]*conv[2][0] + m_arhandle->markerInfo[i].vertex[ind][1]*conv[2][1] + conv[2][2] + conv[2][3]);
+				}
+				curcoords.insert(std::pair<int, std::vector<cv::Point2f> >(m_arhandle->markerInfo[i].idMatrix,coords));
+				curcoords3d.insert(std::pair<int, std::vector<cv::Point3f> >(m_arhandle->markerInfo[i].idMatrix,coords3d));
+			}
+		}
+	}
+	
+	bool added = false;
+	if(curcoords.size() == (unsigned int)m_nbmarkers)
+	{
+		for(std::map<int, std::vector<cv::Point2f> >::iterator it = curcoords.begin(); it != curcoords.end(); it++)
+		{
+			m_savedcoords[it->first].push_back(it->second);
+		}
+		for(std::map<int, std::vector<cv::Point3f> >::iterator it = curcoords3d.begin(); it != curcoords3d.end(); it++)
+		{
+			m_savedcoords3d[it->first].push_back(it->second);
+		}
+		added = true;
+	}
+	
+	return added;
+}
+
+bool tracking::Tracker::computeMulti()
+{
+	bool done = false;
+	if(m_savedcoords.begin()->second.size() >= 3)
+	{
+		if(m_armulti)
+		{
+			delete[] m_armulti->marker;
+			delete m_armulti;
+			m_armulti = NULL;
+		}
+		m_armulti = new ARMultiMarkerInfoT;
+		m_armulti->marker_num = m_nbmarkers;
+		m_armulti->marker = new ARMultiEachMarkerInfoT[m_nbmarkers];
+		m_armulti->prevF = 0;
+		m_armulti->patt_type = AR_MULTI_PATTERN_DETECTION_MODE_MATRIX;
+		m_armulti->cfPattCutoff = AR_MULTI_CONFIDENCE_PATTERN_CUTOFF_DEFAULT;
+		m_armulti->cfMatrixCutoff = AR_MULTI_CONFIDENCE_MATRIX_CUTOFF_DEFAULT;
+		
+		// for each marker, compute position relative to the first one
+		std::vector<std::vector<cv::Point3f> > setPts(m_savedcoords3d.size());
+		
+		unsigned int nummark = 0;
+		for(std::map<int, std::list<std::vector<cv::Point3f> > >::iterator itm = m_savedcoords3d.begin(); itm != m_savedcoords3d.end(); itm++)
+		{
+			setPts.resize(itm->second.size()*4);
+			unsigned int numlist = 0;
+			for(std::list<std::vector<cv::Point3f> >::iterator itl = itm->second.begin(); itl != itm->second.end(); itl++)
+			{
+				for(unsigned int i = 0; i < 4; i++)
+				{
+					setPts[nummark][i] = (*itl)[i+numlist*4];
+				}
+				numlist++;
+			}
+			m_armulti->marker[nummark].patt_type = AR_MULTI_PATTERN_TYPE_MATRIX;
+			m_armulti->marker[nummark].patt_id = itm->first;
+            m_armulti->marker[nummark].patt_type = AR_MULTI_PATTERN_TYPE_MATRIX;
+			m_armulti->marker[nummark].width = m_markersize;
+			
+			nummark++;
+		}
+		/*
+		   typedef struct {
+		   ARdouble  trans[3][4];
+		   ARdouble  itrans[3][4];
+		   ARdouble  pos3d[4][3];
+		   int     visible;
+		   int     visibleR;
+		   } ARMultiEachMarkerInfoT;*/
+		
+		for(unsigned int i = 0; i < setPts.size(); i++)
+		{
+			std::vector<cv::Point3f> meanPt(4,cv::Point3f(0,0,0));
+			if(i != 0)
+			{
+				cv::Mat transform;
+				cv::Mat inliers;
+				cv::estimateAffine3D(setPts[i],setPts[0],transform,inliers);
+				unsigned int nbview = setPts[i].size()/4;
+				for(unsigned int j = 0; j < setPts[i].size(); j++)
+				{
+					meanPt[j%4].x +=
+						(transform.at<double>(0,0)*setPts[i][j].x + transform.at<double>(0,1)*setPts[i][j].y + transform.at<double>(0,2)*setPts[i][j].z + transform.at<double>(0,3))/(float)nbview;
+					meanPt[j%4].y +=
+						(transform.at<double>(1,0)*setPts[i][j].x + transform.at<double>(1,1)*setPts[i][j].y + transform.at<double>(1,2)*setPts[i][j].z + transform.at<double>(1,3))/(float)nbview;
+					meanPt[j%4].z +=
+						(transform.at<double>(2,0)*setPts[i][j].x + transform.at<double>(2,1)*setPts[i][j].y + transform.at<double>(2,2)*setPts[i][j].z + transform.at<double>(2,3))/(float)nbview;
+				}
+				
+				for(unsigned int j = 0; j < 3; j++)
+					for(unsigned int k = 0; k < 4; k++)
+					{
+						m_armulti->marker[i].trans[j][k] = transform.at<double>(j,k);
+					}
+				
+				arUtilMatInv( (const ARdouble (*)[4])m_armulti->marker[i].trans, m_armulti->marker[i].itrans );
+				
+				for(unsigned int j = 0; j < 4; j++)
+				{
+					m_armulti->marker[i].pos3d[j][0] = meanPt[j].x;
+					m_armulti->marker[i].pos3d[j][1] = meanPt[j].y;
+					m_armulti->marker[i].pos3d[j][2] = meanPt[j].z;
+				}
+			}
+			else
+			{
+				unsigned int nbview = setPts[i].size()/4;
+				for(unsigned int j = 0; j < setPts[i].size(); j++)
+				{
+					meanPt[j%4].x += setPts[i][j].x/(float)nbview;
+					meanPt[j%4].y += setPts[i][j].y/(float)nbview;
+					meanPt[j%4].z += setPts[i][j].z/(float)nbview;
+				}
+				m_armulti->marker[i].trans[0][0] = 1.0;
+				m_armulti->marker[i].trans[0][1] = 0.0;
+				m_armulti->marker[i].trans[0][2] = 0.0;
+				m_armulti->marker[i].trans[0][3] = 0.0;
+				
+				m_armulti->marker[i].trans[1][0] = 0.0;
+				m_armulti->marker[i].trans[1][1] = 1.0;
+				m_armulti->marker[i].trans[1][2] = 0.0;
+				m_armulti->marker[i].trans[1][3] = 0.0;
+				
+				m_armulti->marker[i].trans[2][0] = 0.0;
+				m_armulti->marker[i].trans[2][1] = 0.0;
+				m_armulti->marker[i].trans[2][2] = 1.0;
+				m_armulti->marker[i].trans[2][3] = 0.0;
+				
+				arUtilMatInv( (const ARdouble (*)[4])m_armulti->marker[i].trans, m_armulti->marker[i].itrans );
+				
+				for(unsigned int j = 0; j < 4; j++)
+				{
+					m_armulti->marker[i].pos3d[j][0] = meanPt[j].x;
+					m_armulti->marker[i].pos3d[j][1] = meanPt[j].y;
+					m_armulti->marker[i].pos3d[j][2] = meanPt[j].z;
+				}
+			}
+		}
+		
+		done = true;
+	}
+
+	return done;
 }
