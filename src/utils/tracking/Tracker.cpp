@@ -307,3 +307,16 @@ bool tracking::Tracker::computeMulti()
 
 	return done;
 }
+
+Eigen::Matrix<double,3,4> tracking::Tracker::getCurrTr()
+{
+    arGetTransMatMultiSquareRobust(m_ar3dhandle, m_arhandle->markerInfo, m_arhandle->marker_num, m_armulti);
+
+	Eigen::Matrix<double,3,4> matTr;
+	matTr <<
+		m_ar3dhandle->icpHandle->matXc2U[0][0], m_ar3dhandle->icpHandle->matXc2U[0][1], m_ar3dhandle->icpHandle->matXc2U[0][2], m_ar3dhandle->icpHandle->matXc2U[0][3], 
+		m_ar3dhandle->icpHandle->matXc2U[1][0], m_ar3dhandle->icpHandle->matXc2U[1][1], m_ar3dhandle->icpHandle->matXc2U[1][2], m_ar3dhandle->icpHandle->matXc2U[1][3], 
+		m_ar3dhandle->icpHandle->matXc2U[2][0], m_ar3dhandle->icpHandle->matXc2U[2][1], m_ar3dhandle->icpHandle->matXc2U[2][2], m_ar3dhandle->icpHandle->matXc2U[2][3];
+
+	return matTr;
+}

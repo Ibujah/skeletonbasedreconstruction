@@ -33,6 +33,7 @@ SOFTWARE.
 #include <AR/ar.h>
 #include <AR/arMulti.h>
 #include <opencv2/core/core.hpp>
+#include <Eigen/Dense>
 #include <list>
 #include <map>
 
@@ -128,11 +129,20 @@ namespace tracking
 			bool addCurrDetection();
 
 			/**
-			 *  \brief Computes relative pose of markers (needs at least 3 images)
+			 *  \brief Computes relative pose of markers 
+			 *  \details Needs at least 3 viewpoints, added with addCurrDetection()
 			 *
 			 *  \return true if correctly computed
 			 */
 			bool computeMulti();
+
+			/**
+ 			 *  \brief Gets current transformation matrix
+ 			 *  \details Needs relative pose of markers computed, with computeMulti()
+ 			 *
+ 			 *  \return Current transformation matrix
+ 			 */
+			Eigen::Matrix<double,3,4> getCurrTr();
 	};
 }
 
