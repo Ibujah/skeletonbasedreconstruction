@@ -140,6 +140,7 @@ bool tracking::Tracker::addCurrDetection()
 	
 	if(m_arhandle->marker_num >= m_nbmarkers)
 	{
+		std::cout << "Added image" << std::endl;
 		for(int i = 0; i < m_arhandle->marker_num; i++)
 		{
 			if(m_arhandle->markerInfo[i].cf > 0.5)
@@ -149,15 +150,54 @@ bool tracking::Tracker::addCurrDetection()
 
 				std::vector<cv::Point2f> coords(4);
 				std::vector<cv::Point3f> coords3d(4);
+				Eigen::Matrix4d tr;
+				tr << conv[0][0], conv[0][1], conv[0][2], conv[0][3], 
+				   conv[1][0], conv[1][1], conv[1][2], conv[1][3], 
+				   conv[2][0], conv[2][1], conv[2][2], conv[2][3], 
+				   0.0,        0.0,        0.0,        1.0;
+				std::cout << "tr" << std::endl;
+				std::cout << tr << std::endl;
+				Eigen::Matrix4d trinv = Eigen::Matrix4d::Identity();
+				trinv.block<3,3>(0,0) = tr.block<3,3>(0,0).transpose();
+				trinv.block<3,1>(0,3) = - trinv.block<3,3>(0,0) * tr.block<3,1>(0,3);
+				std::cout << "trinv" << std::endl;
+				std::cout << trinv << std::endl;
+				Eigen::Matrix<double,4,4> K;
+				K << m_arhandle->arParamLT->param.mat[0][0], m_arhandle->arParamLT->param.mat[0][1], m_arhandle->arParamLT->param.mat[0][2], 0.0,
+				  m_arhandle->arParamLT->param.mat[1][0], m_arhandle->arParamLT->param.mat[1][1], m_arhandle->arParamLT->param.mat[1][2], 0.0,
+				  m_arhandle->arParamLT->param.mat[2][0], m_arhandle->arParamLT->param.mat[2][1], m_arhandle->arParamLT->param.mat[2][2], 0.0,
+				  0.0,0.0,0.0,1.0;
+				std::cout << "K" << std::endl;
+				std::cout << K << std::endl;
 				for(int j = 0; j < 4; j++)
 				{
 					int ind = (4-m_arhandle->markerInfo[i].dirMatrix + j)%4;
 					//save 2d position for each point
 					coords[j] = cv::Point2f(m_arhandle->markerInfo[i].vertex[ind][0],m_arhandle->markerInfo[i].vertex[ind][1]);
 					//estimate 3d position for each point
-					coords3d[j] = cv::Point3f(m_arhandle->markerInfo[i].vertex[ind][0]*conv[0][0] + m_arhandle->markerInfo[i].vertex[ind][1]*conv[0][1] + conv[0][2] + conv[0][3],
-											  m_arhandle->markerInfo[i].vertex[ind][0]*conv[1][0] + m_arhandle->markerInfo[i].vertex[ind][1]*conv[1][1] + conv[1][2] + conv[1][3],
-											  m_arhandle->markerInfo[i].vertex[ind][0]*conv[2][0] + m_arhandle->markerInfo[i].vertex[ind][1]*conv[2][1] + conv[2][2] + conv[2][3]);
+					if(j == 0)
+						coords3d[j] = cv::Point3f(trinv(0,3),
+												  trinv(1,3),
+												  trinv(2,3));
+					if(j == 1)
+						coords3d[j] = cv::Point3f(m_markersize*trinv(0,0) + trinv(0,2) + trinv(0,3),
+												  m_markersize*trinv(1,0) + trinv(1,2) + trinv(1,3),
+												  m_markersize*trinv(2,0) + trinv(2,2) + trinv(2,3));
+					if(j == 2)
+						coords3d[j] = cv::Point3f(m_markersize*trinv(0,0) + m_markersize*trinv(0,1) + trinv(0,2) + trinv(0,3),
+												  m_markersize*trinv(1,0) + m_markersize*trinv(1,1) + trinv(1,2) + trinv(1,3),
+												  m_markersize*trinv(2,0) + m_markersize*trinv(2,1) + trinv(2,2) + trinv(2,3));
+					if(j == 3)
+						coords3d[j] = cv::Point3f(m_markersize*trinv(0,1) + trinv(0,2) + trinv(0,3),
+												  m_markersize*trinv(1,1) + trinv(1,2) + trinv(1,3),
+												  m_markersize*trinv(2,1) + trinv(2,2) + trinv(2,3));
+					std::cout << coords3d[j] << std::endl;
+					std::cout << coords[j] << std::endl;
+					Eigen::Vector4d vec3(coords3d[j].x,coords3d[j].y,coords3d[j].z,1.0);
+					Eigen::Vector4d vec2_2 = K*vec3;
+					std::cout << vec2_2.transpose() << std::endl;
+					std::cout << vec2_2.x() / vec2_2.z() << " " << vec2_2.y() / vec2_2.z() << std::endl;
+					
 				}
 				curcoords.insert(std::pair<int, std::vector<cv::Point2f> >(m_arhandle->markerInfo[i].idMatrix,coords));
 				curcoords3d.insert(std::pair<int, std::vector<cv::Point3f> >(m_arhandle->markerInfo[i].idMatrix,coords3d));
@@ -207,31 +247,25 @@ bool tracking::Tracker::computeMulti()
 		unsigned int nummark = 0;
 		for(std::map<int, std::list<std::vector<cv::Point3f> > >::iterator itm = m_savedcoords3d.begin(); itm != m_savedcoords3d.end(); itm++)
 		{
-			setPts.resize(itm->second.size()*4);
 			unsigned int numlist = 0;
+			setPts[nummark].resize(4*itm->second.size());
+			std::cout << nummark << std::endl;
 			for(std::list<std::vector<cv::Point3f> >::iterator itl = itm->second.begin(); itl != itm->second.end(); itl++)
 			{
 				for(unsigned int i = 0; i < 4; i++)
 				{
-					setPts[nummark][i] = (*itl)[i+numlist*4];
+					setPts[nummark][i+numlist*4] = (*itl)[i];
 				}
 				numlist++;
 			}
 			m_armulti->marker[nummark].patt_type = AR_MULTI_PATTERN_TYPE_MATRIX;
-			m_armulti->marker[nummark].patt_id = itm->first;
-            m_armulti->marker[nummark].patt_type = AR_MULTI_PATTERN_TYPE_MATRIX;
+			m_armulti->marker[nummark].patt_id = itm->first & 0x00007fffULL;
+			//std::cout << "id : " << m_armulti->marker[nummark].patt_id << std::endl;
+			m_armulti->marker[nummark].globalID = itm->first;
 			m_armulti->marker[nummark].width = m_markersize;
 			
 			nummark++;
 		}
-		/*
-		   typedef struct {
-		   ARdouble  trans[3][4];
-		   ARdouble  itrans[3][4];
-		   ARdouble  pos3d[4][3];
-		   int     visible;
-		   int     visibleR;
-		   } ARMultiEachMarkerInfoT;*/
 		
 		for(unsigned int i = 0; i < setPts.size(); i++)
 		{
@@ -251,14 +285,32 @@ bool tracking::Tracker::computeMulti()
 					meanPt[j%4].z +=
 						(transform.at<double>(2,0)*setPts[i][j].x + transform.at<double>(2,1)*setPts[i][j].y + transform.at<double>(2,2)*setPts[i][j].z + transform.at<double>(2,3))/(float)nbview;
 				}
+				std::cout << i << std::endl;
 				
+				std::cout << nbview << std::endl;
+				
+				std::cout << "trans" << std::endl;
 				for(unsigned int j = 0; j < 3; j++)
+				{
 					for(unsigned int k = 0; k < 4; k++)
 					{
 						m_armulti->marker[i].trans[j][k] = transform.at<double>(j,k);
+						std::cout << m_armulti->marker[i].trans[j][k] << " ";
 					}
+					std::cout << std::endl;
+				}
 				
 				arUtilMatInv( (const ARdouble (*)[4])m_armulti->marker[i].trans, m_armulti->marker[i].itrans );
+				std::cout << std::endl;
+				std::cout << "itrans" << std::endl;
+				for(unsigned int j = 0; j < 3; j++)
+				{
+					for(unsigned int k = 0; k < 4; k++)
+					{
+						std::cout << m_armulti->marker[i].itrans[j][k] << " ";
+					}
+					std::cout << std::endl;
+				}
 				
 				for(unsigned int j = 0; j < 4; j++)
 				{
@@ -293,6 +345,26 @@ bool tracking::Tracker::computeMulti()
 				
 				arUtilMatInv( (const ARdouble (*)[4])m_armulti->marker[i].trans, m_armulti->marker[i].itrans );
 				
+				std::cout << i << std::endl;
+				for(unsigned int j = 0; j < 3; j++)
+				{
+					for(unsigned int k = 0; k < 4; k++)
+					{
+						std::cout << m_armulti->marker[i].trans[j][k] << " ";
+					}
+					std::cout << std::endl;
+				}
+				
+				arUtilMatInv( (const ARdouble (*)[4])m_armulti->marker[i].trans, m_armulti->marker[i].itrans );
+				std::cout << std::endl;
+				for(unsigned int j = 0; j < 3; j++)
+				{
+					for(unsigned int k = 0; k < 4; k++)
+					{
+						std::cout << m_armulti->marker[i].itrans[j][k] << " ";
+					}
+					std::cout << std::endl;
+				}
 				for(unsigned int j = 0; j < 4; j++)
 				{
 					m_armulti->marker[i].pos3d[j][0] = meanPt[j].x;
@@ -314,9 +386,9 @@ Eigen::Matrix<double,3,4> tracking::Tracker::getCurrTr()
 
 	Eigen::Matrix<double,3,4> matTr;
 	matTr <<
-		m_ar3dhandle->icpHandle->matXc2U[0][0], m_ar3dhandle->icpHandle->matXc2U[0][1], m_ar3dhandle->icpHandle->matXc2U[0][2], m_ar3dhandle->icpHandle->matXc2U[0][3], 
-		m_ar3dhandle->icpHandle->matXc2U[1][0], m_ar3dhandle->icpHandle->matXc2U[1][1], m_ar3dhandle->icpHandle->matXc2U[1][2], m_ar3dhandle->icpHandle->matXc2U[1][3], 
-		m_ar3dhandle->icpHandle->matXc2U[2][0], m_ar3dhandle->icpHandle->matXc2U[2][1], m_ar3dhandle->icpHandle->matXc2U[2][2], m_ar3dhandle->icpHandle->matXc2U[2][3];
+		m_armulti->trans[0][0], m_armulti->trans[0][1], m_armulti->trans[0][2], m_armulti->trans[0][3], 
+		m_armulti->trans[1][0], m_armulti->trans[1][1], m_armulti->trans[1][2], m_armulti->trans[1][3], 
+		m_armulti->trans[2][0], m_armulti->trans[2][1], m_armulti->trans[2][2], m_armulti->trans[2][3];
 
 	return matTr;
 }
