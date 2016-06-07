@@ -144,6 +144,29 @@ void display3d::DisplayClass::setExtrinsics(const camera::Extrinsics::Ptr extrin
 	m_camrot = sf::Vector3f(0,0,0);
 }
 
+void display3d::DisplayClass::setExtrinsics(const Eigen::Matrix<double,3,4> &matext)
+{
+	m_window.setActive(true);
+	Eigen::Matrix4d trmat = Eigen::Matrix4d::Identity();
+ 	trmat.block<3,4>(0,0) = matext;
+
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity( );
+
+	GLfloat modelMatrix[16];
+	for(unsigned int i = 0; i<4; i++)
+	{
+		for(unsigned int j=0; j<4; j++)
+		{
+			modelMatrix[j*4+i] = trmat(i,j);
+		}
+	}
+	glMultMatrixf(modelMatrix);
+
+	m_campos = sf::Vector3f(0,0,0);
+	m_camrot = sf::Vector3f(0,0,0);
+}
+
 void display3d::DisplayClass::setExtrinsics()
 {
 	m_window.setActive(true);

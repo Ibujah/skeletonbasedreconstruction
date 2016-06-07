@@ -160,6 +160,13 @@ namespace display3d
  			 *  \param extrinsics  extrinsics parameters to set
  			 */
 			void setExtrinsics(const camera::Extrinsics::Ptr extrinsics);
+			
+			/**
+ 			 *  \brief Set extrinsics parameters to current view
+ 			 *
+ 			 *  \param matext  transformation matrix
+ 			 */
+			void setExtrinsics(const Eigen::Matrix<double,3,4> &matext);
 
 			/**
  			 *  \brief Set default extrinsics
