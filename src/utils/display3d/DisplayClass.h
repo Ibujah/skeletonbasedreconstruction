@@ -36,6 +36,7 @@ SOFTWARE.
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics.hpp>
+#include <opencv2/core/core.hpp>
 
 #include <camera/Camera.h>
 #include <camera/Intrinsics.h>
@@ -186,6 +187,13 @@ namespace display3d
 			 *  \param bgimg background image to use
 			 */
 			void setBackground(const sf::Image &bgimg);
+			
+			/**
+			 *  \brief Set background for one frame
+			 *
+			 *  \param bgimg background image to use
+			 */
+			void setBackground(const cv::Mat &bgimg);
 
 			/**
  			 *  \brief Gets the number of lists

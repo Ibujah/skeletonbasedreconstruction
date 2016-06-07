@@ -30,6 +30,8 @@ SOFTWARE.
 #define ZNEAR 0.01
 #define ZFAR 1000.
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 #include "DisplayClass.h"
 #include <camera/OrthoCam.h>
 #include <camera/PinHole.h>
@@ -191,6 +193,21 @@ void display3d::DisplayClass::setBackground(const sf::Image &bgimg)
 	m_bgimg.copy(bgimg,0,0,sf::IntRect(0,0,width,height));
 	m_usebg = true;
 }
+
+void display3d::DisplayClass::setBackground(const cv::Mat &bgimg)
+{
+	int width = bgimg.rows;
+	int height = bgimg.cols;
+	cv::Mat bgimgrgba;
+	cv::cvtColor(bgimg,bgimgrgba,cv::COLOR_BGR2RGBA);
+	sf::Image bgimginter;
+    bgimginter.create(bgimgrgba.cols, bgimgrgba.rows, bgimgrgba.ptr());
+	if(width>1024) width = 1024;
+	if(height>1024) height = 1024;
+	m_bgimg.copy(bgimginter,0,0,sf::IntRect(0,0,width,height));
+	m_usebg = true;
+}
+
 
 unsigned int display3d::DisplayClass::getNblists() const
 {
