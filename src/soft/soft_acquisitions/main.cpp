@@ -33,6 +33,8 @@ SOFTWARE.
 
 #include <camera/Camera.h>
 #include <tracking/Tracker.h>
+#include <display3d/DisplayClass.h>
+#include <display3d/DisplayFrame.h>
 
 #include <fileio/CameraFile.h>
 
@@ -59,7 +61,7 @@ int main(int argc, char** argv)
 	}
 
 	camera::Camera::Ptr cam = fileio::ReadCamera(camfile);
-	tracking::Tracker tracker;
+	tracking::Tracker tracker(4);
 	tracker.init(cam);
 
 	cv::VideoCapture capture;
@@ -96,7 +98,10 @@ int main(int argc, char** argv)
 		{
 			if(key == 'a' || key == 'A')
 			{
-				tracker.addCurrDetection();
+				if(tracker.addCurrDetection())
+					std::cout << "View taken !" << std::endl;
+				else
+					std::cout << "Some markers are not seen in the image" << std::endl;
 			}
 			if(key=='q' || key=='Q')
 			{
@@ -109,6 +114,10 @@ int main(int argc, char** argv)
 	}
 
 	std::cout << "Success !! " << std::endl;
+
+	display3d::DisplayClass disclass("Acquisitions",cam->getIntrinsics()->getWidth(),cam->getIntrinsics()->getHeight());
+	display3d::DisplayFrame(disclass,mathtools::affine::Frame<3>::CanonicFrame());
+	disclass.setIntrinsics(cam->getIntrinsics());
 	
 	fini = false;
 	while(!fini)
@@ -125,18 +134,22 @@ int main(int argc, char** argv)
 			std::cerr << "No acquired view" <<  std::endl;
         	break;
 		}
-
+		
         // detect the markers
 		tracker.detect(aff);
 		Eigen::Matrix<double,3,4> matTr = tracker.getCurrTr();
+		disclass.setExtrinsics(matTr);
         
 		imshow(WINDOW_NAME , aff);
-
+		disclass.setBackground(view);
+		disclass.display();
+		
 		char key;
 		if( (key=cv::waitKey( 10 )) >= 0)
 		{
 			if(key == 'a' || key == 'A')
 			{
+				std::cout << matTr << std::endl;
 				mathtools::affine::Frame<3>::Ptr frame_cur;
 				frame_cur = mathtools::affine::Frame<3>::CreateFrame(matTr.col(3),matTr.col(0),matTr.col(1),matTr.col(2));
 				camera::Extrinsics::Ptr extr(new camera::Extrinsics(frame_cur));
