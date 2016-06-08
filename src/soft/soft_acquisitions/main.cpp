@@ -137,11 +137,12 @@ int main(int argc, char** argv)
 		
         // detect the markers
 		tracker.detect(aff);
-		Eigen::Matrix<double,3,4> matTr = tracker.getCurrTr();
+		Eigen::Matrix<double,3,4> matTr;
+		tracker.getCurrTr(matTr);
 		disclass.setExtrinsics(matTr);
         
 		imshow(WINDOW_NAME , aff);
-		disclass.setBackground(view);
+		//disclass.setBackground(view);
 		disclass.display();
 		
 		char key;
