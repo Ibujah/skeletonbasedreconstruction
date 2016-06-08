@@ -79,16 +79,16 @@ namespace tracking
 			 *  \brief Markers size
 			 */
 			double m_markersize;
-			
+
 			/**
-			 *  \brief Saved coordinates that are used to compute relative pose of markers
+			 *  \brief Estimated marker poses at each acquired image
 			 */
-			std::map<int, std::list<std::vector<cv::Point2f> > > m_savedcoords;
-			
+			std::map<int, std::list<cv::Mat> > m_savedposes;
+
 			/**
-			 *  \brief Estimated 3d coordinates that are used to compute relative pose of markers
+			 *  \brief Storage of marker global id
 			 */
-			std::map<int, std::list<std::vector<cv::Point3f> > > m_savedcoords3d;
+			std::map<int,int> m_globalid;
 		public:
 			/**
  			 *  \brief Constructor
@@ -142,7 +142,7 @@ namespace tracking
  			 *
  			 *  \return Current transformation matrix
  			 */
-			Eigen::Matrix<double,3,4> getCurrTr();
+			 void getCurrTr(Eigen::Matrix<double,3,4> &matTr);
 	};
 }
 
