@@ -29,13 +29,14 @@ SOFTWARE.
 
 
 #include "Tracker.h"
-#include <iostream>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
-tracking::Tracker::Tracker(unsigned int nbmarkers, double markersize) : m_arhandle(NULL), m_arparamlt(NULL), m_armulti(NULL), m_nbmarkers(nbmarkers), m_markersize(markersize)
+#include <iostream>
+
+tracking::Tracker::Tracker(unsigned int nbmarkers, double markersize) : m_arhandle(NULL), m_arparamlt(NULL), m_armulti(NULL), m_matK(3,3,CV_64F), m_distCoeff(cv::Mat::zeros(1,4,CV_64F)), m_nbmarkers(nbmarkers), m_markersize(markersize), rvec(1,1,CV_64F)
 {
 }
 
@@ -65,6 +66,10 @@ void tracking::Tracker::init(const camera::Camera::Ptr cam)
 	arparam.mat[2][1] = 0.0; 
 	arparam.mat[2][2] = 1.0;
 	arparam.mat[2][3] = 0.0;
+
+	for(unsigned int i = 0; i < 3; i++)
+		for(unsigned int j = 0; j < 3; j++)
+			m_matK.at<double>(i,j) = arparam.mat[i][j];
 	
 	arparam.dist_factor[0] = 0.0;
 	arparam.dist_factor[1] = 0.0;
@@ -118,12 +123,17 @@ int tracking::Tracker::detect(cv::Mat &img)
 		{
 			for(int j = 0; j < 4; j++)
 			{
-				int ind1 = j;
+				int ind1 = (4 - m_arhandle->markerInfo[i].dirMatrix + j)%4;
 				int ind2 = (ind1 + 1)%4;
+				cv::Scalar col(255,0,0);
+				if(ind1 == 0)
+					col = cv::Scalar(0,255,0);
+				if(ind1 == 1)
+					col = cv::Scalar(0,0,255);
 				cv::Point2i pt1(m_arhandle->markerInfo[i].vertex[ind1][0],m_arhandle->markerInfo[i].vertex[ind1][1]),
 							pt2(m_arhandle->markerInfo[i].vertex[ind2][0],m_arhandle->markerInfo[i].vertex[ind2][1]);
 				if(m_arhandle->markerInfo[i].cf > 0.5)
-					cv::line(img,pt1,pt2,cv::Scalar(0,255,0),2);
+					cv::line(img,pt1,pt2,col,2);
 				else
 					cv::line(img,pt1,pt2,cv::Scalar(0,0,255),2);
 			}
@@ -135,12 +145,10 @@ int tracking::Tracker::detect(cv::Mat &img)
 
 bool tracking::Tracker::addCurrDetection()
 {
-	std::map<int, std::vector<cv::Point2f> > curcoords;
 	std::map<int, cv::Mat > curpose;
-	
+
 	if(m_arhandle->marker_num >= m_nbmarkers)
 	{
-		std::cout << "Added image" << std::endl;
 		for(int i = 0; i < m_arhandle->marker_num; i++)
 		{
 			if(m_arhandle->markerInfo[i].cf > 0.5)
@@ -163,7 +171,7 @@ bool tracking::Tracker::addCurrDetection()
 	}
 	
 	bool added = false;
-	if(curcoords.size() == (unsigned int)m_nbmarkers)
+	if(curpose.size() == (unsigned int)m_nbmarkers)
 	{
 		for(std::map<int, cv::Mat>::iterator it = curpose.begin(); it != curpose.end(); it++)
 		{
@@ -200,7 +208,6 @@ bool tracking::Tracker::computeMulti()
 		unsigned int nummark = 0;
 		for(std::map<int, std::list<cv::Mat> >::iterator itm = m_savedposes.begin(); itm != m_savedposes.end(); itm++)
 		{
-			std::cout << nummark << std::endl;
 			cv::Point3d curTr(0,0,0);
 			cv::Point3d curVec1(0,0,0);
 			cv::Point3d curVec2(0,0,0);
@@ -250,11 +257,29 @@ bool tracking::Tracker::computeMulti()
 			m_armulti->marker[nummark].trans[1][3] = curTr.y;
 			m_armulti->marker[nummark].trans[2][3] = curTr.z;
 
-			for(unsigned int j = 0; j < 3; j++)
+
+			m_armulti->marker[nummark].pos3d[0][0] = curTr.x + m_markersize*curVec2.x;
+			m_armulti->marker[nummark].pos3d[0][1] = curTr.y + m_markersize*curVec2.y;
+			m_armulti->marker[nummark].pos3d[0][2] = curTr.z + m_markersize*curVec2.z;
+
+			m_armulti->marker[nummark].pos3d[1][0] = curTr.x + m_markersize*curVec1.x + m_markersize*curVec2.x;
+			m_armulti->marker[nummark].pos3d[1][1] = curTr.y + m_markersize*curVec1.y + m_markersize*curVec2.y;
+			m_armulti->marker[nummark].pos3d[1][2] = curTr.z + m_markersize*curVec1.z + m_markersize*curVec2.z;
+			
+			m_armulti->marker[nummark].pos3d[2][0] = curTr.x + m_markersize*curVec1.x;
+			m_armulti->marker[nummark].pos3d[2][1] = curTr.y + m_markersize*curVec1.y;
+			m_armulti->marker[nummark].pos3d[2][2] = curTr.z + m_markersize*curVec1.z;
+
+			m_armulti->marker[nummark].pos3d[3][0] = curTr.x;
+			m_armulti->marker[nummark].pos3d[3][1] = curTr.y;
+			m_armulti->marker[nummark].pos3d[3][2] = curTr.z;
+			
+			std::cout << nummark << std::endl;
+			for(unsigned int i = 0; i < 4; i++)
 			{
-				for(unsigned int k = 0; k < 4; k++)
+				for(unsigned int j = 0; j < 3; j++)
 				{
-					std::cout << m_armulti->marker[nummark].trans[j][k] << " ";
+					std::cout << m_armulti->marker[nummark].pos3d[i][j] << " ";
 				}
 				std::cout << std::endl;
 			}
@@ -269,12 +294,95 @@ bool tracking::Tracker::computeMulti()
 	return done;
 }
 
-void tracking::Tracker::getCurrTr(Eigen::Matrix<double,3,4> &matTr)
+bool tracking::Tracker::getCurrTr(Eigen::Matrix<double,3,4> &matTr)
 {
-    arGetTransMatMultiSquare(m_ar3dhandle, m_arhandle->markerInfo, m_arhandle->marker_num, m_armulti);
+	bool correct = false;
+	std::vector<cv::Point2f> imgpts(0);
+	std::vector<cv::Point3f> objpts(0);
+	for ( int i = 0; i < m_arhandle->marker_num; i++ )
+	{
+		ARMarkerInfo marker = m_arhandle->markerInfo[i];
+		if ( marker.idMatrix != -1)
+		{
+			unsigned int num;
+			for(int j=0;j<m_armulti->marker_num;j++)
+			{
+				if(m_armulti->marker[j].patt_id==marker.idMatrix)
+					num=j;
+			}
+			for(unsigned int j=0;j<4;j++)
+			{
+				imgpts.push_back(cv::Point2f( ( float ) marker.vertex[(4-marker.dir+j)%4][0], ( float ) marker.vertex[(4-marker.dir+j)%4][1] ));
+				objpts.push_back(cv::Point3f( 
+							( float ) m_armulti->marker[num].pos3d[j][0],
+							( float ) m_armulti->marker[num].pos3d[j][1],
+							( float ) m_armulti->marker[num].pos3d[j][2]));
+			}
+		}
+	}
+	
+	if(imgpts.size() >= 4)
+	{
+		std::cout << "Im = [";
+		for(unsigned int i = 0; i < imgpts.size(); i++)
+		{
+			std::cout << imgpts[i].x << " " << imgpts[i].y << std::endl;
+		}
+		std::cout << "]" << std::endl;
+		std::cout << "Pt3d = [";
+		for(unsigned int i = 0; i < imgpts.size(); i++)
+		{
+			std::cout << objpts[i].x << " " << objpts[i].y << " " << objpts[i].z << " 1" << std::endl;
+		}
+		std::cout << "]';" << std::endl;
+		if(rvec.cols == 1 && rvec.rows == 1)
+		{
+			cv::solvePnP(objpts,imgpts,m_matK,m_distCoeff,rvec,tvec,false,cv::SOLVEPNP_ITERATIVE);
+		}
+		else
+		{
+			cv::solvePnP(objpts,imgpts,m_matK,m_distCoeff,rvec,tvec,true,cv::SOLVEPNP_ITERATIVE);
+		}
+		cv::Mat rot(3,3,CV_32F);
+		cv::Rodrigues(rvec,rot);
+
+		std::cout << "matK = [";
+		for( int i = 0; i < 3; i++ )
+		{
+			for( int j = 0; j < 3; j++ )
+			{
+				std::cout << m_matK.at<double>(i,j) << " ";
+			}
+			std::cout << "0";
+			std::cout << std::endl;
+		}
+		std::cout << "];" << std::endl;
+		
+		std::cout << "Tr = [";
+		for( int i = 0; i < 3; i++ )
+		{
+			for( int j = 0; j < 3; j++ )
+			{
+				matTr(i,j) = rot.at<double>(i,j);
+				std::cout << matTr(i,j) << " ";
+			}
+			matTr(i,3) = tvec.at<double>(i,0);
+			std::cout << matTr(i,3) << std::endl;;
+		}
+		std::cout << "0 0 0 1";
+		std::cout << "];" << std::endl;
+
+		std::cout << "ImHomog = matK*Tr*Pt3d;" << std::endl;
+		std::cout << "C2d = [ImHomog(1,:)./ImHomog(3,:)" << std::endl;
+		std::cout << "ImHomog(2,:)./ImHomog(3,:)]'" << std::endl;
+		correct = true;
+	}
+    /*arGetTransMatMultiSquareRobust(m_ar3dhandle, m_arhandle->markerInfo, m_arhandle->marker_num, m_armulti);
 
 	matTr <<
 		m_armulti->trans[0][0], m_armulti->trans[0][1], m_armulti->trans[0][2], m_armulti->trans[0][3], 
 		m_armulti->trans[1][0], m_armulti->trans[1][1], m_armulti->trans[1][2], m_armulti->trans[1][3], 
-		m_armulti->trans[2][0], m_armulti->trans[2][1], m_armulti->trans[2][2], m_armulti->trans[2][3];
+		m_armulti->trans[2][0], m_armulti->trans[2][1], m_armulti->trans[2][2], m_armulti->trans[2][3];*/
+
+	return correct;
 }

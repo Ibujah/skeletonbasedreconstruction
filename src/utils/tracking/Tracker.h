@@ -69,6 +69,16 @@ namespace tracking
 			 *  \brief ARToolKit structure to handle multiple 3D markers
 			 */
 			ARMultiMarkerInfoT *m_armulti;
+			
+			/**
+			 *  \brief OpenCV calibration matrix
+			 */
+			cv::Mat m_matK;
+			
+			/**
+			 *  \brief OpenCV distortion coefficients
+			 */
+			cv::Mat m_distCoeff;
 
 			/**
 			 *  \brief Number of detected markers
@@ -89,6 +99,11 @@ namespace tracking
 			 *  \brief Storage of marker global id
 			 */
 			std::map<int,int> m_globalid;
+
+			/**
+			 *  \brief matries containing informations about current position, to optimize the tracking
+			 */
+			cv::Mat rvec, tvec;
 		public:
 			/**
  			 *  \brief Constructor
@@ -140,9 +155,11 @@ namespace tracking
  			 *  \brief Gets current transformation matrix
  			 *  \details Needs relative pose of markers computed, with computeMulti()
  			 *
- 			 *  \return Current transformation matrix
+ 			 *  \param matTr  Current transformation matrix
+			 *
+			 *  \return true if the matrix was correctly computed
  			 */
-			 void getCurrTr(Eigen::Matrix<double,3,4> &matTr);
+			 bool getCurrTr(Eigen::Matrix<double,3,4> &matTr);
 	};
 }
 
