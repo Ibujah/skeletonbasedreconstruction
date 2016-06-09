@@ -138,8 +138,7 @@ int main(int argc, char** argv)
         // detect the markers
 		tracker.detect(aff);
 		Eigen::Matrix<double,3,4> matTr;
-		tracker.getCurrTr(matTr);
-		disclass.setExtrinsics(matTr);
+		bool correct = true;
         
 		imshow(WINDOW_NAME , aff);
 		//disclass.setBackground(view);
@@ -148,9 +147,11 @@ int main(int argc, char** argv)
 		char key;
 		if( (key=cv::waitKey( 10 )) >= 0)
 		{
-			if(key == 'a' || key == 'A')
+			if((key == 'a' || key == 'A') && correct)
 			{
+				tracker.getCurrTr(matTr);
 				std::cout << matTr << std::endl;
+				if(correct) disclass.setExtrinsics(matTr);
 				mathtools::affine::Frame<3>::Ptr frame_cur;
 				frame_cur = mathtools::affine::Frame<3>::CreateFrame(matTr.col(3),matTr.col(0),matTr.col(1),matTr.col(2));
 				camera::Extrinsics::Ptr extr(new camera::Extrinsics(frame_cur));
