@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 	}
 
 	camera::Camera::Ptr cam = fileio::ReadCamera(camfile);
-	tracking::Tracker tracker(4);
+	tracking::Tracker tracker(4,0.4);
 	tracker.init(cam);
 
 	cv::VideoCapture capture;
