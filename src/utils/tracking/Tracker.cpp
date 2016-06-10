@@ -292,19 +292,22 @@ bool tracking::Tracker::getCurrTr(Eigen::Matrix<double,3,4> &matTr)
 		ARMarkerInfo marker = m_arhandle->markerInfo[i];
 		if ( marker.idMatrix != -1)
 		{
-			unsigned int num;
+			int num = -1;
 			for(int j=0;j<m_armulti->marker_num;j++)
 			{
 				if(m_armulti->marker[j].patt_id==marker.idMatrix)
 					num=j;
 			}
-			for(unsigned int j=0;j<4;j++)
+			if(num != -1)
 			{
-				imgpts.push_back(cv::Point2f( ( float ) marker.vertex[(4-marker.dirMatrix+j)%4][0], ( float ) marker.vertex[(4-marker.dirMatrix+j)%4][1] ));
-				objpts.push_back(cv::Point3f( 
-							( float ) m_armulti->marker[num].pos3d[j][0],
-							( float ) m_armulti->marker[num].pos3d[j][1],
-							( float ) m_armulti->marker[num].pos3d[j][2]));
+				for(int j=0;j<4;j++)
+				{
+					imgpts.push_back(cv::Point2f( ( float ) marker.vertex[(4-marker.dirMatrix+j)%4][0], ( float ) marker.vertex[(4-marker.dirMatrix+j)%4][1] ));
+					objpts.push_back(cv::Point3f( 
+								( float ) m_armulti->marker[num].pos3d[j][0],
+								( float ) m_armulti->marker[num].pos3d[j][1],
+								( float ) m_armulti->marker[num].pos3d[j][2]));
+				}
 			}
 		}
 	}
@@ -319,7 +322,7 @@ bool tracking::Tracker::getCurrTr(Eigen::Matrix<double,3,4> &matTr)
 		{
 			cv::solvePnP(objpts,imgpts,m_matK,m_distCoeff,rvec,tvec,true,cv::SOLVEPNP_ITERATIVE);
 		}
-		cv::Mat rot(3,3,CV_32F);
+		cv::Mat rot(3,3,CV_64F);
 		cv::Rodrigues(rvec,rot);
 		
 		for( int i = 0; i < 3; i++ )
