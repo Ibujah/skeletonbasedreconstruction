@@ -126,9 +126,9 @@ int tracking::Tracker::detect(cv::Mat &img)
 				int ind1 = (4 - m_arhandle->markerInfo[i].dirMatrix + j)%4;
 				int ind2 = (ind1 + 1)%4;
 				cv::Scalar col(255,0,0);
-				if(ind1 == 0)
+				if(j == 0)
 					col = cv::Scalar(0,255,0);
-				if(ind1 == 1)
+				if(j == 1)
 					col = cv::Scalar(0,0,255);
 				cv::Point2i pt1(m_arhandle->markerInfo[i].vertex[ind1][0],m_arhandle->markerInfo[i].vertex[ind1][1]),
 							pt2(m_arhandle->markerInfo[i].vertex[ind2][0],m_arhandle->markerInfo[i].vertex[ind2][1]);
@@ -312,7 +312,7 @@ bool tracking::Tracker::getCurrTr(Eigen::Matrix<double,3,4> &matTr)
 			}
 			for(unsigned int j=0;j<4;j++)
 			{
-				imgpts.push_back(cv::Point2f( ( float ) marker.vertex[(4-marker.dir+j)%4][0], ( float ) marker.vertex[(4-marker.dir+j)%4][1] ));
+				imgpts.push_back(cv::Point2f( ( float ) marker.vertex[(4-marker.dirMatrix+j)%4][0], ( float ) marker.vertex[(4-marker.dirMatrix+j)%4][1] ));
 				objpts.push_back(cv::Point3f( 
 							( float ) m_armulti->marker[num].pos3d[j][0],
 							( float ) m_armulti->marker[num].pos3d[j][1],
@@ -375,6 +375,18 @@ bool tracking::Tracker::getCurrTr(Eigen::Matrix<double,3,4> &matTr)
 		std::cout << "ImHomog = matK*Tr*Pt3d;" << std::endl;
 		std::cout << "C2d = [ImHomog(1,:)./ImHomog(3,:)" << std::endl;
 		std::cout << "ImHomog(2,:)./ImHomog(3,:)]'" << std::endl;
+		std::cout << "figure(1)" << std::endl;
+		std::cout << "hold off" << std::endl;
+		std::cout << "plot(Im(:,1),Im(:,2))" << std::endl;
+		std::cout << "hold on" << std::endl;
+		std::cout << "plot(Im(1,1),Im(1,2),'+','color','red')" << std::endl;
+		std::cout << "axis equal" << std::endl;
+		std::cout << "figure(2)" << std::endl;
+		std::cout << "hold off" << std::endl;
+		std::cout << "plot3(Pt3d(1,:),Pt3d(2,:),Pt3d(3,:))" << std::endl;
+		std::cout << "hold on" << std::endl;
+		std::cout << "plot3(Pt3d(1,1),Pt3d(2,1),Pt3d(3,1),'+','color','red')" << std::endl;
+		std::cout << "axis equal" << std::endl;
 		correct = true;
 	}
     /*arGetTransMatMultiSquareRobust(m_ar3dhandle, m_arhandle->markerInfo, m_arhandle->marker_num, m_armulti);
