@@ -87,3 +87,42 @@ camera::Camera::Ptr fileio::ReadCamera(const std::string &filename)
 
 	return camera::Camera::Ptr(new camera::Camera(intrinsics,extrinsics));
 }
+
+void fileio::WriteCamera(const camera::Camera::Ptr cam, const std::string &filename)
+{
+	cv::FileStorage filestor(filename,cv::FileStorage::WRITE);
+
+	cv::Mat pmat(3,4,CV_64F);
+	pmat.at<double>(0,0) = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(0,0);
+	pmat.at<double>(1,0) = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(1,0);
+	pmat.at<double>(2,0) = 0.0;
+
+	pmat.at<double>(0,1) = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(0,1);
+	pmat.at<double>(1,1) = cam->getIntrinsics()->getFrame()->getBasis()->getMatrix()(1,1);
+	pmat.at<double>(2,1) = 0.0;
+
+	pmat.at<double>(0,2) = cam->getIntrinsics()->getFrame()->getOrigin().x();
+	pmat.at<double>(1,2) = cam->getIntrinsics()->getFrame()->getOrigin().y();
+	pmat.at<double>(2,2) = 1.0;
+
+	pmat.at<double>(0,3) = 0.0;
+	pmat.at<double>(1,3) = 0.0;
+	pmat.at<double>(2,3) = 0.0;
+
+	cv::Mat tmat = cv::Mat::eye(4,4,CV_64F);
+	Eigen::Matrix3d mat3d = cam->getExtrinsics()->getFrame()->getFrameInverse()->getBasis()->getMatrix();
+	Eigen::Vector3d ori3d = cam->getExtrinsics()->getFrame()->getFrameInverse()->getOrigin();
+	for(unsigned int i = 0; i < 3; i++)
+	{
+		for(unsigned int j = 0; j < 3; j++)
+		{
+			tmat.at<double>(i,j) = mat3d(i,j);
+		}
+		tmat.at<double>(i,3) = ori3d(i);
+	}
+	
+	filestor << "TransformationMatrix" << tmat;
+	filestor << "ProjectionMatrix" << pmat;
+	filestor << "width" << (int)cam->getIntrinsics()->getWidth();
+	filestor << "height" << (int)cam->getIntrinsics()->getHeight();
+}

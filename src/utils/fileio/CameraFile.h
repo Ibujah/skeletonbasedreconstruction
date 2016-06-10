@@ -42,4 +42,12 @@ namespace fileio
 	 *  \return read file
 	 */
 	camera::Camera::Ptr ReadCamera(const std::string &filename);
+
+	/**
+	 *  \brief Writes a camera file
+	 *
+	 *  \param cam      camera to write
+	 *  \param filename camera filename
+	 */
+	 void WriteCamera(const camera::Camera::Ptr cam, const std::string &filename);
 }
