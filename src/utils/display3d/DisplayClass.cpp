@@ -196,12 +196,12 @@ void display3d::DisplayClass::setBackground(const sf::Image &bgimg)
 
 void display3d::DisplayClass::setBackground(const cv::Mat &bgimg)
 {
-	int width = bgimg.rows;
-	int height = bgimg.cols;
+	int height = bgimg.rows;
+	int width = bgimg.cols;
 	cv::Mat bgimgrgba;
 	cv::cvtColor(bgimg,bgimgrgba,cv::COLOR_BGR2RGBA);
 	sf::Image bgimginter;
-    bgimginter.create(bgimgrgba.cols, bgimgrgba.rows, bgimgrgba.ptr());
+    bgimginter.create(width, height, bgimgrgba.ptr());
 	if(width>1024) width = 1024;
 	if(height>1024) height = 1024;
 	m_bgimg.copy(bgimginter,0,0,sf::IntRect(0,0,width,height));
