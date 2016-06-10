@@ -35,6 +35,7 @@ SOFTWARE.
 #include <tracking/Tracker.h>
 #include <display3d/DisplayClass.h>
 #include <display3d/DisplayFrame.h>
+#include <display3d/DisplayCamera.h>
 
 #include <fileio/CameraFile.h>
 
@@ -150,11 +151,11 @@ int main(int argc, char** argv)
 		{
 			if((key == 'a' || key == 'A') && correct)
 			{
-				std::cout << matTr << std::endl;
 				mathtools::affine::Frame<3>::Ptr frame_cur;
 				frame_cur = mathtools::affine::Frame<3>::CreateFrame(matTr.col(3),matTr.col(0),matTr.col(1),matTr.col(2));
-				camera::Extrinsics::Ptr extr(new camera::Extrinsics(frame_cur));
+				camera::Extrinsics::Ptr extr(new camera::Extrinsics(frame_cur->getFrameInverse()));
 				camera::Camera::Ptr camimg(new camera::Camera(cam->getIntrinsics(),extr));
+				display3d::DisplayCamera(disclass,camimg);
 			}
 			if(key=='q' || key=='Q')
 			{
