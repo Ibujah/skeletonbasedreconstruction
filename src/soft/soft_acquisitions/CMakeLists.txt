@@ -18,5 +18,7 @@ target_link_libraries(${EXEC_NAME} ${MATHTOOLS_LIB}
 								   ${FILEIO_LIB}
 								   ${DISPLAY3D_LIB}
 								   ${Boost_PROGRAM_OPTIONS_LIBRARY}
+								   ${Boost_FILESYSTEM_LIBRARY}
+								   ${Boost_SYSTEM_LIBRARY}
 								   ${ARTOOLKIT5_LIBRARIES})
 
