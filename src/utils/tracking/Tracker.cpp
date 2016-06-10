@@ -34,8 +34,6 @@ SOFTWARE.
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
-#include <iostream>
-
 tracking::Tracker::Tracker(unsigned int nbmarkers, double markersize) : m_arhandle(NULL), m_arparamlt(NULL), m_armulti(NULL), m_matK(3,3,CV_64F), m_distCoeff(cv::Mat::zeros(1,4,CV_64F)), m_nbmarkers(nbmarkers), m_markersize(markersize), rvec(1,1,CV_64F)
 {
 }
@@ -274,16 +272,6 @@ bool tracking::Tracker::computeMulti()
 			m_armulti->marker[nummark].pos3d[3][1] = curTr.y - m_markersize*curVec1.y/2.0 - m_markersize*curVec2.y/2.0;
 			m_armulti->marker[nummark].pos3d[3][2] = curTr.z - m_markersize*curVec1.z/2.0 - m_markersize*curVec2.z/2.0;
 			
-			std::cout << nummark << std::endl;
-			for(unsigned int i = 0; i < 4; i++)
-			{
-				for(unsigned int j = 0; j < 3; j++)
-				{
-					std::cout << m_armulti->marker[nummark].pos3d[i][j] << " ";
-				}
-				std::cout << std::endl;
-			}
-
 			arUtilMatInv( (const ARdouble (*)[4])m_armulti->marker[nummark].trans, m_armulti->marker[nummark].itrans );
 			
 			nummark++;
@@ -323,18 +311,6 @@ bool tracking::Tracker::getCurrTr(Eigen::Matrix<double,3,4> &matTr)
 	
 	if(imgpts.size() >= 4)
 	{
-		std::cout << "Im = [";
-		for(unsigned int i = 0; i < imgpts.size(); i++)
-		{
-			std::cout << imgpts[i].x << " " << imgpts[i].y << std::endl;
-		}
-		std::cout << "]" << std::endl;
-		std::cout << "Pt3d = [";
-		for(unsigned int i = 0; i < imgpts.size(); i++)
-		{
-			std::cout << objpts[i].x << " " << objpts[i].y << " " << objpts[i].z << " 1" << std::endl;
-		}
-		std::cout << "]';" << std::endl;
 		if(rvec.cols == 1 && rvec.rows == 1)
 		{
 			cv::solvePnP(objpts,imgpts,m_matK,m_distCoeff,rvec,tvec,false,cv::SOLVEPNP_ITERATIVE);
@@ -345,56 +321,16 @@ bool tracking::Tracker::getCurrTr(Eigen::Matrix<double,3,4> &matTr)
 		}
 		cv::Mat rot(3,3,CV_32F);
 		cv::Rodrigues(rvec,rot);
-
-		std::cout << "matK = [";
-		for( int i = 0; i < 3; i++ )
-		{
-			for( int j = 0; j < 3; j++ )
-			{
-				std::cout << m_matK.at<double>(i,j) << " ";
-			}
-			std::cout << "0";
-			std::cout << std::endl;
-		}
-		std::cout << "];" << std::endl;
 		
-		std::cout << "Tr = [";
 		for( int i = 0; i < 3; i++ )
 		{
 			for( int j = 0; j < 3; j++ )
 			{
 				matTr(i,j) = rot.at<double>(i,j);
-				std::cout << matTr(i,j) << " ";
 			}
 			matTr(i,3) = tvec.at<double>(i,0);
-			std::cout << matTr(i,3) << std::endl;;
 		}
-		std::cout << "0 0 0 1";
-		std::cout << "];" << std::endl;
-
-		std::cout << "ImHomog = matK*Tr*Pt3d;" << std::endl;
-		std::cout << "C2d = [ImHomog(1,:)./ImHomog(3,:)" << std::endl;
-		std::cout << "ImHomog(2,:)./ImHomog(3,:)]'" << std::endl;
-		std::cout << "figure(1)" << std::endl;
-		std::cout << "hold off" << std::endl;
-		std::cout << "plot(Im(:,1),Im(:,2))" << std::endl;
-		std::cout << "hold on" << std::endl;
-		std::cout << "plot(Im(1,1),Im(1,2),'+','color','red')" << std::endl;
-		std::cout << "axis equal" << std::endl;
-		std::cout << "figure(2)" << std::endl;
-		std::cout << "hold off" << std::endl;
-		std::cout << "plot3(Pt3d(1,:),Pt3d(2,:),Pt3d(3,:))" << std::endl;
-		std::cout << "hold on" << std::endl;
-		std::cout << "plot3(Pt3d(1,1),Pt3d(2,1),Pt3d(3,1),'+','color','red')" << std::endl;
-		std::cout << "axis equal" << std::endl;
 		correct = true;
 	}
-    /*arGetTransMatMultiSquareRobust(m_ar3dhandle, m_arhandle->markerInfo, m_arhandle->marker_num, m_armulti);
-
-	matTr <<
-		m_armulti->trans[0][0], m_armulti->trans[0][1], m_armulti->trans[0][2], m_armulti->trans[0][3], 
-		m_armulti->trans[1][0], m_armulti->trans[1][1], m_armulti->trans[1][2], m_armulti->trans[1][3], 
-		m_armulti->trans[2][0], m_armulti->trans[2][1], m_armulti->trans[2][2], m_armulti->trans[2][3];*/
-
 	return correct;
 }
