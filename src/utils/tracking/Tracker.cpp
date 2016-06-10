@@ -258,21 +258,21 @@ bool tracking::Tracker::computeMulti()
 			m_armulti->marker[nummark].trans[2][3] = curTr.z;
 
 
-			m_armulti->marker[nummark].pos3d[0][0] = curTr.x + m_markersize*curVec2.x;
-			m_armulti->marker[nummark].pos3d[0][1] = curTr.y + m_markersize*curVec2.y;
-			m_armulti->marker[nummark].pos3d[0][2] = curTr.z + m_markersize*curVec2.z;
+			m_armulti->marker[nummark].pos3d[0][0] = curTr.x - m_markersize*curVec1.x/2.0 + m_markersize*curVec2.x/2.0;
+			m_armulti->marker[nummark].pos3d[0][1] = curTr.y - m_markersize*curVec1.y/2.0 + m_markersize*curVec2.y/2.0;
+			m_armulti->marker[nummark].pos3d[0][2] = curTr.z - m_markersize*curVec1.z/2.0 + m_markersize*curVec2.z/2.0;
 
-			m_armulti->marker[nummark].pos3d[1][0] = curTr.x + m_markersize*curVec1.x + m_markersize*curVec2.x;
-			m_armulti->marker[nummark].pos3d[1][1] = curTr.y + m_markersize*curVec1.y + m_markersize*curVec2.y;
-			m_armulti->marker[nummark].pos3d[1][2] = curTr.z + m_markersize*curVec1.z + m_markersize*curVec2.z;
+			m_armulti->marker[nummark].pos3d[1][0] = curTr.x + m_markersize*curVec1.x/2.0 + m_markersize*curVec2.x/2.0;
+			m_armulti->marker[nummark].pos3d[1][1] = curTr.y + m_markersize*curVec1.y/2.0 + m_markersize*curVec2.y/2.0;
+			m_armulti->marker[nummark].pos3d[1][2] = curTr.z + m_markersize*curVec1.z/2.0 + m_markersize*curVec2.z/2.0;
 			
-			m_armulti->marker[nummark].pos3d[2][0] = curTr.x + m_markersize*curVec1.x;
-			m_armulti->marker[nummark].pos3d[2][1] = curTr.y + m_markersize*curVec1.y;
-			m_armulti->marker[nummark].pos3d[2][2] = curTr.z + m_markersize*curVec1.z;
+			m_armulti->marker[nummark].pos3d[2][0] = curTr.x - m_markersize*curVec2.x/2.0 + m_markersize*curVec1.x/2.0;
+			m_armulti->marker[nummark].pos3d[2][1] = curTr.y - m_markersize*curVec2.y/2.0 + m_markersize*curVec1.y/2.0;
+			m_armulti->marker[nummark].pos3d[2][2] = curTr.z - m_markersize*curVec2.z/2.0 + m_markersize*curVec1.z/2.0;
 
-			m_armulti->marker[nummark].pos3d[3][0] = curTr.x;
-			m_armulti->marker[nummark].pos3d[3][1] = curTr.y;
-			m_armulti->marker[nummark].pos3d[3][2] = curTr.z;
+			m_armulti->marker[nummark].pos3d[3][0] = curTr.x - m_markersize*curVec1.x/2.0 - m_markersize*curVec2.x/2.0;
+			m_armulti->marker[nummark].pos3d[3][1] = curTr.y - m_markersize*curVec1.y/2.0 - m_markersize*curVec2.y/2.0;
+			m_armulti->marker[nummark].pos3d[3][2] = curTr.z - m_markersize*curVec1.z/2.0 - m_markersize*curVec2.z/2.0;
 			
 			std::cout << nummark << std::endl;
 			for(unsigned int i = 0; i < 4; i++)
