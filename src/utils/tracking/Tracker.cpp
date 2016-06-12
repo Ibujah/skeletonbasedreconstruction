@@ -130,10 +130,8 @@ int tracking::Tracker::detect(cv::Mat &img)
 					col = cv::Scalar(0,0,255);
 				cv::Point2i pt1(m_arhandle->markerInfo[i].vertex[ind1][0],m_arhandle->markerInfo[i].vertex[ind1][1]),
 							pt2(m_arhandle->markerInfo[i].vertex[ind2][0],m_arhandle->markerInfo[i].vertex[ind2][1]);
-				if(m_arhandle->markerInfo[i].cf > 0.5)
+				if(m_arhandle->markerInfo[i].cf > 0.7)
 					cv::line(img,pt1,pt2,col,2);
-				else
-					cv::line(img,pt1,pt2,cv::Scalar(0,0,255),2);
 			}
 		}
 	}
