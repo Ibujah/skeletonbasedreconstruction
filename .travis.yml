@@ -17,7 +17,14 @@ before_install:
   - wget http://sfml-dev.org/download/sfml/2.1/SFML-2.1-linux-gcc-64bits.tar.bz2 -O /tmp/sfml.tar.bz2 --no-check-certificate
   - tar -xjvf /tmp/sfml.tar.bz2
   - export SFML_ROOT=SFML-2.1/
-  #- sudo cp -r SFML-2.1/* /usr/
+  
+  # nlopt install
+  - git clone git://github.com/stevengj/nlopt
+  - cd nlopt
+  - sh autogen.sh
+  - make
+  - make install
+  - cd ..
   
 install:
   # g++4.9.1
