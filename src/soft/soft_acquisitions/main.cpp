@@ -48,6 +48,7 @@ int main(int argc, char** argv)
 	std::string fold;
 	unsigned int camID;
 	unsigned int nbmarkers;
+	double markersize;
 
 	boost::program_options::options_description desc("OPTIONS");
 	time_t tim = time(0);
@@ -66,6 +67,7 @@ int main(int argc, char** argv)
 		("camID", boost::program_options::value<unsigned int>(&camID)->default_value(1), "Camera number")
 		("fold", boost::program_options::value<std::string>(&fold)->default_value(ossdate.str()), "Folder to save acquisitions in")
 		("nbmarkers", boost::program_options::value<unsigned int>(&nbmarkers)->default_value(6), "Number of markers to detect")
+		("markersize", boost::program_options::value<double>(&markersize)->default_value(0.4), "Marker size")
 		;
 
 	boost::program_options::variables_map vm;
@@ -83,7 +85,7 @@ int main(int argc, char** argv)
 	
 
 	camera::Camera::Ptr cam = fileio::ReadCamera(camfile);
-	tracking::Tracker tracker(4,0.4);
+	tracking::Tracker tracker(nbmarkers,markersize);
 	tracker.init(cam);
 
 	cv::VideoCapture capture;
@@ -113,7 +115,7 @@ int main(int argc, char** argv)
         // detect the markers
 		tracker.detect(aff);
         
-		imshow(WINDOW_NAME , aff);
+		cv::imshow(WINDOW_NAME , aff);
 
 		char key;
 		if( (key=cv::waitKey( 10 )) >= 0)
@@ -134,10 +136,13 @@ int main(int argc, char** argv)
 			}
 		}
 	}
-
+	
+	cv::destroyWindow(WINDOW_NAME);
+	cv::waitKey(100);
+	
 	std::cout << "Success !! " << std::endl;
 
-	display3d::DisplayClass disclass("Acquisitions",cam->getIntrinsics()->getWidth(),cam->getIntrinsics()->getHeight());
+	display3d::DisplayClass disclass(WINDOW_NAME,cam->getIntrinsics()->getWidth(),cam->getIntrinsics()->getHeight());
 	display3d::DisplayFrame(disclass,mathtools::affine::Frame<3>::CanonicFrame());
 	disclass.setIntrinsics(cam->getIntrinsics());
 	
@@ -164,41 +169,46 @@ int main(int argc, char** argv)
 		bool correct = tracker.getCurrTr(matTr);
 		if(correct) disclass.setExtrinsics(matTr);
         
-		imshow(WINDOW_NAME , aff);
-		disclass.setBackground(view);
-		disclass.display();
+		disclass.setBackground(aff);
+		if(correct)
+			disclass.display();
+		else
+			disclass.display(std::list<unsigned int>());
 		
-		char key;
-		if( (key=cv::waitKey( 10 )) >= 0)
+		sf::Event event;
+		while(disclass.getWindow().pollEvent(event))
 		{
-			if((key == 'a' || key == 'A') && correct)
+			if(event.type == sf::Event::KeyPressed)
 			{
-				mathtools::affine::Frame<3>::Ptr frame_cur;
-				frame_cur = mathtools::affine::Frame<3>::CreateFrame(matTr.col(3),matTr.col(0),matTr.col(1),matTr.col(2));
-				camera::Extrinsics::Ptr extr(new camera::Extrinsics(frame_cur->getFrameInverse()));
-				camera::Camera::Ptr camimg(new camera::Camera(cam->getIntrinsics(),extr));
+				if(event.key.code == sf::Keyboard::A)
+				{
+					mathtools::affine::Frame<3>::Ptr frame_cur;
+					frame_cur = mathtools::affine::Frame<3>::CreateFrame(matTr.col(3),matTr.col(0),matTr.col(1),matTr.col(2));
+					camera::Extrinsics::Ptr extr(new camera::Extrinsics(frame_cur->getFrameInverse()));
+					camera::Camera::Ptr camimg(new camera::Camera(cam->getIntrinsics(),extr));
+					
+					std::ostringstream imgfname;
+					imgfname << fold << "img" << nimg << ".jpg";
+					std::ostringstream camfname;
+					camfname << fold << "cam" << nimg << ".xml";
+					cv::imwrite(imgfname.str(),view);
+					fileio::WriteCamera(camimg,camfname.str());
+					
+					std::cout << "Saved image at " << imgfname.str() << std::endl;
+					std::cout << "Saved camera at " << camfname.str() << std::endl;
+					nimg++;
+					
+					display3d::DisplayCamera(disclass,camimg);
+				}
 
-				std::ostringstream imgfname;
-				imgfname << fold << "img" << nimg << ".jpg";
-				std::ostringstream camfname;
-				camfname << fold << "cam" << nimg << ".xml";
-				cv::imwrite(imgfname.str(),aff);
-				fileio::WriteCamera(camimg,camfname.str());
-
-				std::cout << "Saved image at " << imgfname.str() << std::endl;
-				std::cout << "Saved camera at " << camfname.str() << std::endl;
-				nimg++;
-
-				display3d::DisplayCamera(disclass,camimg);
-			}
-			if(key=='q' || key=='Q')
-			{
-				fini = true;
+				if(event.key.code == sf::Keyboard::Q)
+				{
+					fini = true;
+				}
 			}
 		}
 	}
 	
-	cv::destroyWindow(WINDOW_NAME);
 
 	capture.release();
 
