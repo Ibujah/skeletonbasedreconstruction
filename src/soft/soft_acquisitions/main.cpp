@@ -138,7 +138,8 @@ int main(int argc, char** argv)
 	}
 	
 	cv::destroyWindow(WINDOW_NAME);
-	cv::waitKey(100);
+	cv::waitKey(1);
+	cv::waitKey(1);
 	
 	std::cout << "Success !! " << std::endl;
 
