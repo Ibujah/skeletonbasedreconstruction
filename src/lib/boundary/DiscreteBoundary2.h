@@ -33,6 +33,7 @@ SOFTWARE.
 #include <memory>
 #include <list>
 #include <map>
+#include <vector>
 #include <mathtools/affine/Frame.h>
 #include <mathtools/affine/Point.h>
 #include "DiscreteBoundary.h"
