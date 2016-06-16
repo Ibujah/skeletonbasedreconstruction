@@ -97,6 +97,10 @@ int main(int argc, char** argv)
 	const std::string WINDOW_NAME = "Images acquisition";
 	bool fini = false;
 
+	std::cout << "Markers calibration step" << std::endl;
+	std::cout << "Here you need to take some view with all " << nbmarkers << " visible (at least 3 acquisitions are needed)." << std::endl;
+	std::cout << "Please press 'A' to acquire an image, and press 'Q' to finish the calibration." << std::endl;
+
 	while(!fini)
 	{
         cv::Mat view;
@@ -142,6 +146,11 @@ int main(int argc, char** argv)
 	cv::waitKey(1);
 	
 	std::cout << "Success !! " << std::endl;
+
+	std::cout << "Acquisition step" << std::endl;
+	std::cout << "Here you need to take some images of the object, to reconstruct it with skeleton based approach." << std::endl;
+	std::cout << "You will need at least two viewpoints." << std::endl;
+	std::cout << "Please press 'A' to acquire an image, and press 'Q' to finish the acquisition." << std::endl;
 
 	display3d::DisplayClass disclass(WINDOW_NAME,cam->getIntrinsics()->getWidth(),cam->getIntrinsics()->getHeight());
 	display3d::DisplayFrame(disclass,mathtools::affine::Frame<3>::CanonicFrame());
