@@ -38,22 +38,25 @@ else (ARTOOLKIT5_INCLUDE_DIR AND ARTOOLKIT5_LIBRARIES)
 
 	else (WIN32)
 
+		message(STATUS "ARTOOLKIT5_ROOT: $ENV{ARTOOLKIT5_ROOT}")
 		FIND_PATH(
 			ARTOOLKIT5_DIR include/AR/ar.h
 			PATHS $ENV{ARTOOLKIT5_ROOT}/
 			DOC "The main directory of the ARTOOLKIT5 library, containing the subfolders include and lib" )
+		message(STATUS "Found ARTOOLKIT5: ${ARTOOLKIT5_DIR}")
 
 		if (ARTOOLKIT5_DIR)
 		FIND_PATH(ARTOOLKIT5_INCLUDE_DIR
 			AR/ar.h
 			PATHS $ENV{ARTOOLKIT5_ROOT}/include
 			/usr/include)
-		# message(STATUS "Found ARTOOLKIT5: ${ARTOOLKIT5_INCLUDE_DIR}")     
+		message(STATUS "Found ARTOOLKIT5_INCLUDE_DIR: ${ARTOOLKIT5_INCLUDE_DIR}")
 			FIND_LIBRARY(ARTOOLKIT5_LIBRARIES
 				NAME
 				libARWrapper.so
 				PATHS
 				${ARTOOLKIT5_DIR}/lib)
+		message(STATUS "Found ARTOOLKIT5_LIBRARIES: ${ARTOOLKIT5_LIBRARIES}")
 		endif (ARTOOLKIT5_DIR)
 		
 	endif (WIN32)

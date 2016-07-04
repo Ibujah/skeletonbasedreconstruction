@@ -31,6 +31,7 @@ before_install:
   - cd artoolkit5
   - tar -xvf /tmp/artoolkit.tar.gz
   - echo -e 'n\ny\ny\nn\nn\nn\nn\nn\n' | ./Configure
+  - ./share/artoolkit5-setenv
   - cd ..
 
   # glut install
@@ -49,7 +50,6 @@ install:
 
 script:
   - cd artoolkit5
-  - ./share/artoolkit5-setenv
   - cd lib/SRC
   - make 
   - cd ../../..
