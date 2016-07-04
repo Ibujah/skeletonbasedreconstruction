@@ -21,6 +21,7 @@ before_install:
   # nlopt install
   - git clone https://github.com/stevengj/nlopt.git
   - cd nlopt
+  - sh ./autogen.sh --no-configure
   - ./configure && make && sudo make install
   - cd ..
   
