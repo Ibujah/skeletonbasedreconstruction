@@ -46,7 +46,7 @@ install:
 script:
   - cd artoolkit5
   - cd lib/SRC
-  - cd ../../..
   - make 
+  - cd ../../..
   - mkdir build && cd build && cmake .. && make
   - cd ../bin && ok=true; for i in `echo test*`; do "./"$i; if [ $? -ne 0 ]; then ok=false; fi; done; $ok;
