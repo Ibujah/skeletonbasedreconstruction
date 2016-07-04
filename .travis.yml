@@ -33,6 +33,9 @@ before_install:
   - echo -e 'n\ny\ny\nn\nn\nn\nn\nn\n' | ./Configure
   - ./share/artoolkit5-setenv
   - cd ..
+
+  # glut install
+  - sudo apt-get install freeglut3-dev
   
 install:
   # g++4.9.1
@@ -47,8 +50,8 @@ install:
 
 script:
   - cd artoolkit5
-  - cd lib/SRC/ARWrapper
+  - cd lib/SRC
   - make 
-  - cd ../../../..
+  - cd ../../..
   - mkdir build && cd build && cmake .. && make
   - cd ../bin && ok=true; for i in `echo test*`; do "./"$i; if [ $? -ne 0 ]; then ok=false; fi; done; $ok;
