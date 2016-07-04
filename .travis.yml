@@ -19,9 +19,9 @@ before_install:
   - export SFML_ROOT=SFML-2.1/
   
   # nlopt install
-  - git clone https://github.com/stevengj/nlopt.git
-  - cd nlopt
-  - sh ./autogen.sh --no-configure
+  - wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2.tar.gz -O /tmp/nlopt.tar.gz --no-check-certificate
+  - tar -xjvf /tmp/nlopt.tar.gz
+  - cd nlopt-2.4.2
   - ./configure && make && sudo make install
   - cd ..
   
