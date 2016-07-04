@@ -158,7 +158,7 @@ namespace mathtools
 				 *  \param vec2   second basis vector
 				 *  \param vec3   third basis vector
 				 */
-				static const Ptr CreateFrame(const Eigen::Vector2d &origin, const Eigen::Vector2d &vec1, const Eigen::Vector2d &vec2, const Eigen::Vector2d &vec3)
+				static const Ptr CreateFrame(const Eigen::Vector3d &origin, const Eigen::Vector3d &vec1, const Eigen::Vector3d &vec2, const Eigen::Vector3d &vec3)
 				{
 					return Ptr(new Frame<Dim>(origin,vectorial::Basis<Dim>::CreateBasis(vec1,vec2,vec3)));
 				}

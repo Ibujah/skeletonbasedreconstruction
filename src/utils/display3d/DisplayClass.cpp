@@ -30,6 +30,8 @@ SOFTWARE.
 #define ZNEAR 0.01
 #define ZFAR 1000.
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 #include "DisplayClass.h"
 #include <camera/OrthoCam.h>
 #include <camera/PinHole.h>
@@ -144,6 +146,29 @@ void display3d::DisplayClass::setExtrinsics(const camera::Extrinsics::Ptr extrin
 	m_camrot = sf::Vector3f(0,0,0);
 }
 
+void display3d::DisplayClass::setExtrinsics(const Eigen::Matrix<double,3,4> &matext)
+{
+	m_window.setActive(true);
+	Eigen::Matrix4d trmat = Eigen::Matrix4d::Identity();
+ 	trmat.block<3,4>(0,0) = matext;
+
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity( );
+
+	GLfloat modelMatrix[16];
+	for(unsigned int i = 0; i<4; i++)
+	{
+		for(unsigned int j=0; j<4; j++)
+		{
+			modelMatrix[j*4+i] = trmat(i,j);
+		}
+	}
+	glMultMatrixf(modelMatrix);
+
+	m_campos = sf::Vector3f(0,0,0);
+	m_camrot = sf::Vector3f(0,0,0);
+}
+
 void display3d::DisplayClass::setExtrinsics()
 {
 	m_window.setActive(true);
@@ -168,6 +193,21 @@ void display3d::DisplayClass::setBackground(const sf::Image &bgimg)
 	m_bgimg.copy(bgimg,0,0,sf::IntRect(0,0,width,height));
 	m_usebg = true;
 }
+
+void display3d::DisplayClass::setBackground(const cv::Mat &bgimg)
+{
+	int height = bgimg.rows;
+	int width = bgimg.cols;
+	cv::Mat bgimgrgba;
+	cv::cvtColor(bgimg,bgimgrgba,cv::COLOR_BGR2RGBA);
+	sf::Image bgimginter;
+    bgimginter.create(width, height, bgimgrgba.ptr());
+	if(width>1024) width = 1024;
+	if(height>1024) height = 1024;
+	m_bgimg.copy(bgimginter,0,0,sf::IntRect(0,0,width,height));
+	m_usebg = true;
+}
+
 
 unsigned int display3d::DisplayClass::getNblists() const
 {

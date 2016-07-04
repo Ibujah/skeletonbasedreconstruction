@@ -20,3 +20,7 @@ Towards Skeleton Based Reconstruction: From Projective Skeletonization to Canal 
  * [SFML](http://www.sfml-dev.org/)
  * [Voro++](http://math.lbl.gov/voro++/) (already in 3rdparty)
  * [Nlopt](http://ab-initio.mit.edu/nlopt)
+
+## Facultative libraries
+
+ * [ARToolKit](http://www.artoolkit.org) (used in images acquisitions)

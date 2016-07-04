@@ -8,7 +8,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wno-enum-compare -Wno-deprecated-declarations")
 
 # Find the libraries
-find_package(Boost REQUIRED COMPONENTS unit_test_framework program_options)
+find_package(Boost REQUIRED COMPONENTS unit_test_framework program_options system filesystem)
 find_package(EIGEN REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(SFML 2 COMPONENTS system window graphics)
@@ -37,7 +37,7 @@ else()
 	message(STATUS "-- Found OpenGL" )
 endif(NOT OPENGL_FOUND)
 
-
+find_package(ARToolKit5)
 
 
 # Enable OpenMP
@@ -59,6 +59,8 @@ set(FILEIO_LIB     "FileIO")
 
 set(DISPLAYOCV_LIB "DisplayOCV")
 set(DISPLAY3D_LIB  "Display3D")
+
+set(TRACKING_LIB   "Tracking")
 
 include_directories(${EIGEN_INCLUDE_DIRS})
 
