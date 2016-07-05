@@ -10,8 +10,17 @@ before_install:
   - sudo apt-get update -qq
 
   # libraries install
-  - sudo apt-get install -y libjpeg62-dev libsndfile1-dev libglew1.5 libglew1.5-dev libfreetype6 libjpeg-turbo8 libjpeg8 libopenal-data libopenal1  libxrandr2 libxrender1 libsoil1 
-  - sudo apt-get install cmake libboost-all-dev libeigen3-dev libopencv-dev libcv-dev
+  - sudo apt-get install -y libjpeg62-dev libsndfile1-dev libglew1.5 libglew1.5-dev libfreetype6 libjpeg-turbo8 libjpeg8 libopenal-data libopenal1 libxrandr2 libxrender1 libsoil1
+  - sudo apt-get install cmake git libboost-all-dev libeigen3-dev
+
+  # opencv 3 install
+  - git clone https://github.com/Itseez/opencv.git
+  - cd opencv
+  - mkdir release
+  - cd release
+  - cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
+  - make -j8
+  - sudo make install
 
   # sfml install
   - wget http://sfml-dev.org/download/sfml/2.1/SFML-2.1-linux-gcc-64bits.tar.bz2 -O /tmp/sfml.tar.bz2 --no-check-certificate
