@@ -43,6 +43,11 @@ endif(NOT OPENGL_FOUND)
 
 find_package(ARToolKit5)
 
+if (ARTOOLKIT5_FOUND AND ${OpenCV_VERSION_MAJOR} VERSION_GREATER 3)
+	set(DO_TRACKER true)
+else ()
+	set(DO_TRACKER false)
+endif (ARTOOLKIT5_FOUND AND ${OpenCV_VERSION_MAJOR} VERSION_GREATER 3)
 
 # Enable OpenMP
 find_package(OpenMP)

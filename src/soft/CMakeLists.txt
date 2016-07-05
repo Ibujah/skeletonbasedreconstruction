@@ -1,5 +1,5 @@
 add_subdirectory(soft_skeletonreconstruction/)
 
-if (ARTOOLKIT5_FOUND)
+if (DO_TRACKER)
 	add_subdirectory(soft_acquisitions/)
-endif (ARTOOLKIT5_FOUND)
+endif (DO_TRACKER)
